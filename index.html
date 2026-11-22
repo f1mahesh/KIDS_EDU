@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="description" content="Fun interactive 3D HTML5 math learning game for kids: Addition, Subtraction, Multiplication, and Times Tables with offline PWA support." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MathCube 3D" />
+
+  <title>MathCube 3D — Kids Math Adventure</title>
+
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="confetti-layer" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <!-- Top Navigation / Status Bar -->
+    <header class="topbar">
+      <button id="btn-home" class="brand-btn" aria-label="Go to Home">
+        <span class="brand-cube" aria-hidden="true">🎲</span>
+        <span class="brand-title">MathCube <span class="badge-3d">3D</span></span>
+      </button>
+
+      <div class="topbar-stats">
+        <button id="btn-profile" class="profile-pill" title="Change Kid Profile">
+          <span id="profile-avatar">🦁</span>
+          <span id="profile-name">Kid</span>
+        </button>
+        <div class="stat-pill" title="Total Stars">
+          <span aria-hidden="true">⭐</span>
+          <span id="stat-stars">0</span>
+        </div>
+        <div class="stat-pill streak-pill" title="Current Streak">
+          <span aria-hidden="true">🔥</span>
+          <span id="stat-streak">0</span>
+        </div>
+        <button id="btn-sound" class="icon-btn" aria-label="Toggle Sound" title="Sound On/Off">
+          🔊
+        </button>
+        <button id="btn-voice" class="icon-btn" aria-label="Toggle Voice Read-Aloud" title="Voice Read-Aloud On/Off">
+          🗣️
+        </button>
+        <button id="btn-top-learn" class="icon-btn" aria-label="Learning Guides" title="Learning Guides">
+          📚
+        </button>
+        <button id="btn-install" class="install-btn hidden" aria-label="Install App">
+          📲 Install
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-stage">
+      <!-- VIEW: HOME -->
+      <section id="view-home" class="view active" aria-labelledby="home-heading">
+        <div class="hero-card">
+          <div class="hero-text">
+            <span class="rank-chip" id="home-rank">🌱 Number Sprout</span>
+            <h1 id="home-heading">Let's Play &amp; Learn Math!</h1>
+            <p>Spin 3D blocks, mix magic bubbles &amp; planets, and feed your buddy with stars!</p>
+            <div class="hero-cta-row">
+              <button id="btn-quick-play" class="cta-pulse-btn">🚀 Quick Play!</button>
+              <button class="cta-magic-btn" data-action="open-magic">🪄 Magic Mixer</button>
+            </div>
+          </div>
+          <div class="hero-3d-wrap">
+            <canvas id="hero-3d-canvas" width="260" height="200" aria-label="Interactive 3D Math Cubes"></canvas>
+            <span class="drag-hint">👆 Drag to spin 3D!</span>
+          </div>
+        </div>
+
+        <!-- Interactive Buddy Companion Strip -->
+        <div class="buddy-companion-card" id="buddy-companion-card">
+          <button id="btn-pet-buddy" class="pet-avatar-btn" title="Tap your buddy!" aria-label="Tap your buddy">
+            <span id="pet-emoji">🦁</span>
+            <span class="pet-hearts" id="pet-hearts">❤️ 0</span>
+          </button>
+          <div class="pet-speech-wrap">
+            <div class="pet-speech" id="pet-speech">Tap me! Earn 5 ⭐ to feed me a yummy treat!</div>
+          </div>
+          <button id="btn-feed-buddy" class="feed-btn">🧁 Treat (5⭐)</button>
+        </div>
+
+        <div class="mode-grid">
+          <button class="mode-card mode-add" data-action="start-setup" data-op="add">
+            <div class="mode-icon">➕</div>
+            <div class="mode-info">
+              <h2>Addition</h2>
+              <p>Combine 3D blocks &amp; add numbers</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-sub" data-action="start-setup" data-op="sub">
+            <div class="mode-icon">➖</div>
+            <div class="mode-info">
+              <h2>Subtraction</h2>
+              <p>Pop away cubes &amp; find what's left</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-mul" data-action="start-setup" data-op="mul">
+            <div class="mode-icon">✖️</div>
+            <div class="mode-info">
+              <h2>Multiplication</h2>
+              <p>Build 3D cube grids &amp; multiply</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-tables" data-action="open-tables">
+            <div class="mode-icon">🔢</div>
+            <div class="mode-info">
+              <h2>Times Tables</h2>
+              <p>3D flip flashcards &amp; table quiz (1–12)</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-arcade" data-action="start-arcade">
+            <div class="mode-icon">⚡</div>
+            <div class="mode-info">
+              <h2>60s Speed Blitz</h2>
+              <p>Race the clock for high scores!</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-magic" data-action="open-magic">
+            <div class="mode-icon">🪄</div>
+            <div class="mode-info">
+              <h2>Magic Mixer Lab</h2>
+              <p>Drag bubbles, planets &amp; fruits for magic math!</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-learn" data-action="open-learn">
+            <div class="mode-icon">📚</div>
+            <div class="mode-info">
+              <h2>Learn &amp; Guides</h2>
+              <p>Age-based math lessons &amp; tricks (4–10 yrs)</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-trophies" data-action="open-trophies">
+            <div class="mode-icon">📊</div>
+            <div class="mode-info">
+              <h2>Progress &amp; Trophies</h2>
+              <p>Score report, focus areas &amp; badges</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW: DIFFICULTY SETUP -->
+      <section id="view-setup" class="view" aria-labelledby="setup-title">
+        <div class="panel-card setup-card">
+          <div class="step-topbar">
+            <button class="back-btn" data-action="go-home">← Back</button>
+            <button id="btn-help-setup" class="help-pill-btn" aria-label="Help with levels">❓ Help</button>
+          </div>
+          <h2 id="setup-title">Choose Your Level</h2>
+          <p id="setup-subtitle" class="muted">Pick a difficulty that feels just right!</p>
+
+          <div class="level-grid">
+            <button class="level-btn level-easy" data-level="easy">
+              <span class="level-emoji">🐣</span>
+              <strong>Starter</strong>
+              <span class="level-desc" id="desc-easy">Numbers 1–10</span>
+            </button>
+            <button class="level-btn level-medium" data-level="medium">
+              <span class="level-emoji">🚀</span>
+              <strong>Explorer</strong>
+              <span class="level-desc" id="desc-medium">Numbers 1–20</span>
+            </button>
+            <button class="level-btn level-hard" data-level="hard">
+              <span class="level-emoji">👑</span>
+              <strong>Master</strong>
+              <span class="level-desc" id="desc-hard">Big Numbers</span>
+            </button>
+          </div>
+
+          <div class="setup-options">
+            <label class="toggle-chip">
+              <input type="checkbox" id="opt-mix" />
+              <span>🎲 Mix all operations (+, −, ×)</span>
+            </label>
+            <label class="toggle-chip">
+              <input type="checkbox" id="opt-keypad" />
+              <span>⌨️ Use Number Pad instead of choices</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: GAMEPLAY (QUEST & ARCADE) -->
+      <section id="view-play" class="view" aria-labelledby="question-text">
+        <div class="play-hud">
+          <button class="back-btn" data-action="go-home">✕ Quit</button>
+          <div class="progress-wrap" id="quest-progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill" id="quest-progress-fill"></div>
+            </div>
+            <span class="progress-label" id="quest-progress-label">1 / 10</span>
+          </div>
+          <div class="timer-pill hidden" id="arcade-timer-pill">
+            ⏱️ <span id="arcade-timer">60</span>s
+          </div>
+          <div class="score-pill">
+            🎯 <span id="play-score">0</span>
+          </div>
+        </div>
+
+        <div class="play-workspace">
+          <!-- Interactive 3D Visual Stage -->
+          <div class="stage-3d-card" id="stage-3d-card">
+            <div class="stage-3d-header">
+              <span class="stage-label">🧊 3D Math Blocks</span>
+              <div class="stage-controls">
+                <button id="btn-3d-hint" class="mini-btn" title="Animate 3D Solution">✨ Animate</button>
+                <button id="btn-3d-toggle" class="mini-btn" title="Hide or Show 3D Blocks">👁️ Hide</button>
+              </div>
+            </div>
+            <div class="canvas-wrap" id="play-canvas-wrap">
+              <canvas id="play-3d-canvas" width="520" height="240" aria-label="3D Math Manipulative Blocks"></canvas>
+              <div class="canvas-caption" id="canvas-caption">Drag to rotate • Tap Animate to see how it works!</div>
+            </div>
+          </div>
+
+          <!-- Question & Answer Area -->
+          <div class="question-card">
+            <div class="question-top-row">
+              <div class="question-badge" id="question-badge">Addition</div>
+              <div class="question-tools">
+                <button id="btn-speak-q" class="mini-btn" title="Read Question Aloud" aria-label="Read Question Aloud">🗣️ Read</button>
+                <button id="btn-step-hint" class="help-pill-btn" aria-label="Get a step-by-step hint" title="Stuck? Tap for a hint!">
+                  ❓ Hint
+                </button>
+              </div>
+            </div>
+            <div class="question-text" id="question-text">3 + 4 = ?</div>
+            <div class="hint-box hidden" id="hint-box" aria-live="polite">
+              <div class="hint-header">
+                <span id="hint-title">💡 Step-by-Step Hint</span>
+                <button id="btn-hint-more" class="mini-btn">Next Clue →</button>
+              </div>
+              <p id="hint-text" class="hint-text"></p>
+              <div id="hint-visual" class="hint-visual"></div>
+              <button id="btn-hint-lesson" class="mini-btn hint-lesson-btn">📖 Open Full Lesson</button>
+            </div>
+            <div class="feedback-banner" id="feedback-banner" aria-live="polite"></div>
+
+            <!-- Multiple Choice Grid -->
+            <div class="choices-grid" id="choices-grid"></div>
+
+            <!-- Optional Keypad -->
+            <div class="keypad-wrap hidden" id="keypad-wrap">
+              <div class="keypad-display" id="keypad-display">?</div>
+              <div class="keypad-grid">
+                <button class="key-btn" data-key="1">1</button>
+                <button class="key-btn" data-key="2">2</button>
+                <button class="key-btn" data-key="3">3</button>
+                <button class="key-btn" data-key="4">4</button>
+                <button class="key-btn" data-key="5">5</button>
+                <button class="key-btn" data-key="6">6</button>
+                <button class="key-btn" data-key="7">7</button>
+                <button class="key-btn" data-key="8">8</button>
+                <button class="key-btn" data-key="9">9</button>
+                <button class="key-btn key-clear" data-key="clear">⌫</button>
+                <button class="key-btn" data-key="0">0</button>
+                <button class="key-btn key-submit" data-key="submit">✔</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: ROUND SUMMARY -->
+      <section id="view-summary" class="view" aria-labelledby="summary-title">
+        <div class="panel-card summary-card">
+          <canvas id="summary-3d-canvas" width="220" height="170" aria-label="3D Trophy Star"></canvas>
+          <h2 id="summary-title">Awesome Job!</h2>
+          <p id="summary-subtitle" class="muted">You completed the Math Quest!</p>
+
+          <div class="summary-stats">
+            <div class="sum-box">
+              <span class="sum-val" id="sum-correct">0/10</span>
+              <span class="sum-lbl">Correct</span>
+            </div>
+            <div class="sum-box">
+              <span class="sum-val" id="sum-stars">+10 ⭐</span>
+              <span class="sum-lbl">Stars Earned</span>
+            </div>
+            <div class="sum-box">
+              <span class="sum-val" id="sum-best-streak">0 🔥</span>
+              <span class="sum-lbl">Best Streak</span>
+            </div>
+          </div>
+
+          <div class="summary-actions">
+            <button id="btn-play-again" class="primary-btn">🔄 Play Again</button>
+            <button class="secondary-btn" data-action="go-home">🏠 Home</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: TIMES TABLES PLAYGROUND -->
+      <section id="view-tables" class="view" aria-labelledby="tables-title">
+        <div class="panel-card tables-card">
+          <div class="tables-top">
+            <button class="back-btn" data-action="go-home">← Back</button>
+            <h2 id="tables-title">Times Tables Playground</h2>
+            <div class="tables-actions">
+              <button id="btn-help-tables" class="help-pill-btn">❓ Tricks</button>
+              <button id="btn-table-quiz" class="primary-btn small-btn">🎯 Quiz This Table</button>
+            </div>
+          </div>
+
+          <div class="table-selector" id="table-selector" role="tablist" aria-label="Select times table"></div>
+
+          <div class="tables-body">
+            <div class="flashcards-grid" id="flashcards-grid"></div>
+            <div class="table-3d-preview">
+              <h3>🧊 3D Array Explorer</h3>
+              <p class="muted" id="table-3d-desc">Tap any card to flip it and see its 3D cube grid!</p>
+              <canvas id="table-3d-canvas" width="320" height="220" aria-label="3D Times Table Array"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: PROGRESS REPORT & TROPHY ROOM -->
+      <section id="view-trophies" class="view" aria-labelledby="trophies-title">
+        <div class="panel-card trophies-card">
+          <div class="tables-top">
+            <button class="back-btn" data-action="go-home">← Back</button>
+            <h2 id="trophies-title">📊 Progress Report &amp; Trophies</h2>
+            <div class="tables-actions">
+              <button id="btn-copy-report" class="mini-btn">📋 Copy Report</button>
+              <button id="btn-reset-progress" class="mini-btn danger-btn">Reset</button>
+            </div>
+          </div>
+
+          <div class="report-kid-banner">
+            <div class="report-kid-info">
+              <span class="report-avatar" id="report-avatar">🦁</span>
+              <div>
+                <h3 id="report-kid-name">Math Explorer</h3>
+                <span class="muted" id="report-kid-rank">🌱 Number Sprout</span>
+              </div>
+            </div>
+            <button id="btn-switch-kid" class="secondary-btn small-btn">✏️ Change Name</button>
+          </div>
+
+          <div class="profile-summary">
+            <div class="sum-box">
+              <span class="sum-val" id="tr-stars">0</span>
+              <span class="sum-lbl">Total Stars</span>
+            </div>
+            <div class="sum-box">
+              <span class="sum-val" id="tr-solved">0</span>
+              <span class="sum-lbl">Solved</span>
+            </div>
+            <div class="sum-box">
+              <span class="sum-val" id="tr-accuracy">0%</span>
+              <span class="sum-lbl">Accuracy</span>
+            </div>
+            <div class="sum-box">
+              <span class="sum-val" id="tr-arcade">0</span>
+              <span class="sum-lbl">Blitz High Score</span>
+            </div>
+          </div>
+
+          <div class="insights-grid">
+            <div class="insight-card insight-good">
+              <h3>🌟 Doing Well</h3>
+              <ul id="report-strengths"></ul>
+            </div>
+            <div class="insight-card insight-focus">
+              <h3>🎯 Where to Focus</h3>
+              <ul id="report-focus"></ul>
+            </div>
+          </div>
+
+          <h3 class="badges-heading">📈 Topic Score Breakdown</h3>
+          <div class="topic-bars" id="topic-bars"></div>
+
+          <h3 class="badges-heading">🏆 Badges</h3>
+          <div class="badges-grid" id="badges-grid"></div>
+        </div>
+      </section>
+
+      <!-- VIEW: LEARNING MATERIALS (BY KIDS AGE) -->
+      <section id="view-learn" class="view" aria-labelledby="learn-title">
+        <div class="panel-card learn-card">
+          <div class="tables-top">
+            <button class="back-btn" data-action="go-home">← Back</button>
+            <h2 id="learn-title">📚 Kids Math Learning Guides</h2>
+            <span class="muted age-subtitle">Pick your age group!</span>
+          </div>
+
+          <div class="age-tabs" id="age-tabs" role="tablist" aria-label="Select age group">
+            <button class="age-tab active" data-age="4-6">🐣 Ages 4–6<br><small>Little Counters</small></button>
+            <button class="age-tab" data-age="6-8">🚀 Ages 6–8<br><small>Math Builders</small></button>
+            <button class="age-tab" data-age="8-10">👑 Ages 8–10<br><small>Times &amp; Tricks</small></button>
+          </div>
+
+          <div class="lessons-grid" id="lessons-grid"></div>
+        </div>
+      </section>
+
+      <!-- VIEW: MAGIC MIXER LAB -->
+      <section id="view-magic" class="view" aria-labelledby="magic-title">
+        <div class="panel-card magic-card">
+          <div class="tables-top">
+            <button class="back-btn" data-action="go-home">← Back</button>
+            <h2 id="magic-title">🪄 Magic Mixer Lab</h2>
+            <button id="btn-help-magic" class="help-pill-btn">❓ Help</button>
+          </div>
+
+          <div class="magic-toolbar">
+            <div class="magic-group" aria-label="Choose Theme">
+              <button class="magic-pill active" data-magic-theme="bubbles">🫧 Bubbles</button>
+              <button class="magic-pill" data-magic-theme="planets">🪐 Planets</button>
+              <button class="magic-pill" data-magic-theme="fruits">🍓 Fruits</button>
+            </div>
+            <div class="magic-group" aria-label="Choose Operation">
+              <button class="magic-pill active" data-magic-op="add">➕ Add</button>
+              <button class="magic-pill" data-magic-op="sub">➖ Sub</button>
+              <button class="magic-pill" data-magic-op="mul">✖️ Mul</button>
+            </div>
+            <div class="magic-group" aria-label="Choose Mode">
+              <button class="magic-pill active" data-magic-mode="challenge">🎯 Target</button>
+              <button class="magic-pill" data-magic-mode="free">🧪 Free Mix</button>
+            </div>
+          </div>
+
+          <div class="magic-target-banner" id="magic-target-banner">
+            <span id="magic-target-text">🎯 Drag 2 items to make <strong>10</strong>!</span>
+            <div class="magic-banner-right">
+              <span class="magic-streak-pill" id="magic-streak-pill">🪄 Streak: 0</span>
+              <button id="btn-magic-new" class="mini-btn">🔄 New Set</button>
+            </div>
+          </div>
+
+          <!-- Draggable Orbs Tray -->
+          <div class="magic-tray" id="magic-tray" aria-label="Draggable numbered items"></div>
+
+          <!-- Magic Cauldron / Portal Drop Zone -->
+          <div class="magic-portal" id="magic-portal">
+            <div class="magic-sparkles" id="magic-sparkles" aria-hidden="true"></div>
+            <div class="magic-portal-label" id="magic-portal-label">✨ Drag or tap 2 items — they auto-mix! (Tap slot to remove) ✨</div>
+
+            <div class="magic-slots">
+              <button type="button" class="magic-slot" id="magic-slot-a" title="Tap to remove">?</button>
+              <span class="magic-op-symbol" id="magic-op-symbol">➕</span>
+              <button type="button" class="magic-slot" id="magic-slot-b" title="Tap to remove">?</button>
+              <span class="magic-eq-symbol">=</span>
+              <div class="magic-result-orb" id="magic-result-orb">✨</div>
+            </div>
+
+            <div class="magic-visual-parade" id="magic-visual-parade"></div>
+
+            <div class="magic-portal-actions">
+              <button id="btn-magic-mix" class="primary-btn magic-mix-btn" disabled>🪄 Mix Magic!</button>
+              <button id="btn-magic-clear" class="secondary-btn small-btn">🧹 Clear</button>
+            </div>
+
+            <div class="magic-feedback" id="magic-feedback" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CONTEXTUAL HELP MODAL -->
+  <div id="help-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="help-modal-title">❓ Quick Help</h3>
+        <button id="btn-close-help" class="icon-btn" aria-label="Close Help">✕</button>
+      </div>
+      <div id="help-modal-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button id="btn-modal-learn" class="secondary-btn small-btn">📚 Open Learning Guides</button>
+        <button id="btn-modal-ok" class="primary-btn small-btn">Got It!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KID NAME & AVATAR MODAL -->
+  <div id="name-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="name-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="name-modal-title">👋 Welcome! What's your name?</h3>
+        <button id="btn-close-name" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="muted" style="margin-top:0">We save your stars, scores, and progress report right on this device!</p>
+        <label class="input-label" for="kid-name-input">Kid's Name</label>
+        <input id="kid-name-input" class="kid-input" type="text" maxlength="20" placeholder="Enter name (e.g. Maya)" autocomplete="given-name" />
+
+        <div class="avatar-picker-label">Pick Your Buddy</div>
+        <div class="avatar-picker" id="avatar-picker">
+          <button type="button" class="avatar-opt active" data-avatar="🦁">🦁</button>
+          <button type="button" class="avatar-opt" data-avatar="🐼">🐼</button>
+          <button type="button" class="avatar-opt" data-avatar="🦊">🦊</button>
+          <button type="button" class="avatar-opt" data-avatar="🐸">🐸</button>
+          <button type="button" class="avatar-opt" data-avatar="🦄">🦄</button>
+          <button type="button" class="avatar-opt" data-avatar="🤖">🤖</button>
+        </div>
+
+        <div id="saved-profiles-wrap" class="saved-profiles-wrap hidden">
+          <div class="avatar-picker-label">Switch Saved Profile</div>
+          <div id="saved-profiles-list" class="saved-profiles-list"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-save-name" class="primary-btn small-btn">Let's Play! 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./audio.js"></script>
+  <script src="./math3d.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
