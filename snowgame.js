@@ -43,6 +43,7 @@
 
       this.op = 'add';
       this.speed = 'slow';
+      this.theme = 'snow-num';
       this.score = 0;
       this.combo = 1;
       this.stars = 0;
@@ -155,14 +156,27 @@
       const preset = SPEED_PRESETS[this.speed];
       this.fallingSnowballs = [];
       this._spawnWave();
-      this.onStatus(`Snow Flow: ${preset.label} — Hold 2 snow numbers, then 👏 CLAP!`);
+      this.onStatus(`Snow Flow: ${preset.label} — Hold 2 items, then 👏 CLAP!`);
     }
 
-    async start(op = 'add', speedKey = this.speed) {
+    setTheme(themeKey) {
+      const valid = ['snow-num', 'snowflake', 'apple', 'star'];
+      this.theme = valid.includes(themeKey) ? themeKey : 'snow-num';
+      const names = {
+        'snow-num': '🧊 Snow Numbers',
+        snowflake: '❄️ Real Snowflakes',
+        apple: '🍎 Juicy Apples',
+        star: '🌟 Magic Stars'
+      };
+      this.onStatus(`Switched to ${names[this.theme]}! Catch 2 in your palms & 👏 CLAP!`);
+    }
+
+    async start(op = 'add', speedKey = this.speed, themeKey = this.theme) {
       this.stop();
       this._syncCanvasSize();
       this.op = op;
       this.speed = SPEED_PRESETS[speedKey] ? speedKey : 'slow';
+      this.theme = ['snow-num', 'snowflake', 'apple', 'star'].includes(themeKey) ? themeKey : 'snow-num';
       const preset = SPEED_PRESETS[this.speed];
       this.score = 0;
       this.combo = 1;
@@ -238,8 +252,14 @@
         }
         const src = this.audioCtx.createMediaStreamSource(stream);
         this.analyser = this.audioCtx.createAnalyser();
-        this.analyser.fftSize = 256;
+        this.analyser.fftSize = 512;
+        // Connect through a muted GainNode(0) to destination — REQUIRED on iOS Safari so AnalyserNode pulls samples!
+        const silentGain = this.audioCtx.createGain();
+        silentGain.gain.value = 0;
         src.connect(this.analyser);
+        this.analyser.connect(silentGain);
+        silentGain.connect(this.audioCtx.destination);
+
         this.audioBuf = new Uint8Array(this.analyser.fftSize);
         this.hasMic = true;
       } catch (_) {
@@ -255,10 +275,10 @@
         return;
       }
       try {
-        // Disable noiseSuppression/echoCancellation so iOS & Android keep sharp clap sounds!
+        // Use simple audio: true (most reliable across iOS Safari, Android Chrome & Desktop)
         this.stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true }
+          audio: true
         });
         this._setupMic(this.stream);
       } catch (_) {
@@ -349,6 +369,12 @@
         return;
       }
 
+      const bothHeld = this.heldLeft !== null && this.heldRight !== null;
+      const yStart = Math.round(mh * 0.34); // Skip upper face/head region so head movement doesn't shake palms
+      const yEnd = Math.round(mh * 0.88);
+      const leftBound = bothHeld ? mw * 0.56 : mw * 0.44;
+      const rightBound = bothHeld ? mw * 0.44 : mw * 0.56;
+
       let leftSum = 0;
       let leftX = 0;
       let leftY = 0;
@@ -357,25 +383,25 @@
       let rightX = 0;
       let rightY = 0;
 
-      for (let y = 8; y < mh - 4; y++) {
+      for (let y = yStart; y < yEnd; y++) {
         for (let x = 0; x < mw; x++) {
           const idx = (y * mw + x) * 4;
           const diff =
             Math.abs(data[idx] - this.prevFrame[idx]) +
             Math.abs(data[idx + 1] - this.prevFrame[idx + 1]) +
             Math.abs(data[idx + 2] - this.prevFrame[idx + 2]);
-          if (diff > 65) {
-            if (x < mw * 0.44) {
+          if (diff > 62) {
+            if (x < leftBound) {
               leftSum++;
               leftX += x;
               leftY += y;
             }
-            if (x > mw * 0.56) {
+            if (x > rightBound) {
               rightSum++;
               rightX += x;
               rightY += y;
             }
-            if (x >= mw * 0.32 && x <= mw * 0.68) {
+            if (x >= mw * 0.32 && x <= mw * 0.68 && diff > 72) {
               centerSum++;
             }
           }
@@ -387,16 +413,15 @@
 
       const w = this.canvas.width;
       const h = this.canvas.height;
-      const bothHeld = this.heldLeft !== null && this.heldRight !== null;
-      const minMotionPixels = Math.max(16, Math.round((mw * mh) * 0.004));
+      const minMotionPixels = Math.max(14, Math.round((mw * mh) * 0.0035));
 
       if (leftSum > minMotionPixels) {
         const rawX = (leftX / leftSum / mw) * w;
         const rawY = (leftY / leftSum / mh) * h;
         const tx = Math.max(w * 0.12, Math.min(bothHeld ? w * 0.54 : w * 0.44, rawX));
-        const ty = Math.max(h * 0.34, Math.min(h - 125, rawY));
-        this.leftHand.x += (tx - this.leftHand.x) * 0.24;
-        this.leftHand.y += (ty - this.leftHand.y) * 0.24;
+        const ty = Math.max(h * 0.36, Math.min(h - 125, rawY));
+        this.leftHand.x += (tx - this.leftHand.x) * 0.25;
+        this.leftHand.y += (ty - this.leftHand.y) * 0.25;
         this.leftHand.active = true;
       } else {
         this.leftHand.active = false;
@@ -406,9 +431,9 @@
         const rawX = (rightX / rightSum / mw) * w;
         const rawY = (rightY / rightSum / mh) * h;
         const tx = Math.max(bothHeld ? w * 0.46 : w * 0.56, Math.min(w * 0.88, rawX));
-        const ty = Math.max(h * 0.34, Math.min(h - 125, rawY));
-        this.rightHand.x += (tx - this.rightHand.x) * 0.24;
-        this.rightHand.y += (ty - this.rightHand.y) * 0.24;
+        const ty = Math.max(h * 0.36, Math.min(h - 125, rawY));
+        this.rightHand.x += (tx - this.rightHand.x) * 0.25;
+        this.rightHand.y += (ty - this.rightHand.y) * 0.25;
         this.rightHand.active = true;
       } else {
         this.rightHand.active = false;
@@ -427,15 +452,15 @@
         const amp = Math.abs(this.audioBuf[i] - 128) / 128;
         if (amp > peak) peak = amp;
       }
-      if (peak > 0.002) {
+      if (peak > 0.0015) {
         this.micLiveSignal = true;
       }
       this.micLevel = peak;
-      this.avgNoise = this.avgNoise * 0.92 + peak * 0.08;
+      this.avgNoise = this.avgNoise * 0.90 + peak * 0.10;
 
-      // A clap creates a sharp short transient louder than steady talking/background noise
-      if (peak > 0.14 && peak > this.avgNoise * 1.85) {
-        this.clapSoundWindow = 24;
+      // Crisp clap spike detection tuned for iPhone, Android, and Laptop mics
+      if (peak > 0.09 && peak > this.avgNoise * 1.65) {
+        this.clapSoundWindow = 26;
       } else if (this.clapSoundWindow > 0) {
         this.clapSoundWindow -= 1;
       }
@@ -614,9 +639,9 @@
           this.catchGrace === 0
         ) {
           const palmDist = Math.hypot(this.leftHand.x - this.rightHand.x, this.leftHand.y - this.rightHand.y);
-          const apartDist = w * 0.34;
-          const closeDist = w * 0.26;
-          const centerBurstMin = Math.max(34, Math.round((this.motionCanvas.width * this.motionCanvas.height) * 0.009));
+          const apartDist = w * 0.30;
+          const closeDist = w * 0.28;
+          const centerBurstMin = Math.max(24, Math.round((this.motionCanvas.width * this.motionCanvas.height) * 0.007));
 
           if (palmDist > apartDist) {
             this.handsWereApart = true;
@@ -630,15 +655,13 @@
 
           const micWorking = this.hasMic && this.micLiveSignal && this.audioCtx && this.audioCtx.state === 'running';
           if (micWorking) {
-            // When mic is truly streaming audio: accept clap sound + visual clap OR strong unmistakable palm collision
             const soundClap = this.clapSoundWindow > 0;
-            const visualAction = palmDist < w * 0.36 || this.motionGrid.center > centerBurstMin;
-            if (soundClap && visualAction) {
+            const visualAction = palmDist < w * 0.48 || this.motionGrid.center > centerBurstMin * 0.6;
+            if ((soundClap && visualAction) || (gestureClap && this.motionGrid.center > centerBurstMin * 1.4)) {
               this.clapSoundWindow = 0;
               this.triggerClap();
             }
           } else if (gestureClap) {
-            // Fallback for iOS Safari / muted mic: trigger cleanly when hands come together from apart
             this.triggerClap();
           }
         }
@@ -763,6 +786,185 @@
       ctx.restore();
     }
 
+    _drawSnowflakeWithNumber(x, y, size, label, glowColor = '#7dd3fc') {
+      const ctx = this.ctx;
+      const r = size * 0.78;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.shadowColor = glowColor;
+      ctx.shadowBlur = 16;
+
+      // Rotate gently
+      ctx.save();
+      ctx.rotate(this.tick * 0.015);
+      ctx.strokeStyle = '#e0f2fe';
+      ctx.lineCap = 'round';
+      ctx.lineWidth = Math.max(2.5, r * 0.09);
+
+      // 6 dendritic crystal arms with side branches
+      for (let a = 0; a < 6; a++) {
+        ctx.save();
+        ctx.rotate((Math.PI / 3) * a);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -r);
+        // Side branches
+        ctx.moveTo(0, -r * 0.45);
+        ctx.lineTo(-r * 0.24, -r * 0.65);
+        ctx.moveTo(0, -r * 0.45);
+        ctx.lineTo(r * 0.24, -r * 0.65);
+        ctx.moveTo(0, -r * 0.72);
+        ctx.lineTo(-r * 0.16, -r * 0.88);
+        ctx.moveTo(0, -r * 0.72);
+        ctx.lineTo(r * 0.16, -r * 0.88);
+        ctx.stroke();
+
+        // Tiny crystal tip
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, -r, Math.max(2, r * 0.08), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // Frosted hexagonal center medallion holding the number
+      const medR = r * 0.56;
+      const grad = ctx.createRadialGradient(0, -medR * 0.3, medR * 0.1, 0, 0, medR);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(1, '#7dd3fc');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, medR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#0c4a6e';
+      ctx.font = `900 ${Math.round(size * 0.56)}px system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(label), 0, 2);
+      ctx.restore();
+    }
+
+    _drawAppleWithNumber(x, y, size, label, glowColor = '#f87171', isGolden = false) {
+      const ctx = this.ctx;
+      const r = size * 0.68;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.shadowColor = isGolden ? '#fde047' : glowColor;
+      ctx.shadowBlur = 16;
+
+      // Brown curved stem
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = Math.max(3, r * 0.12);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, -r * 0.72);
+      ctx.quadraticCurveTo(r * 0.12, -r * 1.15, r * 0.28, -r * 1.18);
+      ctx.stroke();
+
+      // Fresh green leaf
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.ellipse(r * 0.34, -r * 0.92, r * 0.28, r * 0.14, -0.45, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Plump Apple Body (two overlapping curves)
+      const grad = ctx.createRadialGradient(-r * 0.28, -r * 0.28, r * 0.12, 0, 0, r * 1.1);
+      if (isGolden) {
+        grad.addColorStop(0, '#fef9c3');
+        grad.addColorStop(0.5, '#fbbf24');
+        grad.addColorStop(1, '#b45309');
+      } else {
+        grad.addColorStop(0, '#fecaca');
+        grad.addColorStop(0.42, '#ef4444');
+        grad.addColorStop(1, '#991b1b');
+      }
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(0, -r * 0.72);
+      ctx.bezierCurveTo(r * 0.85, -r * 1.05, r * 1.15, r * 0.25, r * 0.42, r * 0.88);
+      ctx.quadraticCurveTo(0, r * 1.05, -r * 0.42, r * 0.88);
+      ctx.bezierCurveTo(-r * 1.15, r * 0.25, -r * 0.85, -r * 1.05, 0, -r * 0.72);
+      ctx.closePath();
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = isGolden ? '#fef08a' : '#fecaca';
+      ctx.stroke();
+
+      // Glossy shine
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
+      ctx.beginPath();
+      ctx.ellipse(-r * 0.36, -r * 0.22, r * 0.14, r * 0.28, 0.35, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bold Number on the Apple
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#450a0a';
+      ctx.lineWidth = Math.max(3, size * 0.08);
+      ctx.font = `900 ${Math.round(size * 0.58)}px system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.strokeText(String(label), 0, r * 0.08);
+      ctx.fillText(String(label), 0, r * 0.08);
+      ctx.restore();
+    }
+
+    _drawStarWithNumber(x, y, size, label, glowColor = '#fde047') {
+      const ctx = this.ctx;
+      const outer = size * 0.78;
+      const inner = size * 0.40;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.shadowColor = glowColor;
+      ctx.shadowBlur = 18;
+
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const rad = i % 2 === 0 ? outer : inner;
+        const ang = -Math.PI / 2 + (Math.PI * i) / 5;
+        const px = Math.cos(ang) * rad;
+        const py = Math.sin(ang) * rad;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      const grad = ctx.createRadialGradient(0, -outer * 0.2, inner * 0.1, 0, 0, outer);
+      grad.addColorStop(0, '#fef9c3');
+      grad.addColorStop(0.55, '#fbbf24');
+      grad.addColorStop(1, '#d97706');
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#451a03';
+      ctx.font = `900 ${Math.round(size * 0.52)}px system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(label), 0, 3);
+      ctx.restore();
+    }
+
+    _drawThemedItem(x, y, size, label, glowColor, isResult = false) {
+      if (this.theme === 'snowflake') {
+        this._drawSnowflakeWithNumber(x, y, size, label, glowColor);
+      } else if (this.theme === 'apple') {
+        this._drawAppleWithNumber(x, y, size, label, glowColor, isResult);
+      } else if (this.theme === 'star') {
+        this._drawStarWithNumber(x, y, size, label, glowColor);
+      } else {
+        this._drawSnowNumber(x, y, size, label, glowColor);
+      }
+    }
+
     _render() {
       const ctx = this.ctx;
       const w = this.canvas.width;
@@ -805,9 +1007,9 @@
       ctx.fillText('OPEN LEFT PALM', lx, ly + 52);
       ctx.fillText('OPEN RIGHT PALM', rx, ry + 52);
 
-      // Falling Snow-Shaped Numbers
+      // Falling Themed Numbers (Snow Digits / Real Snowflakes / Apples / Stars)
       for (const sb of this.fallingSnowballs) {
-        this._drawSnowNumber(sb.x, sb.y, sb.fontSize || 48, sb.val, sb.side === 'left' ? '#38bdf8' : '#f472b6');
+        this._drawThemedItem(sb.x, sb.y, sb.fontSize || 48, sb.val, sb.side === 'left' ? '#38bdf8' : '#f472b6', false);
       }
 
       // Live Mic Clap Sound Indicator (positioned below top scoreboard)
@@ -824,15 +1026,15 @@
         ctx.restore();
       }
 
-      // Snow-Shaped Numbers resting inside each Open Palm!
+      // Held Numbers resting inside each Open Palm!
       if (this.heldLeft !== null) {
-        this._drawSnowNumber(lx, ly - 16, 58, this.heldLeft, '#34d399');
+        this._drawThemedItem(lx, ly - 16, 56, this.heldLeft, '#34d399', false);
       }
       if (this.heldRight !== null) {
-        this._drawSnowNumber(rx, ry - 16, 58, this.heldRight, '#34d399');
+        this._drawThemedItem(rx, ry - 16, 56, this.heldRight, '#34d399', false);
       }
 
-      // Prompt when both open palms are holding snow numbers
+      // Prompt when both open palms are holding numbers
       if (this.heldLeft !== null && this.heldRight !== null && !this.bigSnow) {
         const opSym = this.op === 'add' ? '+' : this.op === 'sub' ? '−' : '×';
         ctx.save();
@@ -850,16 +1052,17 @@
         ctx.restore();
       }
 
-      // Giant Snow-Shaped Result Number when clapped!
+      // Giant Themed Result when clapped!
       if (this.bigSnow) {
         const cx = w / 2;
         const cy = h / 2;
-        const fontSize = 148 * this.bigSnow.scale;
-        this._drawSnowNumber(cx, cy + 12, fontSize, this.bigSnow.result, '#fde047');
+        const size = 148 * this.bigSnow.scale;
+        this._drawThemedItem(cx, cy + 12, size, this.bigSnow.result, '#fde047', true);
+        const resIcon = this.theme === 'apple' ? '🍎' : this.theme === 'star' ? '🌟' : '❄️';
         ctx.fillStyle = '#fde047';
         ctx.font = '900 22px system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`❄️ ${this.bigSnow.expr} = ${this.bigSnow.result}! ❄️`, cx, cy - fontSize * 0.65);
+        ctx.fillText(`${resIcon} ${this.bigSnow.expr} = ${this.bigSnow.result}! ${resIcon}`, cx, cy - size * 0.65);
       }
 
       // Explosion snow crystals

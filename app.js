@@ -1028,6 +1028,7 @@
   // ==========================================
   let snowOp = 'add';
   let snowSpeed = 'slow';
+  let snowTheme = 'snow-num';
 
   function initSnowGame() {
     if (snowGame) return snowGame;
@@ -1082,7 +1083,7 @@
     $('snow-right-readout').textContent = 'Right: -- 🤚';
     $('btn-snow-clap').disabled = true;
     showView('snow');
-    game.start(snowOp, snowSpeed);
+    game.start(snowOp, snowSpeed, snowTheme);
   }
 
   document.querySelector('[data-action="open-snow"]').addEventListener('click', openSnowArcade);
@@ -1095,7 +1096,7 @@
   });
   $('btn-snow-restart').addEventListener('click', () => {
     MathAudio.pop();
-    if (snowGame) snowGame.start(snowOp, snowSpeed);
+    if (snowGame) snowGame.start(snowOp, snowSpeed, snowTheme);
   });
   document.querySelectorAll('[data-snow-op]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1111,6 +1112,14 @@
       document.querySelectorAll('[data-snow-speed]').forEach((b) => b.classList.toggle('active', b === btn));
       MathAudio.pop();
       if (snowGame) snowGame.setSpeed(snowSpeed);
+    });
+  });
+  document.querySelectorAll('[data-snow-theme]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      snowTheme = btn.dataset.snowTheme;
+      document.querySelectorAll('[data-snow-theme]').forEach((b) => b.classList.toggle('active', b === btn));
+      MathAudio.pop();
+      if (snowGame) snowGame.setTheme(snowTheme);
     });
   });
 
@@ -1211,6 +1220,7 @@
   // ROCK BLASTER AR (Fist & Kick Action Game)
   // ==========================================
   let rockSpeed = 'slow';
+  let rockPack = 'mix';
 
   function initRockGame() {
     if (rockGame) return rockGame;
@@ -1254,7 +1264,7 @@
     $('rock-timer').textContent = rockSpeed === 'slow' ? '90' : '60';
     $('rock-best').textContent = profile.rockBest || 0;
     showView('rock');
-    game.start(rockSpeed);
+    game.start(rockSpeed, rockPack);
   }
 
   document.querySelector('[data-action="open-rock"]').addEventListener('click', openRockArcade);
@@ -1264,7 +1274,7 @@
   });
   $('btn-rock-restart').addEventListener('click', () => {
     MathAudio.pop();
-    if (rockGame) rockGame.start(rockSpeed);
+    if (rockGame) rockGame.start(rockSpeed, rockPack);
   });
   $('btn-rock-cam').addEventListener('click', () => {
     if (!rockGame) return;
@@ -1278,6 +1288,14 @@
       document.querySelectorAll('[data-rock-speed]').forEach((b) => b.classList.toggle('active', b === btn));
       MathAudio.pop();
       if (rockGame) rockGame.setSpeed(rockSpeed);
+    });
+  });
+  document.querySelectorAll('[data-rock-pack]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      rockPack = btn.dataset.rockPack;
+      document.querySelectorAll('[data-rock-pack]').forEach((b) => b.classList.toggle('active', b === btn));
+      MathAudio.pop();
+      if (rockGame) rockGame.setPack(rockPack);
     });
   });
 

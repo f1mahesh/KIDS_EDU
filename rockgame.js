@@ -7,13 +7,29 @@
   };
 
   const TARGET_VARIETIES = [
-    { type: 'rock',     pts: [10, 20, 25], shardColors: ['#94a3b8', '#64748b'], glow: '#94a3b8', r: 48 },
-    { type: 'lava',     pts: [30, 50],     shardColors: ['#ef4444', '#f97316'], glow: '#f97316', r: 52 },
-    { type: 'snow',     pts: [15, 25],     shardColors: ['#ffffff', '#bae6fd'], glow: '#38bdf8', r: 48 },
-    { type: 'ornament', pts: [40, 50],     shardColors: ['#ef4444', '#22c55e', '#fde047'], glow: '#fde047', r: 50 },
-    { type: 'crystal',  pts: [75, 100],    shardColors: ['#c084fc', '#38bdf8', '#fde047'], glow: '#c084fc', r: 54 },
-    { type: 'candy',    pts: [20, 35],     shardColors: ['#fb7185', '#fde047'], glow: '#f472b6', r: 48 }
+    { type: 'rock',       pts: [10, 20, 25], shardColors: ['#94a3b8', '#64748b'], glow: '#94a3b8', r: 48 },
+    { type: 'lava',       pts: [30, 50],     shardColors: ['#ef4444', '#f97316'], glow: '#f97316', r: 52 },
+    { type: 'snow',       pts: [15, 25],     shardColors: ['#ffffff', '#bae6fd'], glow: '#38bdf8', r: 48 },
+    { type: 'snowflake',  pts: [25, 40],     shardColors: ['#ffffff', '#7dd3fc'], glow: '#7dd3fc', r: 52 },
+    { type: 'ornament',   pts: [40, 50],     shardColors: ['#ef4444', '#22c55e', '#fde047'], glow: '#fde047', r: 50 },
+    { type: 'crystal',    pts: [75, 100],    shardColors: ['#c084fc', '#38bdf8', '#fde047'], glow: '#c084fc', r: 54 },
+    { type: 'planet',     pts: [50, 75],     shardColors: ['#fde047', '#a855f7', '#38bdf8'], glow: '#a855f7', r: 52 },
+    { type: 'bubble',     pts: [15, 30],     shardColors: ['#bae6fd', '#f472b6', '#ffffff'], glow: '#38bdf8', r: 50 },
+    { type: 'watermelon', pts: [35, 50],     shardColors: ['#22c55e', '#ef4444', '#14532d'], glow: '#22c55e', r: 52 },
+    { type: 'apple',      pts: [20, 30],     shardColors: ['#ef4444', '#22c55e'], glow: '#ef4444', r: 48 },
+    { type: 'orange',     pts: [20, 30],     shardColors: ['#fb923c', '#fde047'], glow: '#f97316', r: 48 },
+    { type: 'strawberry', pts: [25, 40],     shardColors: ['#fb7185', '#22c55e', '#fde047'], glow: '#f43f5e', r: 48 },
+    { type: 'candy',      pts: [20, 35],     shardColors: ['#fb7185', '#fde047'], glow: '#f472b6', r: 48 }
   ];
+
+  const PACK_TYPES = {
+    mix:     null, // all varieties!
+    rocks:   ['rock', 'lava', 'crystal'],
+    planets: ['planet', 'crystal', 'lava'],
+    bubbles: ['bubble', 'crystal', 'snow'],
+    snow:    ['snow', 'snowflake', 'ornament'],
+    fruits:  ['watermelon', 'apple', 'orange', 'strawberry', 'candy']
+  };
 
   const HAZARD_VARIETY = {
     type: 'hazard',
@@ -49,6 +65,7 @@
       this.timerId = null;
 
       this.speed = 'slow';
+      this.pack = 'mix';
       this.score = 0;
       this.blasted = 0;
       this.timeLeft = 90;
@@ -141,10 +158,26 @@
       this.onStatus(`🥊 ${preset.label} — Punch & Kick HARD to blast one target at a time!`);
     }
 
-    async start(speedKey = this.speed) {
+    setPack(packKey) {
+      this.pack = Object.prototype.hasOwnProperty.call(PACK_TYPES, packKey) ? packKey : 'mix';
+      this.rocks = [];
+      this._ensureRocks();
+      const labels = {
+        mix: '🎲 Mix All',
+        rocks: '🪨 Rocks & Lava',
+        planets: '🪐 Space Planets',
+        bubbles: '🫧 Magic Bubbles',
+        snow: '❄️ Snow & Flakes',
+        fruits: '🍉 Juicy Fruits'
+      };
+      this.onStatus(`Pack: ${labels[this.pack]} — Punch & Kick HARD, skip negative numbers!`);
+    }
+
+    async start(speedKey = this.speed, packKey = this.pack) {
       this.stop();
       this._syncCanvasSize();
       this.speed = ROCK_SPEED_PRESETS[speedKey] ? speedKey : 'slow';
+      this.pack = Object.prototype.hasOwnProperty.call(PACK_TYPES, packKey) ? packKey : 'mix';
       const preset = ROCK_SPEED_PRESETS[this.speed];
 
       this.score = 0;
@@ -238,14 +271,18 @@
     _ensureRocks() {
       const preset = ROCK_SPEED_PRESETS[this.speed] || ROCK_SPEED_PRESETS.slow;
       const w = this.canvas.width;
+      const allowed = PACK_TYPES[this.pack];
+      const pool = allowed
+        ? TARGET_VARIETIES.filter((v) => allowed.includes(v.type))
+        : TARGET_VARIETIES;
 
       let guard = 0;
       while (this.rocks.length < preset.maxRocks && guard < 30) {
         guard++;
-        const isHazard = Math.random() < 0.28;
+        const isHazard = Math.random() < 0.25;
         const variety = isHazard
           ? HAZARD_VARIETY
-          : TARGET_VARIETIES[Math.floor(Math.random() * TARGET_VARIETIES.length)];
+          : pool[Math.floor(Math.random() * pool.length)];
         const pts = variety.pts[Math.floor(Math.random() * variety.pts.length)];
         const r = variety.r;
         const x = 85 + Math.random() * (w - 170);
@@ -552,6 +589,138 @@
         ctx.lineWidth = 3;
         ctx.strokeStyle = '#fde047';
         ctx.stroke();
+      } else if (rk.type === 'snowflake') {
+        // Real 6-Pointed Crystalline Snowflake
+        ctx.save();
+        ctx.rotate(rk.rot);
+        ctx.strokeStyle = '#e0f2fe';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 4;
+        for (let a = 0; a < 6; a++) {
+          ctx.save();
+          ctx.rotate((Math.PI / 3) * a);
+          ctx.beginPath();
+          ctx.moveTo(0, 0); ctx.lineTo(0, -rk.r);
+          ctx.moveTo(0, -rk.r * 0.48); ctx.lineTo(-10, -rk.r * 0.68);
+          ctx.moveTo(0, -rk.r * 0.48); ctx.lineTo(10, -rk.r * 0.68);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+        const grad = ctx.createRadialGradient(0, -8, 4, 0, 0, rk.r * 0.56);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(1, '#7dd3fc');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, rk.r * 0.56, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+      } else if (rk.type === 'planet') {
+        // Cosmic Ringed Planet!
+        const grad = ctx.createRadialGradient(-rk.r * 0.25, -rk.r * 0.25, rk.r * 0.12, 0, 0, rk.r * 0.85);
+        grad.addColorStop(0, '#fde047');
+        grad.addColorStop(0.5, '#8b5cf6');
+        grad.addColorStop(1, '#312e81');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, rk.r * 0.82, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#e9d5ff';
+        ctx.stroke();
+        // Tilted Planetary Ring
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.88)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.ellipse(0, 3, rk.r * 1.18, rk.r * 0.28, -0.25, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (rk.type === 'bubble') {
+        // Iridescent Soap Bubble
+        const grad = ctx.createRadialGradient(-rk.r * 0.3, -rk.r * 0.3, rk.r * 0.1, 0, 0, rk.r);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+        grad.addColorStop(0.55, 'rgba(125, 211, 252, 0.38)');
+        grad.addColorStop(0.85, 'rgba(244, 114, 182, 0.45)');
+        grad.addColorStop(1, 'rgba(56, 189, 248, 0.72)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, rk.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.beginPath();
+        ctx.ellipse(-rk.r * 0.35, -rk.r * 0.35, rk.r * 0.22, rk.r * 0.12, -0.6, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (rk.type === 'watermelon') {
+        // Juicy Striped Watermelon!
+        const grad = ctx.createRadialGradient(-rk.r * 0.25, -rk.r * 0.25, rk.r * 0.12, 0, 0, rk.r);
+        grad.addColorStop(0, '#86efac');
+        grad.addColorStop(0.55, '#16a34a');
+        grad.addColorStop(1, '#14532d');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, rk.r, 0, Math.PI * 2);
+        ctx.fill();
+        // Dark green stripes
+        ctx.strokeStyle = '#052e16';
+        ctx.lineWidth = 5;
+        for (const ox of [-22, 0, 22]) {
+          ctx.beginPath();
+          ctx.moveTo(ox, -rk.r * 0.82);
+          ctx.quadraticCurveTo(ox * 1.35, 0, ox, rk.r * 0.82);
+          ctx.stroke();
+        }
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#bbf7d0';
+        ctx.beginPath();
+        ctx.arc(0, 0, rk.r, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (rk.type === 'apple' || rk.type === 'orange') {
+        const isApple = rk.type === 'apple';
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(0, -rk.r * 0.82);
+        ctx.quadraticCurveTo(6, -rk.r - 10, 12, -rk.r - 10);
+        ctx.stroke();
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath();
+        ctx.ellipse(14, -rk.r + 2, 12, 6, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+        const grad = ctx.createRadialGradient(-rk.r * 0.28, -rk.r * 0.28, rk.r * 0.1, 0, 0, rk.r);
+        grad.addColorStop(0, isApple ? '#fecaca' : '#fef08a');
+        grad.addColorStop(0.45, isApple ? '#ef4444' : '#f97316');
+        grad.addColorStop(1, isApple ? '#991b1b' : '#c2410c');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, rk.r * 0.94, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = isApple ? '#fecaca' : '#fed7aa';
+        ctx.stroke();
+      } else if (rk.type === 'strawberry') {
+        // Sweet Strawberry!
+        const grad = ctx.createRadialGradient(-10, -14, 6, 0, 0, rk.r);
+        grad.addColorStop(0, '#fda4af');
+        grad.addColorStop(0.5, '#e11d48');
+        grad.addColorStop(1, '#881337');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(0, rk.r * 0.96);
+        ctx.bezierCurveTo(rk.r * 1.05, rk.r * 0.3, rk.r * 0.95, -rk.r * 0.85, 0, -rk.r * 0.78);
+        ctx.bezierCurveTo(-rk.r * 0.95, -rk.r * 0.85, -rk.r * 1.05, rk.r * 0.3, 0, rk.r * 0.96);
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#fecdd3';
+        ctx.stroke();
+        // Green leafy crown
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath();
+        ctx.ellipse(0, -rk.r * 0.78, 22, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
       } else {
         // Candy Swirl Ball
         const grad = ctx.createRadialGradient(-rk.r * 0.25, -rk.r * 0.25, rk.r * 0.15, 0, 0, rk.r);
