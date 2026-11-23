@@ -1,12 +1,16 @@
 /* Snow Clap AR — Camera Motion + Touch Hybrid Arcade Math Game */
-(function (global) {
-  const SPEED_PRESETS = {
+(function (app) {
+  'use strict';
+
+  const { AudioEngine, pickRandomTreasure, drawTreasureCanvasItem } = app;
+
+const SPEED_PRESETS = {
     slow:   { label: '🐢 Slow (Ages 4–6)',   vyMin: 0.52, vyRange: 0.30, maxAdd: 5,  maxMul: 4, duration: 90, fontSize: 54 },
     medium: { label: '🚀 Medium (Ages 6–8)', vyMin: 0.95, vyRange: 0.50, maxAdd: 9,  maxMul: 7, duration: 60, fontSize: 48 },
     fast:   { label: '⚡ Fast (Ages 8–10)',  vyMin: 1.55, vyRange: 0.70, maxAdd: 12, maxMul: 9, duration: 60, fontSize: 44 }
   };
 
-  class SnowClapArcade {
+  class SnowClapGame {
     constructor(options) {
       this.canvas = options.canvas;
       this.ctx = this.canvas.getContext('2d');
@@ -51,7 +55,9 @@
 
       this.flakes = [];
       this.fallingSnowballs = [];
+      this.fallingTreasures = [];
       this.particles = [];
+      this.popups = [];
       this.heldLeft = null;
       this.heldRight = null;
       this.bigSnow = null;
@@ -131,6 +137,15 @@
           }
         }
 
+        // Tap a falling bonus treasure first!
+        for (let i = this.fallingTreasures.length - 1; i >= 0; i--) {
+          const tr = this.fallingTreasures[i];
+          if (Math.hypot(x - tr.x, y - tr.y) <= tr.r + 18) {
+            this._collectTreasure(tr, i);
+            return;
+          }
+        }
+
         // Otherwise tap a falling snowball to catch it!
         for (let i = this.fallingSnowballs.length - 1; i >= 0; i--) {
           const sb = this.fallingSnowballs[i];
@@ -186,7 +201,9 @@
       this.heldRight = null;
       this.bigSnow = null;
       this.fallingSnowballs = [];
+      this.fallingTreasures = [];
       this.particles = [];
+      this.popups = [];
       this.prevFrame = null;
       this.catchGrace = 0;
       this.handsWereApart = false;
@@ -195,7 +212,7 @@
       this.running = true;
 
       // Unlock AudioContext synchronously inside user click/tap for iOS Safari!
-      const AudioCtx = global.AudioContext || global.webkitAudioContext;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
         try {
           this.audioCtx = new AudioCtx();
@@ -354,6 +371,17 @@
           wobble: Math.random() * Math.PI * 2
         });
       }
+      if (true && this.fallingTreasures.length < 2 && Math.random() < 0.72) {
+        const mat = pickRandomTreasure();
+        this.fallingTreasures.push({
+          x: 65 + Math.random() * (w - 130),
+          y: -28 - Math.random() * 90,
+          r: 23,
+          vy: preset.vyMin * 0.9 + Math.random() * 0.35,
+          wobble: Math.random() * Math.PI * 2,
+          mat
+        });
+      }
     }
 
     _analyzeMotion() {
@@ -486,7 +514,7 @@
         this.fallingSnowballs.splice(index, 1);
         this.catchGrace = 28; // Prevent catch motion from triggering an accidental clap
         this.handsWereApart = false;
-        if (global.MathAudio) global.MathAudio.pop();
+        if (AudioEngine) AudioEngine.pop();
       }
 
       this.onScore({
@@ -496,6 +524,43 @@
         timeLeft: this.timeLeft,
         heldLeft: this.heldLeft,
         heldRight: this.heldRight
+      });
+    }
+
+    _collectTreasure(tr, index) {
+      this.fallingTreasures.splice(index, 1);
+      const mat = tr.mat;
+      this.score += mat.pts;
+      this.stars += mat.stars;
+      if (AudioEngine) AudioEngine.magic();
+      for (let i = 0; i < 16; i++) {
+        const ang = (Math.PI * 2 * i) / 16;
+        const spd = 2 + Math.random() * 4;
+        this.particles.push({
+          x: tr.x,
+          y: tr.y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          r: 2.5 + Math.random() * 3.5,
+          color: mat.glow,
+          life: 28 + Math.random() * 12
+        });
+      }
+      this.popups.push({
+        x: tr.x,
+        y: tr.y - 10,
+        text: `${mat.emoji} +${mat.pts} ${mat.short}!`,
+        color: mat.glow,
+        life: 44
+      });
+      this.onScore({
+        score: this.score,
+        combo: this.combo,
+        stars: this.stars,
+        timeLeft: this.timeLeft,
+        heldLeft: this.heldLeft,
+        heldRight: this.heldRight,
+        collectedMaterial: mat.id
       });
     }
 
@@ -538,9 +603,20 @@
         });
       }
 
-      if (global.MathAudio) {
-        global.MathAudio.magic();
-        global.MathAudio.speak(`${a} ${this.op === 'add' ? 'plus' : this.op === 'sub' ? 'minus' : 'times'} ${b} is ${result}!`, 'cheer');
+      if (AudioEngine) {
+        AudioEngine.magic();
+        AudioEngine.speak(`${a} ${this.op === 'add' ? 'plus' : this.op === 'sub' ? 'minus' : 'times'} ${b} is ${result}!`, 'cheer');
+      }
+
+      const clapBonus = true ? pickRandomTreasure() : null;
+      if (clapBonus) {
+        this.popups.push({
+          x: cx,
+          y: cy + 78,
+          text: `${clapBonus.emoji} Bonus ${clapBonus.name}!`,
+          color: clapBonus.glow,
+          life: 62
+        });
       }
 
       this.heldLeft = null;
@@ -553,7 +629,8 @@
         heldLeft: null,
         heldRight: null,
         lastExpr: `${a} ${opSym} ${b} = ${result}`,
-        pts
+        pts,
+        collectedMaterial: clapBonus ? clapBonus.id : null
       });
     }
 
@@ -627,6 +704,24 @@
 
           if (sb.y > h + 40) {
             this.fallingSnowballs.splice(i, 1);
+          }
+        }
+
+        for (let i = this.fallingTreasures.length - 1; i >= 0; i--) {
+          const tr = this.fallingTreasures[i];
+          tr.y += tr.vy;
+          tr.wobble += 0.06;
+          tr.x += Math.sin(tr.wobble) * 0.7;
+          if (this.hasCamera && tr.y > h * 0.22 && tr.y < h * 0.90) {
+            const distL = Math.hypot(tr.x - this.leftHand.x, tr.y - this.leftHand.y);
+            const distR = Math.hypot(tr.x - this.rightHand.x, tr.y - this.rightHand.y);
+            if (distL < catchRadius || distR < catchRadius) {
+              this._collectTreasure(tr, i);
+              continue;
+            }
+          }
+          if (tr.y > h + 36) {
+            this.fallingTreasures.splice(i, 1);
           }
         }
 
@@ -1012,17 +1107,27 @@
         this._drawThemedItem(sb.x, sb.y, sb.fontSize || 48, sb.val, sb.side === 'left' ? '#38bdf8' : '#f472b6', false);
       }
 
-      // Live Mic Clap Sound Indicator (positioned below top scoreboard)
+      // Falling Bonus Treasure Materials
+      if (true) {
+        for (const tr of this.fallingTreasures) {
+          ctx.save();
+          ctx.translate(tr.x, tr.y);
+          drawTreasureCanvasItem(ctx, tr.mat.id, tr.r, this.tick);
+          ctx.restore();
+        }
+      }
+
+      // Live Mic Clap Sound Indicator (positioned below slim top scoreboard)
       if (this.hasMic) {
         ctx.save();
         ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
         ctx.beginPath();
-        ctx.roundRect(14, 146, 118, 26, 999);
+        ctx.roundRect(14, 62, 118, 26, 999);
         ctx.fill();
         ctx.fillStyle = this.clapSoundWindow > 0 ? '#fde047' : '#bae6fd';
         ctx.font = '800 11px system-ui, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(this.clapSoundWindow > 0 ? '🎤 CLAP HEARD!' : '🎤 Clap Mic', 24, 163);
+        ctx.fillText(this.clapSoundWindow > 0 ? '🎤 CLAP HEARD!' : '🎤 Clap Mic', 24, 79);
         ctx.restore();
       }
 
@@ -1040,7 +1145,7 @@
         ctx.save();
         ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
         ctx.beginPath();
-        ctx.roundRect(w / 2 - 150, 142, 300, 52, 20);
+        ctx.roundRect(w / 2 - 150, 58, 300, 48, 20);
         ctx.fill();
         ctx.strokeStyle = '#fde047';
         ctx.lineWidth = 3;
@@ -1048,7 +1153,7 @@
         ctx.fillStyle = '#fde047';
         ctx.font = '900 19px system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`👏 CLAP PALMS! (${this.heldLeft} ${opSym} ${this.heldRight})`, w / 2, 174);
+        ctx.fillText(`👏 CLAP PALMS! (${this.heldLeft} ${opSym} ${this.heldRight})`, w / 2, 88);
         ctx.restore();
       }
 
@@ -1065,15 +1170,34 @@
         ctx.fillText(`${resIcon} ${this.bigSnow.expr} = ${this.bigSnow.result}! ${resIcon}`, cx, cy - size * 0.65);
       }
 
-      // Explosion snow crystals
-      ctx.fillStyle = '#ffffff';
+      // Explosion snow crystals & treasure popups
       for (const p of this.particles) {
+        ctx.fillStyle = p.color || '#ffffff';
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
+      for (let i = this.popups.length - 1; i >= 0; i--) {
+        const pop = this.popups[i];
+        pop.y -= 1.1;
+        pop.life -= 1;
+        if (pop.life <= 0) {
+          this.popups.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, pop.life / 18);
+        ctx.font = '900 18px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#0f172a';
+        ctx.strokeText(pop.text, pop.x, pop.y);
+        ctx.fillStyle = pop.color || '#fde047';
+        ctx.fillText(pop.text, pop.x, pop.y);
+        ctx.restore();
+      }
     }
   }
 
-  global.SnowClapArcade = SnowClapArcade;
-})(window);
+  app.SnowClapGame = SnowClapGame;
+})(window.KidApp = window.KidApp || {});

@@ -1,12 +1,16 @@
 /* Squirrel Bridge AR — Crosses Over Kid's Real Outstretched Hands & Shoulders */
-(function (global) {
-  const SQ_SPEED_PRESETS = {
+(function (app) {
+  'use strict';
+
+  const { AudioEngine, pickRandomTreasure, drawTreasureCanvasItem } = app;
+
+const SQ_SPEED_PRESETS = {
     slow:   { label: '🐢 Slow (Ages 4–6)',   crossSpeed: 1.9, maxAdd: 5,  maxMul: 4, holdStep: 0.11 },
     medium: { label: '🚀 Medium (Ages 6–8)', crossSpeed: 3.1, maxAdd: 8,  maxMul: 6, holdStep: 0.14 },
     fast:   { label: '⚡ Fast (Ages 8–10)',  crossSpeed: 4.8, maxAdd: 12, maxMul: 9, holdStep: 0.18 }
   };
 
-  class SquirrelBridgeArcade {
+  class SquirrelBridgeGame {
     constructor(options) {
       this.canvas = options.canvas;
       this.ctx = this.canvas.getContext('2d');
@@ -51,9 +55,9 @@
       this.faceCenter = { x: w / 2, y: h * 0.34 };
       this.nativeFaceAt = 0;
       this.faceDetector = null;
-      if (typeof global.FaceDetector === 'function') {
+      if (typeof window.FaceDetector === 'function') {
         try {
-          this.faceDetector = new global.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
+          this.faceDetector = new window.FaceDetector({ fastMode: true, maxDetectedFaces: 2 });
         } catch (_) {}
       }
       this.zoneHandA = 0;
@@ -66,6 +70,8 @@
       this.waitingQuiz = false;
       this.squirrel = { x: 46, y: h * 0.58 - 20, crossing: false, crossed: false, bob: 0 };
       this.pawSparkles = [];
+      this.popups = [];
+      this.bridgeTreasure = null;
       this.problem = { a: 3, b: 4, answer: 7, sym: '+', choices: [6, 7, 8] };
       this.acorns = [];
       this.butterflies = [
@@ -135,14 +141,22 @@
           return;
         }
 
+        if (this.bridgeTreasure && !this.bridgeTreasure.collected) {
+          const ty = this._getArmBridgeY(this.bridgeTreasure.x) - 22;
+          if (Math.hypot(pos.x - this.bridgeTreasure.x, pos.y - ty) <= 36) {
+            this._collectBridgeTreasure(this.bridgeTreasure.x, ty);
+            return;
+          }
+        }
+
         if (this.bridgeBuilt) return;
 
         if (Math.hypot(pos.x - this.pointA.x, pos.y - this.pointA.y) < 60) {
           this.pointA.connected = true;
-          if (global.MathAudio) global.MathAudio.pop();
+          if (AudioEngine) AudioEngine.pop();
         } else if (Math.hypot(pos.x - this.pointB.x, pos.y - this.pointB.y) < 60) {
           this.pointB.connected = true;
-          if (global.MathAudio) global.MathAudio.pop();
+          if (AudioEngine) AudioEngine.pop();
         }
 
         if (this.pointA.connected && this.pointB.connected) {
@@ -250,6 +264,13 @@
       this.bridgeBuilt = false;
       this.waitingQuiz = false;
       this.pawSparkles = [];
+      this.popups = [];
+      this.bridgeTreasure = true ? {
+            x: w * (0.36 + Math.random() * 0.28),
+            collected: false,
+            mat: pickRandomTreasure()
+          }
+        : null;
       this.squirrel = { x: 46, y: h * 0.58 - 20, crossing: false, crossed: false, bob: 0 };
 
       const preset = SQ_SPEED_PRESETS[this.speed] || SQ_SPEED_PRESETS.slow;
@@ -304,14 +325,14 @@
     _completeBridge() {
       if (this.bridgeBuilt) return;
       this.bridgeBuilt = true;
-      if (global.MathAudio) global.MathAudio.magic();
+      if (AudioEngine) AudioEngine.magic();
 
       if (this.quizMode) {
         this.waitingQuiz = true;
         this.onStatus(`🌰 Hands stretched! Tap the Acorn with ${this.problem.a} ${this.problem.sym} ${this.problem.b} so Squirrel walks over your arms!`);
-        if (global.MathAudio) {
+        if (AudioEngine) {
           const opWord = this.op === 'add' ? 'plus' : this.op === 'sub' ? 'minus' : 'times';
-          global.MathAudio.speak(`Hands ready! Pick ${this.problem.a} ${opWord} ${this.problem.b}!`, 'normal');
+          AudioEngine.speak(`Hands ready! Pick ${this.problem.a} ${opWord} ${this.problem.b}!`, 'normal');
         }
       } else {
         this._startSquirrelCross();
@@ -324,7 +345,7 @@
         this.waitingQuiz = false;
         this._startSquirrelCross();
       } else {
-        if (global.MathAudio) global.MathAudio.wrong();
+        if (AudioEngine) AudioEngine.wrong();
         this.onStatus(`💡 Almost! Count ${this.problem.a} ${this.problem.sym} ${this.problem.b} again!`);
       }
     }
@@ -332,9 +353,9 @@
     _startSquirrelCross() {
       this.squirrel.crossing = true;
       this.onStatus(`🐿️ Hold steady! Sammy the Squirrel is walking over your real hands & shoulders!`);
-      if (global.MathAudio) {
+      if (AudioEngine) {
         const opWord = this.op === 'add' ? 'plus' : this.op === 'sub' ? 'minus' : 'times';
-        global.MathAudio.speak(`Hold steady! ${this.problem.a} ${opWord} ${this.problem.b} is ${this.problem.answer}! Look at the squirrel walk across your hands!`, 'cheer');
+        AudioEngine.speak(`Hold steady! ${this.problem.a} ${opWord} ${this.problem.b} is ${this.problem.answer}! Look at the squirrel walk across your hands!`, 'cheer');
       }
     }
 
@@ -525,6 +546,37 @@
       this.onStatus('📷 Background refreshed! Stand in front of camera & stretch both hands!');
     }
 
+    _collectBridgeTreasure(tx, ty) {
+      if (!this.bridgeTreasure || this.bridgeTreasure.collected) return;
+      this.bridgeTreasure.collected = true;
+      const mat = this.bridgeTreasure.mat;
+      this.score += mat.pts;
+      this.stars += mat.stars;
+      if (AudioEngine) AudioEngine.magic();
+      for (let i = 0; i < 14; i++) {
+        this.pawSparkles.push({
+          x: tx + (Math.random() - 0.5) * 32,
+          y: ty + (Math.random() - 0.5) * 28,
+          life: 24
+        });
+      }
+      this.popups.push({
+        x: tx,
+        y: ty - 16,
+        text: `${mat.emoji} +${mat.pts} ${mat.short}!`,
+        color: mat.glow,
+        life: 48
+      });
+      this.onScore({
+        score: this.score,
+        stars: this.stars,
+        crossed: this.crossedCount,
+        problem: this.problem,
+        bridgeBuilt: this.bridgeBuilt,
+        collectedMaterial: mat.id
+      });
+    }
+
     _update() {
       this.tick += 1;
       if (this.roundGrace > 0) this.roundGrace -= 1;
@@ -586,6 +638,13 @@
           this.squirrel.y = this._getArmBridgeY(this.squirrel.x) - 18;
           if (this.tick % 3 === 0) {
             this.pawSparkles.push({ x: this.squirrel.x, y: this.squirrel.y + 18, life: 22 });
+          }
+          if (
+            this.bridgeTreasure &&
+            !this.bridgeTreasure.collected &&
+            Math.abs(this.squirrel.x - this.bridgeTreasure.x) < 24
+          ) {
+            this._collectBridgeTreasure(this.bridgeTreasure.x, this.squirrel.y);
           }
         } else {
           this.squirrel.y = this.pointB.y - 20;
@@ -798,17 +857,17 @@
       drawMarker(this.pointA, 'TOUCH LEFT', this.problem.a, this.bridgeBuilt ? 1 : this.holdA);
       drawMarker(this.pointB, 'TOUCH RIGHT', this.problem.b, this.bridgeBuilt ? 1 : this.holdB);
 
-      // Human Face Detection Status Pill (positioned below top scoreboard)
+      // Human Face Detection Status Pill (positioned below slim top scoreboard)
       if (this.hasCamera) {
         ctx.save();
         ctx.fillStyle = this.faceDetected ? 'rgba(16, 185, 129, 0.85)' : 'rgba(239, 68, 68, 0.85)';
         ctx.beginPath();
-        ctx.roundRect(14, 148, 118, 28, 999);
+        ctx.roundRect(14, 62, 118, 28, 999);
         ctx.fill();
         ctx.fillStyle = '#ffffff';
         ctx.font = '800 11px system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(this.faceDetected ? '😊 Face Ready' : '👀 Show Face', 73, 166);
+        ctx.fillText(this.faceDetected ? '😊 Face Ready' : '👀 Show Face', 73, 80);
         ctx.restore();
       }
 
@@ -820,11 +879,11 @@
         ctx.fill();
       }
 
-      // Math Banner (below top scoreboard, keeping shoulders & hands unobstructed)
+      // Math Banner (below slim top scoreboard, keeping shoulders & hands unobstructed)
       ctx.save();
       ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
       ctx.beginPath();
-      ctx.roundRect(w / 2 - 155, 142, 310, 42, 16);
+      ctx.roundRect(w / 2 - 155, 58, 310, 40, 16);
       ctx.fill();
       ctx.strokeStyle = '#4ade80';
       ctx.lineWidth = 2.5;
@@ -837,7 +896,7 @@
           ? `🐿️ Over Your Hands: ${this.problem.a} ${this.problem.sym} ${this.problem.b} = ${this.waitingQuiz ? '?' : this.problem.answer}`
           : `🙌 Stretch Arms: ${this.problem.a} ${this.problem.sym} ${this.problem.b}`,
         w / 2,
-        168
+        83
       );
       ctx.restore();
 
@@ -861,10 +920,40 @@
         }
       }
 
+      // Bonus Treasure Material hovering along the bridge path!
+      if (this.bridgeTreasure && !this.bridgeTreasure.collected ) {
+        const tx = this.bridgeTreasure.x;
+        const ty = this._getArmBridgeY(tx) - 22 + Math.sin(this.tick * 0.1) * 5;
+        ctx.save();
+        ctx.translate(tx, ty);
+        drawTreasureCanvasItem(ctx, this.bridgeTreasure.mat.id, 18, this.tick);
+        ctx.restore();
+      }
+
       // Sammy the Squirrel!
       this._drawSquirrel(this.squirrel.x, this.squirrel.y);
+
+      for (let i = this.popups.length - 1; i >= 0; i--) {
+        const pop = this.popups[i];
+        pop.y -= 1.05;
+        pop.life -= 1;
+        if (pop.life <= 0) {
+          this.popups.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, pop.life / 18);
+        ctx.font = '900 18px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#0f172a';
+        ctx.strokeText(pop.text, pop.x, pop.y);
+        ctx.fillStyle = pop.color || '#fde047';
+        ctx.fillText(pop.text, pop.x, pop.y);
+        ctx.restore();
+      }
     }
   }
 
-  global.SquirrelBridgeArcade = SquirrelBridgeArcade;
-})(window);
+  app.SquirrelBridgeGame = SquirrelBridgeGame;
+})(window.KidApp = window.KidApp || {});

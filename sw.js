@@ -1,18 +1,34 @@
-const CACHE_NAME = 'mathcube-3d-v25';
+const CACHE_NAME = 'playspark-v38';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
-  './audio.js',
-  './math3d.js',
-  './snowgame.js',
-  './squirrelgame.js',
-  './rockgame.js',
-  './app.js',
   './manifest.webmanifest',
   './icons/icon.svg',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './src/main.js',
+  './src/core/audio-engine.js',
+  './src/core/profile-store.js',
+  './src/core/treasure-registry.js',
+  './src/core/ui-effects.js',
+  './src/math/math-3d-scene.js',
+  './src/math/math-quest-controller.js',
+  './src/math/times-tables-controller.js',
+  './src/english/phonics-curriculum.js',
+  './src/english/phonics-clap-game.js',
+  './src/english/phonics-blaster-game.js',
+  './src/english/phonics-runner-game.js',
+  './src/english/phonics-trace-game.js',
+  './src/english/english-hub-controller.js',
+  './src/learn/learn-curriculum.js',
+  './src/learn/learn-controller.js',
+  './src/games/magic-mixer-game.js',
+  './src/games/snow-clap-game.js',
+  './src/games/squirrel-bridge-game.js',
+  './src/games/rock-blaster-game.js',
+  './src/games/number-runner-game.js',
+  './src/games/games-hub-controller.js'
 ];
 
 self.addEventListener('install', (event) => {

@@ -1,0 +1,486 @@
+/* English Hub Controller — K-5 Phonics Arcade & 4 Interactive Games */
+
+(function (app) {
+  'use strict';
+
+  const { AudioEngine, $, launchConfetti, PhonicsBlasterGame, PhonicsClapGame, PhonicsRunnerGame, PhonicsTraceGame } = app;
+
+class EnglishHubController {
+  constructor({ profileStore, showView, refreshHeader, stopMathTimer, closeArcadeSettings }) {
+    this.profileStore = profileStore;
+    this.showView = showView;
+    this.refreshHeader = refreshHeader;
+    this.stopMathTimer = stopMathTimer;
+    this.closeArcadeSettings = closeArcadeSettings;
+
+    this.englishTier = 'all';
+    this.enClapSpeed = 'slow';
+    this.enClapMode = 'blend';
+    this.enBlasterSpeed = 'slow';
+    this.enRunnerSpeed = 'slow';
+    this.enRunnerWorld = 'jungle';
+    this.enTraceMode = 'trace';
+
+    this.enClapGame = null;
+    this.enBlasterGame = null;
+    this.enRunnerGame = null;
+    this.enTraceGame = null;
+
+    this._bindEvents();
+  }
+
+  stopAll(exceptView = '') {
+    if (exceptView !== 'enClap' && this.enClapGame) this.enClapGame.stop();
+    if (exceptView !== 'enBlaster' && this.enBlasterGame) this.enBlasterGame.stop();
+    if (exceptView !== 'enRunner' && this.enRunnerGame) this.enRunnerGame.stop();
+    if (exceptView !== 'enTrace' && this.enTraceGame) this.enTraceGame.stop();
+  }
+
+  getActiveRunner() {
+    if ($('view-en-runner').classList.contains('active') && this.enRunnerGame) {
+      return this.enRunnerGame;
+    }
+    return null;
+  }
+
+  getActiveTrace() {
+    if ($('view-en-trace').classList.contains('active') && this.enTraceGame) {
+      return this.enTraceGame;
+    }
+    return null;
+  }
+
+  syncTierUI(tier) {
+    this.englishTier = tier;
+    document.querySelectorAll('[data-en-tier]').forEach((b) => b.classList.toggle('active', b.dataset.enTier === tier));
+    document.querySelectorAll('[data-en-tier-sync]').forEach((b) => b.classList.toggle('active', b.dataset.enTierSync === tier));
+  }
+
+  openHub(tier = null) {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    if (tier) this.syncTierUI(tier);
+    this.showView('english');
+  }
+
+  _recordEnglishResult(correct = true) {
+    if (correct) {
+      this.profileStore.profile.stars += 1;
+      launchConfetti(14);
+    }
+    this.profileStore.recordAttempt('en', correct);
+    this.refreshHeader();
+  }
+
+  _bindEvents() {
+    document.querySelectorAll('[data-action="open-english"]').forEach((el) => {
+      el.addEventListener('click', () => this.openHub());
+    });
+
+    document.querySelectorAll('[data-en-tier]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.syncTierUI(btn.dataset.enTier);
+        AudioEngine.pop();
+      });
+    });
+
+    this._bindClapEvents();
+    this._bindBlasterEvents();
+    this._bindRunnerEvents();
+    this._bindTraceEvents();
+  }
+
+  // --- Option 1: Phonics Clap Blender AR ---
+  _initClap() {
+    if (this.enClapGame) return this.enClapGame;
+    this.enClapGame = new PhonicsClapGame({
+      canvas: $('en-clap-canvas'),
+      onStatus: (msg) => {
+        $('en-clap-status').textContent = msg;
+      },
+      onScore: (info) => {
+        $('en-clap-score').textContent = info.score;
+        $('en-clap-combo').textContent = `x${info.combo}`;
+        $('en-clap-timer').textContent = info.timeLeft;
+        $('en-clap-stars').textContent = info.stars;
+        $('en-clap-left-readout').textContent = `✋ Left: ${info.heldLeft !== null ? info.heldLeft : '--'}`;
+        $('en-clap-right-readout').textContent = `Right: ${info.heldRight !== null ? info.heldRight : '--'} 🤚`;
+        $('btn-en-clap-trigger').disabled = !(info.heldLeft !== null && info.heldRight !== null);
+        if (info.collectedMaterial) {
+          this.profileStore.awardTreasure(info.collectedMaterial, true);
+          this.refreshHeader();
+        }
+        if (info.lastWord) {
+          this._recordEnglishResult(true);
+        }
+      },
+      onFinish: (res) => {
+        AudioEngine.fanfare();
+        launchConfetti(40);
+        const msg = `🏆 Time Up! Score: ${res.score} • +${res.stars} ⭐`;
+        $('en-clap-status').textContent = `${msg} Tap Restart to play again!`;
+        $('en-clap-finish-text').textContent = msg;
+        $('en-clap-finish-banner').classList.remove('hidden');
+      }
+    });
+    return this.enClapGame;
+  }
+
+  openClap() {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    $('en-clap-finish-banner').classList.add('hidden');
+    const game = this._initClap();
+    $('en-clap-score').textContent = '0';
+    $('en-clap-combo').textContent = 'x1';
+    $('en-clap-timer').textContent = this.enClapSpeed === 'slow' ? '90' : this.enClapSpeed === 'medium' ? '75' : '60';
+    $('en-clap-stars').textContent = '0';
+    $('en-clap-left-readout').textContent = '✋ Left: --';
+    $('en-clap-right-readout').textContent = 'Right: -- 🤚';
+    $('btn-en-clap-trigger').disabled = true;
+    this.showView('enClap');
+    game.start(this.englishTier, this.enClapSpeed, this.enClapMode);
+  }
+
+  _bindClapEvents() {
+    document.querySelectorAll('[data-action="open-en-clap"]').forEach((el) => {
+      el.addEventListener('click', () => this.openClap());
+    });
+    $('btn-en-clap-back').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      this.showView('english');
+    });
+    $('btn-en-clap-trigger').addEventListener('click', () => {
+      if (this.enClapGame) this.enClapGame.triggerClap();
+    });
+    const restart = () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      $('en-clap-finish-banner').classList.add('hidden');
+      if (this.enClapGame) this.enClapGame.start(this.englishTier, this.enClapSpeed, this.enClapMode);
+    };
+    $('btn-en-clap-restart').addEventListener('click', restart);
+    $('btn-en-clap-play-again').addEventListener('click', restart);
+    document.querySelectorAll('[data-en-clap-tier]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.syncTierUI(btn.dataset.enClapTier);
+        AudioEngine.pop();
+        if (this.enClapGame) this.enClapGame.setTier(this.englishTier);
+      });
+    });
+    document.querySelectorAll('[data-en-clap-speed]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.enClapSpeed = btn.dataset.enClapSpeed;
+        document.querySelectorAll('[data-en-clap-speed]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.enClapGame) this.enClapGame.setSpeed(this.enClapSpeed);
+      });
+    });
+    document.querySelectorAll('[data-en-clap-mode]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.enClapMode = btn.dataset.enClapMode;
+        document.querySelectorAll('[data-en-clap-mode]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.enClapGame) this.enClapGame.setMode(this.enClapMode);
+      });
+    });
+  }
+
+  // --- Option 2: Letter Blaster AR ---
+  _initBlaster() {
+    if (this.enBlasterGame) return this.enBlasterGame;
+    this.enBlasterGame = new PhonicsBlasterGame({
+      canvas: $('en-blaster-canvas'),
+      onStatus: (msg) => {
+        $('en-blaster-status').textContent = msg;
+      },
+      onScore: (info) => {
+        $('en-blaster-score').textContent = info.score;
+        $('en-blaster-words').textContent = info.wordsDone;
+        $('en-blaster-timer').textContent = info.timeLeft;
+        $('en-blaster-streak').textContent = info.streak;
+        if (info.collectedMaterial) {
+          this.profileStore.awardTreasure(info.collectedMaterial, true);
+          this.refreshHeader();
+        }
+        if (info.solvedWord) {
+          this._recordEnglishResult(true);
+        }
+      },
+      onFinish: (res) => {
+        AudioEngine.fanfare();
+        launchConfetti(40);
+        const msg = `🏆 Time Up! ${res.score} pts (${res.wordsDone} words) • +${res.stars} ⭐`;
+        $('en-blaster-status').textContent = msg;
+        $('en-blaster-finish-text').textContent = msg;
+        $('en-blaster-finish-banner').classList.remove('hidden');
+      }
+    });
+    return this.enBlasterGame;
+  }
+
+  openBlaster() {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    $('en-blaster-finish-banner').classList.add('hidden');
+    const game = this._initBlaster();
+    $('en-blaster-score').textContent = '0';
+    $('en-blaster-words').textContent = '0';
+    $('en-blaster-timer').textContent = this.enBlasterSpeed === 'slow' ? '90' : this.enBlasterSpeed === 'medium' ? '75' : '60';
+    $('en-blaster-streak').textContent = '0';
+    this.showView('enBlaster');
+    game.start(this.englishTier, this.enBlasterSpeed);
+  }
+
+  _bindBlasterEvents() {
+    document.querySelectorAll('[data-action="open-en-blaster"]').forEach((el) => {
+      el.addEventListener('click', () => this.openBlaster());
+    });
+    $('btn-en-blaster-back').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      this.showView('english');
+    });
+    const restart = () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      $('en-blaster-finish-banner').classList.add('hidden');
+      if (this.enBlasterGame) this.enBlasterGame.start(this.englishTier, this.enBlasterSpeed);
+    };
+    $('btn-en-blaster-restart').addEventListener('click', restart);
+    $('btn-en-blaster-play-again').addEventListener('click', restart);
+    $('btn-en-blaster-repeat').addEventListener('click', () => {
+      if (this.enBlasterGame) this.enBlasterGame.repeatWord();
+    });
+    $('btn-en-blaster-cam').addEventListener('click', () => {
+      if (!this.enBlasterGame) return;
+      const on = this.enBlasterGame.toggleCameraView();
+      $('btn-en-blaster-cam').textContent = on ? '📷 Cam + Galaxy' : '🌌 Full Galaxy';
+      AudioEngine.pop();
+    });
+    document.querySelectorAll('[data-en-blaster-tier]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.syncTierUI(btn.dataset.enBlasterTier);
+        AudioEngine.pop();
+        if (this.enBlasterGame) this.enBlasterGame.setTier(this.englishTier);
+      });
+    });
+    document.querySelectorAll('[data-en-blaster-speed]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.enBlasterSpeed = btn.dataset.enBlasterSpeed;
+        document.querySelectorAll('[data-en-blaster-speed]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.enBlasterGame) this.enBlasterGame.setSpeed(this.enBlasterSpeed);
+      });
+    });
+  }
+
+  // --- Option 3: Phonics Runner AR ---
+  _initRunner() {
+    if (this.enRunnerGame) return this.enRunnerGame;
+    this.enRunnerGame = new PhonicsRunnerGame({
+      canvas: $('en-runner-canvas'),
+      getAvatar: () => this.profileStore.profile.avatar || '🦁',
+      onStatus: (msg) => {
+        $('en-runner-status').textContent = msg;
+      },
+      onScore: (info) => {
+        $('en-runner-score').textContent = info.score;
+        $('en-runner-streak').textContent = info.streak;
+        $('en-runner-timer').textContent = info.timeLeft;
+        $('en-runner-stars').textContent = info.stars;
+        if (info.collectedMaterial) {
+          this.profileStore.awardTreasure(info.collectedMaterial, true);
+          this.refreshHeader();
+        }
+        if (info.solvedWord !== null && info.correct !== null) {
+          this._recordEnglishResult(Boolean(info.correct));
+        }
+      },
+      onFinish: (res) => {
+        AudioEngine.fanfare();
+        launchConfetti(40);
+        const msg = `🏆 Time Up! ${res.score} pts • +${res.stars} ⭐`;
+        $('en-runner-status').textContent = `${msg} Tap Restart to run again!`;
+        $('en-runner-finish-text').textContent = msg;
+        $('en-runner-finish-banner').classList.remove('hidden');
+      }
+    });
+    return this.enRunnerGame;
+  }
+
+  openRunner() {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    $('en-runner-finish-banner').classList.add('hidden');
+    const game = this._initRunner();
+    $('en-runner-score').textContent = '0';
+    $('en-runner-streak').textContent = '0';
+    $('en-runner-timer').textContent = this.enRunnerSpeed === 'slow' ? '90' : '60';
+    $('en-runner-stars').textContent = '0';
+    this.showView('enRunner');
+    game.start(this.englishTier, this.enRunnerSpeed, this.enRunnerWorld);
+  }
+
+  _bindRunnerEvents() {
+    document.querySelectorAll('[data-action="open-en-runner"]').forEach((el) => {
+      el.addEventListener('click', () => this.openRunner());
+    });
+    $('btn-en-runner-back').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      this.showView('english');
+    });
+    const restart = () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      $('en-runner-finish-banner').classList.add('hidden');
+      if (this.enRunnerGame) this.enRunnerGame.start(this.englishTier, this.enRunnerSpeed, this.enRunnerWorld);
+    };
+    $('btn-en-runner-restart').addEventListener('click', restart);
+    $('btn-en-runner-play-again').addEventListener('click', restart);
+    $('btn-en-runner-repeat').addEventListener('click', () => {
+      if (this.enRunnerGame) this.enRunnerGame.repeatWord();
+    });
+    $('btn-en-runner-cam').addEventListener('click', () => {
+      if (!this.enRunnerGame) return;
+      const on = this.enRunnerGame.toggleCameraView();
+      $('btn-en-runner-cam').textContent = on ? '📷 Cam + World' : '🏃 Full World';
+      AudioEngine.pop();
+    });
+    $('btn-en-runner-cal').addEventListener('click', () => {
+      if (this.enRunnerGame) this.enRunnerGame.recalibrate();
+      AudioEngine.pop();
+    });
+    $('btn-en-runner-left').addEventListener('click', () => {
+      if (this.enRunnerGame) this.enRunnerGame.moveLane(-1);
+    });
+    $('btn-en-runner-right').addEventListener('click', () => {
+      if (this.enRunnerGame) this.enRunnerGame.moveLane(1);
+    });
+    $('btn-en-runner-jump').addEventListener('click', () => {
+      if (this.enRunnerGame) this.enRunnerGame.jump();
+    });
+    $('btn-en-runner-duck').addEventListener('click', () => {
+      if (this.enRunnerGame) this.enRunnerGame.duck();
+    });
+    document.querySelectorAll('[data-en-runner-tier]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.syncTierUI(btn.dataset.enRunnerTier);
+        AudioEngine.pop();
+        if (this.enRunnerGame) this.enRunnerGame.setTier(this.englishTier);
+      });
+    });
+    document.querySelectorAll('[data-en-runner-speed]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.enRunnerSpeed = btn.dataset.enRunnerSpeed;
+        document.querySelectorAll('[data-en-runner-speed]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.enRunnerGame) this.enRunnerGame.setSpeed(this.enRunnerSpeed);
+      });
+    });
+    document.querySelectorAll('[data-en-runner-world]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.enRunnerWorld = btn.dataset.enRunnerWorld;
+        document.querySelectorAll('[data-en-runner-world]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.enRunnerGame) this.enRunnerGame.setWorld(this.enRunnerWorld);
+      });
+    });
+  }
+
+  // --- Option 4: Air-Trace & Glow Pad ---
+  _initTrace() {
+    if (this.enTraceGame) return this.enTraceGame;
+    this.enTraceGame = new PhonicsTraceGame({
+      canvas: $('en-trace-canvas'),
+      onStatus: (msg) => {
+        $('en-trace-status').textContent = msg;
+      },
+      onScore: (info) => {
+        $('en-trace-score').textContent = info.score;
+        $('en-trace-words').textContent = info.wordsDone;
+        $('en-trace-streak').textContent = info.streak;
+        $('en-trace-stars').textContent = info.stars;
+        if (info.collectedMaterial) {
+          this.profileStore.awardTreasure(info.collectedMaterial, true);
+          this.refreshHeader();
+        }
+        if (info.solvedWord) {
+          this._recordEnglishResult(true);
+        }
+      }
+    });
+    return this.enTraceGame;
+  }
+
+  openTrace() {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    const game = this._initTrace();
+    $('en-trace-score').textContent = '0';
+    $('en-trace-words').textContent = '0';
+    $('en-trace-streak').textContent = '0';
+    $('en-trace-stars').textContent = '0';
+    $('btn-en-trace-cam').textContent = game.showCamera ? '📷 Air-Cam: On' : '📷 Air-Cam: Off';
+    this.showView('enTrace');
+    game.start(this.englishTier, this.enTraceMode);
+  }
+
+  _bindTraceEvents() {
+    document.querySelectorAll('[data-action="open-en-trace"]').forEach((el) => {
+      el.addEventListener('click', () => this.openTrace());
+    });
+    $('btn-en-trace-back').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      this.showView('english');
+    });
+    $('btn-en-trace-clear').addEventListener('click', () => {
+      AudioEngine.pop();
+      if (this.enTraceGame) this.enTraceGame.clearActiveBox();
+    });
+    $('btn-en-trace-speak').addEventListener('click', () => {
+      if (this.enTraceGame) this.enTraceGame.speakCurrentWord();
+    });
+    $('btn-en-trace-skip').addEventListener('click', () => {
+      AudioEngine.pop();
+      if (this.enTraceGame) this.enTraceGame.nextWord();
+    });
+    $('btn-en-trace-next').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      if (this.enTraceGame) this.enTraceGame.nextWord();
+    });
+    $('btn-en-trace-cam').addEventListener('click', async () => {
+      if (!this.enTraceGame) return;
+      const on = await this.enTraceGame.toggleCameraView();
+      $('btn-en-trace-cam').textContent = on ? '📷 Air-Cam: On' : '📷 Air-Cam: Off';
+      AudioEngine.pop();
+    });
+    document.querySelectorAll('[data-en-trace-tier]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.syncTierUI(btn.dataset.enTraceTier);
+        AudioEngine.pop();
+        if (this.enTraceGame) this.enTraceGame.setTier(this.englishTier);
+      });
+    });
+    document.querySelectorAll('[data-en-trace-mode]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.enTraceMode = btn.dataset.enTraceMode;
+        document.querySelectorAll('[data-en-trace-mode]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.enTraceGame) this.enTraceGame.setMode(this.enTraceMode);
+      });
+    });
+  }
+}
+
+  app.EnglishHubController = EnglishHubController;
+})(window.KidApp = window.KidApp || {});

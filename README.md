@@ -1,6 +1,6 @@
-# MathCube 3D — Kids Math Adventure (PWA)
+# PlaySpark — Kids Math, English & AR Adventure (PWA)
 
-An interactive, responsive, offline-ready HTML5 Progressive Web App (PWA) for kids to learn **Addition**, **Subtraction**, **Multiplication**, and **Times Tables (1–12)** through 3D visual blocks and mini-games.
+An interactive, responsive, offline-ready HTML5 Progressive Web App (PWA) for kids featuring **Math** (3D blocks & Times Tables), **English** (K–5 Phonics & Air-Trace writing), **Learning Guides**, and **AR Camera Motion Games**.
 
 ## Features
 - **Interactive 3D Math Blocks**: Drag to rotate 3D cubes on touch or mouse; tap **Animate** to watch addition groups merge, subtraction cubes lift away, or multiplication grids form row-by-row.

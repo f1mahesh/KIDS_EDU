@@ -1,7 +1,7 @@
 {
-  "name": "MathCube 3D — Kids Math Adventure",
-  "short_name": "MathCube 3D",
-  "description": "Interactive 3D HTML5 math learning game for kids: Addition, Subtraction, Multiplication, and Times Tables.",
+  "name": "PlaySpark — Math, English & AR Games",
+  "short_name": "PlaySpark",
+  "description": "Interactive 3D Math, K-5 English Phonics, Learning Guides, and AR Camera Motion Games for kids.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

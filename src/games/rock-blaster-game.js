@@ -1,6 +1,10 @@
 /* Rock Blaster AR — Variety Punch & Kick Action Arcade Game */
-(function (global) {
-  const ROCK_SPEED_PRESETS = {
+(function (app) {
+  'use strict';
+
+  const { AudioEngine, TREASURE_BY_ID, drawTreasureCanvasItem } = app;
+
+const ROCK_SPEED_PRESETS = {
     slow:   { label: '🐢 Slow (Ages 4–6)',   fallSpeed: 0.90, duration: 90, hardThreshold: 16, maxRocks: 3 },
     medium: { label: '🚀 Medium (Ages 6–8)', fallSpeed: 1.45, duration: 60, hardThreshold: 22, maxRocks: 4 },
     fast:   { label: '⚡ Fast (Ages 8–10)',  fallSpeed: 2.15, duration: 60, hardThreshold: 28, maxRocks: 5 }
@@ -19,16 +23,22 @@
     { type: 'apple',      pts: [20, 30],     shardColors: ['#ef4444', '#22c55e'], glow: '#ef4444', r: 48 },
     { type: 'orange',     pts: [20, 30],     shardColors: ['#fb923c', '#fde047'], glow: '#f97316', r: 48 },
     { type: 'strawberry', pts: [25, 40],     shardColors: ['#fb7185', '#22c55e', '#fde047'], glow: '#f43f5e', r: 48 },
-    { type: 'candy',      pts: [20, 35],     shardColors: ['#fb7185', '#fde047'], glow: '#f472b6', r: 48 }
+    { type: 'candy',      pts: [20, 35],     shardColors: ['#fb7185', '#fde047'], glow: '#f472b6', r: 48 },
+    { type: 'stone',      pts: [10, 20],     shardColors: ['#cbd5e1', '#64748b', '#38bdf8'], glow: '#94a3b8', r: 48, isTreasure: true },
+    { type: 'bronze',     pts: [15, 25],     shardColors: ['#fdba74', '#d97706', '#92400e'], glow: '#fb923c', r: 48, isTreasure: true },
+    { type: 'gold',       pts: [25, 40],     shardColors: ['#fef08a', '#f59e0b', '#fbbf24'], glow: '#fde047', r: 50, isTreasure: true },
+    { type: 'jewel',      pts: [35, 60],     shardColors: ['#fbcfe8', '#ec4899', '#be185d'], glow: '#f472b6', r: 50, isTreasure: true },
+    { type: 'diamond',    pts: [50, 100],    shardColors: ['#ffffff', '#bae6fd', '#38bdf8'], glow: '#38bdf8', r: 52, isTreasure: true }
   ];
 
   const PACK_TYPES = {
-    mix:     null, // all varieties!
-    rocks:   ['rock', 'lava', 'crystal'],
-    planets: ['planet', 'crystal', 'lava'],
-    bubbles: ['bubble', 'crystal', 'snow'],
-    snow:    ['snow', 'snowflake', 'ornament'],
-    fruits:  ['watermelon', 'apple', 'orange', 'strawberry', 'candy']
+    mix:      null, // all varieties!
+    treasure: ['stone', 'bronze', 'gold', 'jewel', 'diamond'],
+    rocks:    ['rock', 'lava', 'crystal'],
+    planets:  ['planet', 'crystal', 'lava'],
+    bubbles:  ['bubble', 'crystal', 'snow'],
+    snow:     ['snow', 'snowflake', 'ornament'],
+    fruits:   ['watermelon', 'apple', 'orange', 'strawberry', 'candy']
   };
 
   const HAZARD_VARIETY = {
@@ -39,7 +49,7 @@
     r: 48
   };
 
-  class RockBlasterArcade {
+  class RockBlasterGame {
     constructor(options) {
       this.canvas = options.canvas;
       this.ctx = this.canvas.getContext('2d');
@@ -164,6 +174,7 @@
       this._ensureRocks();
       const labels = {
         mix: '🎲 Mix All',
+        treasure: '💎 Treasure Haul',
         rocks: '🪨 Rocks & Lava',
         planets: '🪐 Space Planets',
         bubbles: '🫧 Magic Bubbles',
@@ -276,13 +287,20 @@
         ? TARGET_VARIETIES.filter((v) => allowed.includes(v.type))
         : TARGET_VARIETIES;
 
+      const treasurePool = TARGET_VARIETIES.filter((v) => v.isTreasure);
+
       let guard = 0;
       while (this.rocks.length < preset.maxRocks && guard < 30) {
         guard++;
         const isHazard = Math.random() < 0.25;
-        const variety = isHazard
-          ? HAZARD_VARIETY
-          : pool[Math.floor(Math.random() * pool.length)];
+        let variety;
+        if (isHazard) {
+          variety = HAZARD_VARIETY;
+        } else if (this.pack !== 'treasure' && Math.random() < 0.26) {
+          variety = treasurePool[Math.floor(Math.random() * treasurePool.length)];
+        } else {
+          variety = pool[Math.floor(Math.random() * pool.length)];
+        }
         const pts = variety.pts[Math.floor(Math.random() * variety.pts.length)];
         const r = variety.r;
         const x = 85 + Math.random() * (w - 170);
@@ -301,6 +319,7 @@
           rot: Math.random() * Math.PI * 2,
           vrot: (Math.random() - 0.5) * 0.02,
           type: variety.type,
+          isTreasure: Boolean(variety.isTreasure),
           shardColors: variety.shardColors,
           glow: variety.glow,
           ornamentRed: Math.random() < 0.5,
@@ -327,11 +346,14 @@
 
       if (rk.points < 0) {
         this.score = Math.max(0, this.score + rk.points);
-        if (global.MathAudio) global.MathAudio.wrong();
+        if (AudioEngine) AudioEngine.wrong();
       } else {
         this.score += rk.points;
         this.blasted += 1;
-        if (global.MathAudio) global.MathAudio.boom();
+        if (AudioEngine) {
+          if (rk.isTreasure) AudioEngine.magic();
+          else AudioEngine.boom();
+        }
       }
 
       // Burst shards matching the blasted item's theme
@@ -349,10 +371,15 @@
         });
       }
 
+      const matInfo = rk.isTreasure && true ? TREASURE_BY_ID[rk.type] : null;
       this.popups.push({
         x: rk.x,
         y: rk.y - 12,
-        text: rk.points < 0 ? `🚫 ${rk.points}! SKIP!` : `💥 +${rk.points}!`,
+        text: rk.points < 0
+          ? `🚫 ${rk.points}! SKIP!`
+          : matInfo
+          ? `${matInfo.emoji} +${rk.points} ${matInfo.short}!`
+          : `💥 +${rk.points}!`,
         color: rk.points < 0 ? '#ef4444' : rk.points >= 50 ? '#fde047' : '#4ade80',
         life: 46
       });
@@ -361,7 +388,8 @@
         score: this.score,
         blasted: this.blasted,
         timeLeft: this.timeLeft,
-        lastPoints: rk.points
+        lastPoints: rk.points,
+        collectedMaterial: rk.isTreasure ? rk.type : null
       });
     }
 
@@ -503,7 +531,9 @@
       ctx.shadowColor = rk.glow;
       ctx.shadowBlur = 16;
 
-      if (rk.type === 'rock' || rk.type === 'crystal' || rk.type === 'hazard') {
+      if (rk.isTreasure ) {
+        drawTreasureCanvasItem(ctx, rk.type, rk.r * 0.9, this.tick);
+      } else if (rk.type === 'rock' || rk.type === 'crystal' || rk.type === 'hazard') {
         ctx.save();
         ctx.rotate(rk.rot);
         ctx.beginPath();
@@ -889,5 +919,5 @@
     }
   }
 
-  global.RockBlasterArcade = RockBlasterArcade;
-})(window);
+  app.RockBlasterGame = RockBlasterGame;
+})(window.KidApp = window.KidApp || {});

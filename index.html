@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#4f46e5" />
-  <meta name="description" content="Fun interactive 3D HTML5 math learning game for kids: Addition, Subtraction, Multiplication, and Times Tables with offline PWA support." />
+  <meta name="description" content="PlaySpark: Fun interactive 3D Math, K-5 English Phonics, Learning Guides, and AR Camera Motion Games for kids." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="MathCube 3D" />
+  <meta name="apple-mobile-web-app-title" content="PlaySpark" />
 
-  <title>MathCube 3D — Kids Math Adventure</title>
+  <title>PlaySpark — Math, English &amp; AR Games</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
@@ -23,8 +23,8 @@
     <!-- Top Navigation / Status Bar -->
     <header class="topbar">
       <button id="btn-home" class="brand-btn" aria-label="Go to Home">
-        <span class="brand-cube" aria-hidden="true">🎲</span>
-        <span class="brand-title">MathCube <span class="badge-3d">3D</span></span>
+        <span class="brand-cube" aria-hidden="true">✨</span>
+        <span class="brand-title">PlaySpark <span class="badge-3d">3D</span></span>
       </button>
 
       <div class="topbar-stats">
@@ -55,6 +55,16 @@
       </div>
     </header>
 
+    <!-- Top Category Navigation (Home · Math · English · Learn · Games) -->
+    <nav class="section-nav" aria-label="Main Categories">
+      <button class="nav-pill active" data-nav-section="home" data-action="go-home">🏠 Home</button>
+      <button class="nav-pill" data-nav-section="math" data-action="open-math">🔢 Math</button>
+      <button class="nav-pill" data-nav-section="english" data-action="open-english">📖 English</button>
+      <button class="nav-pill" data-nav-section="learn" data-action="open-learn">📚 Learn</button>
+      <button class="nav-pill" data-nav-section="games" data-action="open-games">🎮 Games</button>
+      <button class="nav-pill" data-nav-section="trophies" data-action="open-trophies">🏆 Trophies</button>
+    </nav>
+
     <!-- Main Content Area -->
     <main class="main-stage">
       <!-- VIEW: HOME -->
@@ -62,10 +72,11 @@
         <div class="hero-card">
           <div class="hero-text">
             <span class="rank-chip" id="home-rank">🌱 Number Sprout</span>
-            <h1 id="home-heading">Let's Play &amp; Learn Math!</h1>
-            <p>Spin 3D blocks, mix magic bubbles &amp; planets, and feed your buddy with stars!</p>
+            <h1 id="home-heading">Let's Play &amp; Learn Together!</h1>
+            <p>Explore Math 3D blocks, K–5 English Phonics, interactive Learning Guides, and AR Camera Games!</p>
             <div class="hero-cta-row">
-              <button id="btn-quick-play" class="cta-pulse-btn">🚀 Quick Play!</button>
+              <button id="btn-quick-play" class="cta-pulse-btn">🚀 Quick Play Math!</button>
+              <button class="cta-magic-btn" data-action="open-english">📖 English Phonics</button>
               <button class="cta-magic-btn" data-action="open-games">🎮 Game Arcade</button>
             </div>
           </div>
@@ -84,51 +95,26 @@
           <div class="pet-speech-wrap">
             <div class="pet-speech" id="pet-speech">Tap me! Earn 5 ⭐ to feed me a yummy treat!</div>
           </div>
+          <button id="btn-home-treasure" class="treasure-pill-btn" title="Open Treasure Chest" aria-label="Open Treasure Chest">💎 <span id="home-treasure-count">0</span></button>
           <button id="btn-feed-buddy" class="feed-btn">🧁 Treat (5⭐)</button>
         </div>
 
-        <div class="mode-grid">
-          <button class="mode-card mode-add" data-action="start-setup" data-op="add">
-            <div class="mode-icon">➕</div>
-            <div class="mode-info">
-              <h2>Addition</h2>
-              <p>Combine 3D blocks &amp; add numbers</p>
-            </div>
-            <span class="mode-arrow">▶</span>
-          </button>
-
-          <button class="mode-card mode-sub" data-action="start-setup" data-op="sub">
-            <div class="mode-icon">➖</div>
-            <div class="mode-info">
-              <h2>Subtraction</h2>
-              <p>Pop away cubes &amp; find what's left</p>
-            </div>
-            <span class="mode-arrow">▶</span>
-          </button>
-
-          <button class="mode-card mode-mul" data-action="start-setup" data-op="mul">
-            <div class="mode-icon">✖️</div>
-            <div class="mode-info">
-              <h2>Multiplication</h2>
-              <p>Build 3D cube grids &amp; multiply</p>
-            </div>
-            <span class="mode-arrow">▶</span>
-          </button>
-
-          <button class="mode-card mode-tables" data-action="open-tables">
+        <h2 class="section-heading">✨ Pick a Category</h2>
+        <div class="mode-grid category-portal-grid">
+          <button class="mode-card mode-math" data-action="open-math">
             <div class="mode-icon">🔢</div>
             <div class="mode-info">
-              <h2>Times Tables</h2>
-              <p>3D flip flashcards &amp; table quiz (1–12)</p>
+              <h2>Math World</h2>
+              <p>Addition, Subtraction, Multiplication &amp; 3D Times Tables</p>
             </div>
             <span class="mode-arrow">▶</span>
           </button>
 
-          <button class="mode-card mode-games" data-action="open-games">
-            <div class="mode-icon">🎮</div>
+          <button class="mode-card mode-english" data-action="open-english">
+            <div class="mode-icon">📖</div>
             <div class="mode-info">
-              <h2>Game Arcade</h2>
-              <p>Snow Clap Camera, Magic Mixer &amp; Speed Blitz!</p>
+              <h2>English Phonics <span class="new-tag">K–5</span></h2>
+              <p>3 &amp; 4-letter words: Clap Blender, Letter Blaster, Runner &amp; Air-Trace</p>
             </div>
             <span class="mode-arrow">▶</span>
           </button>
@@ -137,19 +123,87 @@
             <div class="mode-icon">📚</div>
             <div class="mode-info">
               <h2>Learn &amp; Guides</h2>
-              <p>Age-based math lessons &amp; tricks (4–10 yrs)</p>
+              <p>Step-by-step Math tricks &amp; English Phonics rules (K–5)</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-games" data-action="open-games">
+            <div class="mode-icon">🎮</div>
+            <div class="mode-info">
+              <h2>Game Arcade</h2>
+              <p>Camera AR games, Magic Mixer Lab &amp; Speed Blitz</p>
             </div>
             <span class="mode-arrow">▶</span>
           </button>
 
           <button class="mode-card mode-trophies" data-action="open-trophies">
-            <div class="mode-icon">📊</div>
+            <div class="mode-icon">🏆</div>
             <div class="mode-info">
-              <h2>Progress &amp; Trophies</h2>
-              <p>Score report, focus areas &amp; badges</p>
+              <h2>Progress &amp; Treasure Chest</h2>
+              <p>Score report, Stones, Coins, Jewels, Diamonds &amp; Badges</p>
             </div>
             <span class="mode-arrow">▶</span>
           </button>
+        </div>
+      </section>
+
+      <!-- VIEW: MATH WORLD HUB -->
+      <section id="view-math" class="view" aria-labelledby="math-title">
+        <div class="panel-card math-hub-card">
+          <div class="tables-top">
+            <button class="back-btn" data-action="go-home">← Back</button>
+            <h2 id="math-title">🔢 Math World</h2>
+            <button class="help-pill-btn" data-action="open-learn">📚 Math Guides</button>
+          </div>
+          <p class="muted" style="margin-top:0">Practice with interactive 3D cube blocks, step-by-step hints, and bonus treasure drops!</p>
+
+          <div class="mode-grid">
+            <button class="mode-card mode-add" data-action="start-setup" data-op="add">
+              <div class="mode-icon">➕</div>
+              <div class="mode-info">
+                <h2>Addition</h2>
+                <p>Combine 3D blocks &amp; add numbers</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-sub" data-action="start-setup" data-op="sub">
+              <div class="mode-icon">➖</div>
+              <div class="mode-info">
+                <h2>Subtraction</h2>
+                <p>Pop away cubes &amp; find what's left</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-mul" data-action="start-setup" data-op="mul">
+              <div class="mode-icon">✖️</div>
+              <div class="mode-info">
+                <h2>Multiplication</h2>
+                <p>Build 3D cube grids &amp; multiply</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-tables" data-action="open-tables">
+              <div class="mode-icon">🔢</div>
+              <div class="mode-info">
+                <h2>Times Tables</h2>
+                <p>3D flip flashcards &amp; table quiz (1–12)</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-arcade" data-action="start-arcade">
+              <div class="mode-icon">⚡</div>
+              <div class="mode-info">
+                <h2>60s Speed Blitz</h2>
+                <p>Race the clock for high scores!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -383,6 +437,9 @@
             </div>
           </div>
 
+          <h3 class="badges-heading">🏴‍☠️ Treasure Chest (Bonus Materials)</h3>
+          <div class="treasure-chest-grid" id="treasure-chest-grid"></div>
+
           <h3 class="badges-heading">📈 Topic Score Breakdown</h3>
           <div class="topic-bars" id="topic-bars"></div>
 
@@ -391,13 +448,18 @@
         </div>
       </section>
 
-      <!-- VIEW: LEARNING MATERIALS (BY KIDS AGE) -->
+      <!-- VIEW: LEARNING MATERIALS (MATH & ENGLISH GUIDES) -->
       <section id="view-learn" class="view" aria-labelledby="learn-title">
         <div class="panel-card learn-card">
           <div class="tables-top">
             <button class="back-btn" data-action="go-home">← Back</button>
-            <h2 id="learn-title">📚 Kids Math Learning Guides</h2>
-            <span class="muted age-subtitle">Pick your age group!</span>
+            <h2 id="learn-title">📚 Learning Guides</h2>
+            <span class="muted age-subtitle">Math &amp; English Lessons</span>
+          </div>
+
+          <div class="learn-subject-tabs" role="tablist" aria-label="Select learning subject">
+            <button class="magic-pill active" data-learn-subject="math">🔢 Math Guides</button>
+            <button class="magic-pill" data-learn-subject="english">📖 English Phonics Guides</button>
           </div>
 
           <div class="age-tabs" id="age-tabs" role="tablist" aria-label="Select age group">
@@ -480,14 +542,24 @@
             <h2 id="games-title">🎮 Kid's Game Arcade</h2>
             <span class="arcade-badge">INSERT FUN!</span>
           </div>
-          <p class="muted" style="margin-top:0">Pick an arcade game to play, earn stars, and boost your math superpowers!</p>
+          <p class="muted" style="margin-top:0">All Math &amp; English games organized by category — earn stars &amp; collect bonus treasures!</p>
 
+          <h3 class="arcade-subhead">📷 Math &amp; Action AR Games</h3>
           <div class="mode-grid">
+            <button class="mode-card mode-runner" data-action="open-runner">
+              <div class="mode-icon">🏃</div>
+              <div class="mode-info">
+                <h2>Number Runner AR <span class="new-tag">NEW</span></h2>
+                <p>Move Left/Right, Jump logs &amp; Duck flyers to hit the right answer!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
             <button class="mode-card mode-rock" data-action="open-rock">
               <div class="mode-icon">🥊</div>
               <div class="mode-info">
                 <h2>Rock Blaster AR <span class="new-tag">NEW</span></h2>
-                <p>Punch &amp; kick hard to blast rocks, lava, snow &amp; holiday balls!</p>
+                <p>Punch &amp; kick hard to blast rocks, planets &amp; treasure hauls!</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
@@ -509,7 +581,49 @@
               </div>
               <span class="mode-arrow">▶</span>
             </button>
+          </div>
 
+          <h3 class="arcade-subhead">📖 English Phonics AR Games (K–5)</h3>
+          <div class="mode-grid">
+            <button class="mode-card mode-en-clap" data-action="open-en-clap">
+              <div class="mode-icon">👏</div>
+              <div class="mode-info">
+                <h2>Phonics Clap Blender</h2>
+                <p>Catch onset &amp; rime in each hand, clap to blend &amp; pick the picture!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-blaster" data-action="open-en-blaster">
+              <div class="mode-icon">🥊</div>
+              <div class="mode-info">
+                <h2>Letter Blaster AR</h2>
+                <p>Punch &amp; kick falling letters in order to spell 3 &amp; 4-letter words!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-runner" data-action="open-en-runner">
+              <div class="mode-icon">🏃</div>
+              <div class="mode-info">
+                <h2>Phonics Runner AR</h2>
+                <p>Steer Left/Right, Jump &amp; Duck into the matching word gate!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-trace" data-action="open-en-trace">
+              <div class="mode-icon">✍️</div>
+              <div class="mode-info">
+                <h2>Air-Trace &amp; Glow Pad</h2>
+                <p>Trace &amp; write letters with phoneme sounds + Dictation mode!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+          </div>
+
+          <h3 class="arcade-subhead">🧪 Interactive Lab &amp; Speed Challenges</h3>
+          <div class="mode-grid">
             <button class="mode-card mode-magic" data-action="open-magic">
               <div class="mode-icon">🪄</div>
               <div class="mode-info">
@@ -549,34 +663,54 @@
 
           <div class="arcade-top-overlay">
             <div class="arcade-marquee">
-              <button class="back-btn glass-back" id="btn-snow-back">← Back</button>
+              <button class="back-btn glass-back" id="btn-snow-back" aria-label="Back to Arcade">← Back</button>
               <div class="arcade-hud">
-                <div class="hud-chip">SCORE <strong id="snow-score">0</strong></div>
-                <div class="hud-chip hud-combo">COMBO <strong id="snow-combo">x1</strong></div>
-                <div class="hud-chip hud-timer">⏱️ <strong id="snow-timer">60</strong>s</div>
-                <div class="hud-chip">⭐ <strong id="snow-stars">0</strong></div>
+                <div class="hud-chip"><span>SCORE</span> <strong id="snow-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>COMBO</span> <strong id="snow-combo">x1</strong></div>
+                <div class="hud-chip hud-timer"><span>⏱️</span> <strong id="snow-timer">60</strong>s</div>
+                <div class="hud-chip"><span>⭐</span> <strong id="snow-stars">0</strong></div>
               </div>
-              <button id="btn-help-snow" class="help-pill-btn glass-pill">❓</button>
+              <button id="btn-snow-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
             </div>
 
-            <div class="arcade-compact-bars">
-              <div class="snow-op-bar">
-                <button class="magic-pill active" data-snow-op="add">➕</button>
-                <button class="magic-pill" data-snow-op="sub">➖</button>
-                <button class="magic-pill" data-snow-op="mul">✖️</button>
-                <button class="magic-pill active" data-snow-speed="slow">🐢 Slow</button>
-                <button class="magic-pill" data-snow-speed="medium">🚀 Med</button>
-                <button class="magic-pill" data-snow-speed="fast">⚡ Fast</button>
-                <button id="btn-snow-restart" class="mini-btn glass-pill">🔄</button>
-              </div>
-              <div class="snow-op-bar" aria-label="Choose Falling Shape Style">
-                <button class="magic-pill active" data-snow-theme="snow-num">🧊 Snow</button>
-                <button class="magic-pill" data-snow-theme="snowflake">❄️ Flake</button>
-                <button class="magic-pill" data-snow-theme="apple">🍎 Apple</button>
-                <button class="magic-pill" data-snow-theme="star">🌟 Star</button>
+            <div id="snow-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Snow Clap Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-snow" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="snow-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
               </div>
               <div class="snow-status-bar" id="snow-status">📷 Starting Snow Camera...</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Math &amp; Speed</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-snow-op="add">➕</button>
+                  <button class="magic-pill" data-snow-op="sub">➖</button>
+                  <button class="magic-pill" data-snow-op="mul">✖️</button>
+                  <button class="magic-pill active" data-snow-speed="slow">🐢 Slow</button>
+                  <button class="magic-pill" data-snow-speed="medium">🚀 Med</button>
+                  <button class="magic-pill" data-snow-speed="fast">⚡ Fast</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Falling Style</span>
+                <div class="snow-op-bar" aria-label="Choose Falling Shape Style">
+                  <button class="magic-pill active" data-snow-theme="snow-num">🧊 Snow</button>
+                  <button class="magic-pill" data-snow-theme="snowflake">❄️ Flake</button>
+                  <button class="magic-pill" data-snow-theme="apple">🍎 Apple</button>
+                  <button class="magic-pill" data-snow-theme="star">🌟 Star</button>
+                </div>
+              </div>
+              <div class="arcade-settings-actions">
+                <button id="btn-snow-restart" class="mini-btn glass-pill">🔄 Restart Game</button>
+              </div>
             </div>
+          </div>
+
+          <div id="snow-finish-banner" class="arcade-finish-banner hidden">
+            <span id="snow-finish-text"></span>
+            <button id="btn-snow-play-again" class="mini-btn">🔄 Play Again</button>
           </div>
 
           <div class="snow-controls-bar arcade-bottom-overlay">
@@ -596,29 +730,44 @@
 
           <div class="arcade-top-overlay">
             <div class="arcade-marquee">
-              <button class="back-btn glass-back" id="btn-squirrel-back">← Back</button>
+              <button class="back-btn glass-back" id="btn-squirrel-back" aria-label="Back to Arcade">← Back</button>
               <div class="arcade-hud">
-                <div class="hud-chip">SCORE <strong id="sq-score">0</strong></div>
-                <div class="hud-chip hud-combo">CROSSED <strong id="sq-crossed">0</strong></div>
-                <div class="hud-chip">BRIDGE <strong id="sq-expr">3 + 4</strong></div>
-                <div class="hud-chip">⭐ <strong id="sq-stars">0</strong></div>
+                <div class="hud-chip"><span>SCORE</span> <strong id="sq-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>CROSSED</span> <strong id="sq-crossed">0</strong></div>
+                <div class="hud-chip"><span>BRIDGE</span> <strong id="sq-expr">3 + 4</strong></div>
+                <div class="hud-chip"><span>⭐</span> <strong id="sq-stars">0</strong></div>
               </div>
-              <button id="btn-help-squirrel" class="help-pill-btn glass-pill">❓</button>
+              <button id="btn-sq-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
             </div>
 
-            <div class="arcade-compact-bars">
-              <div class="snow-op-bar">
-                <button class="magic-pill active" data-sq-op="add">➕</button>
-                <button class="magic-pill" data-sq-op="sub">➖</button>
-                <button class="magic-pill" data-sq-op="mul">✖️</button>
-                <button class="magic-pill active" data-sq-speed="slow">🐢 Slow</button>
-                <button class="magic-pill" data-sq-speed="medium">🚀 Med</button>
-                <button class="magic-pill" data-sq-speed="fast">⚡ Fast</button>
-                <button id="btn-sq-mode" class="mini-btn glass-pill">🌉 Stretch &amp; Cross</button>
-                <button id="btn-sq-cam" class="mini-btn glass-pill">📷 Cam</button>
-                <button id="btn-sq-cal" class="mini-btn glass-pill" title="Recalibrate empty background">🎯 Reset Bg</button>
+            <div id="sq-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Squirrel Bridge Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-squirrel" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="sq-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
               </div>
               <div class="snow-status-bar" id="sq-status">🙌 Stretch both hands to touch both numbers!</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Math &amp; Speed</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-sq-op="add">➕</button>
+                  <button class="magic-pill" data-sq-op="sub">➖</button>
+                  <button class="magic-pill" data-sq-op="mul">✖️</button>
+                  <button class="magic-pill active" data-sq-speed="slow">🐢 Slow</button>
+                  <button class="magic-pill" data-sq-speed="medium">🚀 Med</button>
+                  <button class="magic-pill" data-sq-speed="fast">⚡ Fast</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Mode &amp; Camera</span>
+                <div class="snow-op-bar">
+                  <button id="btn-sq-mode" class="mini-btn glass-pill">🌉 Stretch &amp; Cross</button>
+                  <button id="btn-sq-cam" class="mini-btn glass-pill">📷 Cam</button>
+                  <button id="btn-sq-cal" class="mini-btn glass-pill" title="Recalibrate empty background">🎯 Reset Bg</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -638,34 +787,461 @@
 
           <div class="arcade-top-overlay">
             <div class="arcade-marquee">
-              <button class="back-btn glass-back" id="btn-rock-back">← Back</button>
+              <button class="back-btn glass-back" id="btn-rock-back" aria-label="Back to Arcade">← Back</button>
               <div class="arcade-hud">
-                <div class="hud-chip">POINTS <strong id="rock-score">0</strong></div>
-                <div class="hud-chip hud-combo">BLASTED <strong id="rock-blasted">0</strong></div>
-                <div class="hud-chip hud-timer">⏱️ <strong id="rock-timer">90</strong>s</div>
-                <div class="hud-chip">🏆 BEST <strong id="rock-best">0</strong></div>
+                <div class="hud-chip"><span>PTS</span> <strong id="rock-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>💥</span> <strong id="rock-blasted">0</strong></div>
+                <div class="hud-chip hud-timer"><span>⏱️</span> <strong id="rock-timer">90</strong>s</div>
+                <div class="hud-chip"><span>🏆</span> <strong id="rock-best">0</strong></div>
               </div>
-              <button id="btn-help-rock" class="help-pill-btn glass-pill">❓</button>
+              <button id="btn-rock-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
             </div>
 
-            <div class="arcade-compact-bars">
-              <div class="snow-op-bar" aria-label="Rock Blaster Speed">
-                <button class="magic-pill active" data-rock-speed="slow">🐢 Slow (4–6)</button>
-                <button class="magic-pill" data-rock-speed="medium">🚀 Medium (6–8)</button>
-                <button class="magic-pill" data-rock-speed="fast">⚡ Fast (8–10)</button>
-                <button id="btn-rock-cam" class="mini-btn glass-pill">📷 Cam + Galaxy</button>
-                <button id="btn-rock-restart" class="mini-btn glass-pill">🔄</button>
-              </div>
-              <div class="snow-op-bar" aria-label="Choose Target Pack">
-                <button class="magic-pill active" data-rock-pack="mix">🎲 Mix</button>
-                <button class="magic-pill" data-rock-pack="planets">🪐 Planets</button>
-                <button class="magic-pill" data-rock-pack="bubbles">🫧 Bubbles</button>
-                <button class="magic-pill" data-rock-pack="snow">❄️ Snow</button>
-                <button class="magic-pill" data-rock-pack="fruits">🍉 Fruits</button>
-                <button class="magic-pill" data-rock-pack="rocks">🪨 Rocks</button>
+            <div id="rock-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Rock Blaster Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-rock" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="rock-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
               </div>
               <div class="snow-status-bar" id="rock-status">📷 Starting Punch &amp; Kick Camera...</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Speed</span>
+                <div class="snow-op-bar" aria-label="Rock Blaster Speed">
+                  <button class="magic-pill active" data-rock-speed="slow">🐢 Slow (4–6)</button>
+                  <button class="magic-pill" data-rock-speed="medium">🚀 Medium (6–8)</button>
+                  <button class="magic-pill" data-rock-speed="fast">⚡ Fast (8–10)</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Target Pack</span>
+                <div class="snow-op-bar" aria-label="Choose Target Pack">
+                  <button class="magic-pill active" data-rock-pack="mix">🎲 Mix</button>
+                  <button class="magic-pill" data-rock-pack="treasure">💎 Treasure</button>
+                  <button class="magic-pill" data-rock-pack="planets">🪐 Planets</button>
+                  <button class="magic-pill" data-rock-pack="bubbles">🫧 Bubbles</button>
+                  <button class="magic-pill" data-rock-pack="snow">❄️ Snow</button>
+                  <button class="magic-pill" data-rock-pack="fruits">🍉 Fruits</button>
+                  <button class="magic-pill" data-rock-pack="rocks">🪨 Rocks</button>
+                </div>
+              </div>
+              <div class="arcade-settings-actions">
+                <button id="btn-rock-cam" class="mini-btn glass-pill">📷 Cam + Galaxy</button>
+                <button id="btn-rock-restart" class="mini-btn glass-pill">🔄 Restart Game</button>
+              </div>
             </div>
+          </div>
+
+          <div id="rock-finish-banner" class="arcade-finish-banner hidden">
+            <span id="rock-finish-text"></span>
+            <button id="btn-rock-play-again" class="mini-btn">🔄 Play Again</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: NUMBER RUNNER AR (DUCK & JUMP 3-LANE CAMERA GAME) -->
+      <section id="view-runner" class="view" aria-labelledby="runner-title">
+        <div class="arcade-cabinet runner-cabinet arcade-fullscreen">
+          <div class="snow-stage-wrap">
+            <canvas id="runner-canvas" width="640" height="400" aria-label="Number Runner Duck and Jump Arcade"></canvas>
+          </div>
+
+          <div class="arcade-top-overlay">
+            <div class="arcade-marquee">
+              <button class="back-btn glass-back" id="btn-runner-back" aria-label="Back to Arcade">← Back</button>
+              <div class="arcade-hud">
+                <div class="hud-chip"><span>SCORE</span> <strong id="runner-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>STREAK</span> <strong id="runner-streak">0</strong></div>
+                <div class="hud-chip hud-timer"><span>⏱️</span> <strong id="runner-timer">90</strong>s</div>
+                <div class="hud-chip"><span>⭐</span> <strong id="runner-stars">0</strong></div>
+              </div>
+              <button id="btn-runner-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
+            </div>
+
+            <div id="runner-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Number Runner Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-runner" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="runner-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
+              </div>
+              <div class="snow-status-bar" id="runner-status">📷 Starting Number Runner Camera...</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Math &amp; Speed</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-runner-op="add">➕</button>
+                  <button class="magic-pill" data-runner-op="sub">➖</button>
+                  <button class="magic-pill" data-runner-op="mul">✖️</button>
+                  <button class="magic-pill" data-runner-op="mix">🎲 Mix</button>
+                </div>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-runner-speed="slow">🐢 Slow</button>
+                  <button class="magic-pill" data-runner-speed="medium">🚀 Med</button>
+                  <button class="magic-pill" data-runner-speed="fast">⚡ Fast</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">World Theme</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-runner-world="jungle">🌲 Jungle</button>
+                  <button class="magic-pill" data-runner-world="space">🚀 Space</button>
+                  <button class="magic-pill" data-runner-world="snow">❄️ Snow</button>
+                  <button class="magic-pill" data-runner-world="lava">🌋 Lava</button>
+                </div>
+              </div>
+              <div class="arcade-settings-actions">
+                <button id="btn-runner-cam" class="mini-btn glass-pill">📷 Cam + World</button>
+                <button id="btn-runner-cal" class="mini-btn glass-pill">🎯 Reset Pose</button>
+                <button id="btn-runner-restart" class="mini-btn glass-pill">🔄 Restart</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="runner-finish-banner" class="arcade-finish-banner hidden">
+            <span id="runner-finish-text"></span>
+            <button id="btn-runner-play-again" class="mini-btn">🔄 Play Again</button>
+          </div>
+
+          <div class="runner-controls-bar arcade-bottom-overlay">
+            <button id="btn-runner-left" class="runner-pad-btn glass-pill" aria-label="Move Left">⬅️</button>
+            <button id="btn-runner-jump" class="runner-pad-btn runner-action-btn" aria-label="Jump">🦘 JUMP</button>
+            <button id="btn-runner-duck" class="runner-pad-btn runner-action-btn runner-duck-btn" aria-label="Duck">🦆 DUCK</button>
+            <button id="btn-runner-right" class="runner-pad-btn glass-pill" aria-label="Move Right">➡️</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: ENGLISH PHONICS HUB (K–5 READING & WRITING) -->
+      <section id="view-english" class="view" aria-labelledby="english-title">
+        <div class="panel-card english-hub-card">
+          <div class="tables-top">
+            <button class="back-btn" data-action="go-home">← Back</button>
+            <h2 id="english-title">📖 English Phonics Arcade (K–5)</h2>
+            <div class="tables-actions">
+              <button class="help-pill-btn" data-action="open-learn-english">📚 Phonics Guides</button>
+              <button id="btn-help-english" class="help-pill-btn">❓ Help</button>
+            </div>
+          </div>
+          <p class="muted" style="margin-top:0">Learn 3-letter &amp; 4-letter regular words with phonics sounds for reading and writing!</p>
+
+          <div class="en-tier-bar" id="en-tier-selector" role="tablist" aria-label="Choose Grade Level">
+            <button class="magic-pill" data-en-tier="k">🐣 K (3-Letter)</button>
+            <button class="magic-pill" data-en-tier="g1">🌱 G1 (Blends)</button>
+            <button class="magic-pill" data-en-tier="g2">🚀 G2 (Digraphs)</button>
+            <button class="magic-pill" data-en-tier="g3">✨ G3 (Magic-E)</button>
+            <button class="magic-pill" data-en-tier="g4_5">👑 G4–5 (Teams)</button>
+            <button class="magic-pill active" data-en-tier="all">🎲 All K–5</button>
+          </div>
+
+          <div class="mode-grid">
+            <button class="mode-card mode-en-clap" data-action="open-en-clap">
+              <div class="mode-icon">👏</div>
+              <div class="mode-info">
+                <h2>Phonics Clap Blender <span class="new-tag">OPT 1</span></h2>
+                <p>Catch onset &amp; rime in each hand, clap to blend &amp; pick the picture!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-blaster" data-action="open-en-blaster">
+              <div class="mode-icon">🥊</div>
+              <div class="mode-info">
+                <h2>Letter Blaster AR <span class="new-tag">OPT 2</span></h2>
+                <p>Punch &amp; kick falling letters in order to spell 3 &amp; 4-letter words!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-runner" data-action="open-en-runner">
+              <div class="mode-icon">🏃</div>
+              <div class="mode-info">
+                <h2>Phonics Runner AR <span class="new-tag">OPT 3</span></h2>
+                <p>Steer Left/Right, Jump &amp; Duck into the matching word gate!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-trace" data-action="open-en-trace">
+              <div class="mode-icon">✍️</div>
+              <div class="mode-info">
+                <h2>Air-Trace &amp; Glow Pad <span class="new-tag">NEW OPT 4</span></h2>
+                <p>Trace &amp; write letters with phoneme sounds + Dictation mode!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+          </div>
+
+          <div class="en-parked-strip">
+            <span>🅿️ <strong>Parked for Next Phase:</strong> 🌉 Sound-Bridge Stretch (Opt 5) • 🧪 Word Cauldron Mixer (Opt 6)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: OPTION 1 — PHONICS CLAP BLENDER AR -->
+      <section id="view-en-clap" class="view" aria-label="Phonics Clap Blender">
+        <div class="arcade-cabinet en-clap-cabinet arcade-fullscreen">
+          <div class="snow-stage-wrap">
+            <canvas id="en-clap-canvas" width="640" height="400" aria-label="Phonics Clap Blender Arcade"></canvas>
+          </div>
+
+          <div class="arcade-top-overlay">
+            <div class="arcade-marquee">
+              <button class="back-btn glass-back" id="btn-en-clap-back" aria-label="Back to English">← Back</button>
+              <div class="arcade-hud">
+                <div class="hud-chip"><span>SCORE</span> <strong id="en-clap-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>COMBO</span> <strong id="en-clap-combo">x1</strong></div>
+                <div class="hud-chip hud-timer"><span>⏱️</span> <strong id="en-clap-timer">90</strong>s</div>
+                <div class="hud-chip"><span>⭐</span> <strong id="en-clap-stars">0</strong></div>
+              </div>
+              <button id="btn-en-clap-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
+            </div>
+
+            <div id="en-clap-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Phonics Clap Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Phonics Clap Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-en-clap" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="en-clap-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
+              </div>
+              <div class="snow-status-bar" id="en-clap-status">📷 Starting Phonics Clap Camera...</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Grade Level</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill" data-en-tier-sync="k" data-en-clap-tier="k">🐣 K</button>
+                  <button class="magic-pill" data-en-tier-sync="g1" data-en-clap-tier="g1">🌱 G1</button>
+                  <button class="magic-pill" data-en-tier-sync="g2" data-en-clap-tier="g2">🚀 G2</button>
+                  <button class="magic-pill" data-en-tier-sync="g3" data-en-clap-tier="g3">✨ G3</button>
+                  <button class="magic-pill" data-en-tier-sync="g4_5" data-en-clap-tier="g4_5">👑 G4–5</button>
+                  <button class="magic-pill active" data-en-tier-sync="all" data-en-clap-tier="all">🎲 All</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Mode &amp; Speed</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-en-clap-mode="blend">✨ Blend</button>
+                  <button class="magic-pill" data-en-clap-mode="magic-e">🪄 Magic-E</button>
+                  <button class="magic-pill active" data-en-clap-speed="slow">🐢 Slow</button>
+                  <button class="magic-pill" data-en-clap-speed="medium">🚀 Med</button>
+                  <button class="magic-pill" data-en-clap-speed="fast">⚡ Fast</button>
+                </div>
+              </div>
+              <div class="arcade-settings-actions">
+                <button id="btn-en-clap-restart" class="mini-btn glass-pill">🔄 Restart Game</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="en-clap-finish-banner" class="arcade-finish-banner hidden">
+            <span id="en-clap-finish-text"></span>
+            <button id="btn-en-clap-play-again" class="mini-btn">🔄 Play Again</button>
+          </div>
+
+          <div class="snow-controls-bar arcade-bottom-overlay">
+            <div class="hand-readout" id="en-clap-left-readout">✋ Left: --</div>
+            <button id="btn-en-clap-trigger" class="clap-arcade-btn" disabled>👏 CLAP &amp; BLEND!</button>
+            <div class="hand-readout" id="en-clap-right-readout">Right: -- 🤚</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: OPTION 2 — LETTER BLASTER / SOUND SMASH AR -->
+      <section id="view-en-blaster" class="view" aria-label="Letter Blaster AR">
+        <div class="arcade-cabinet en-blaster-cabinet arcade-fullscreen">
+          <div class="snow-stage-wrap">
+            <canvas id="en-blaster-canvas" width="640" height="400" aria-label="Letter Blaster Phonics Arcade"></canvas>
+          </div>
+
+          <div class="arcade-top-overlay">
+            <div class="arcade-marquee">
+              <button class="back-btn glass-back" id="btn-en-blaster-back" aria-label="Back to English">← Back</button>
+              <div class="arcade-hud">
+                <div class="hud-chip"><span>PTS</span> <strong id="en-blaster-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>📖</span> <strong id="en-blaster-words">0</strong></div>
+                <div class="hud-chip hud-timer"><span>⏱️</span> <strong id="en-blaster-timer">90</strong>s</div>
+                <div class="hud-chip"><span>🔥</span> <strong id="en-blaster-streak">0</strong></div>
+              </div>
+              <button id="btn-en-blaster-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
+            </div>
+
+            <div id="en-blaster-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Letter Blaster Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Letter Blaster Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-en-blaster" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="en-blaster-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
+              </div>
+              <div class="snow-status-bar" id="en-blaster-status">📷 Starting Letter Blaster Camera...</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Grade Level</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill" data-en-tier-sync="k" data-en-blaster-tier="k">🐣 K</button>
+                  <button class="magic-pill" data-en-tier-sync="g1" data-en-blaster-tier="g1">🌱 G1</button>
+                  <button class="magic-pill" data-en-tier-sync="g2" data-en-blaster-tier="g2">🚀 G2</button>
+                  <button class="magic-pill" data-en-tier-sync="g3" data-en-blaster-tier="g3">✨ G3</button>
+                  <button class="magic-pill" data-en-tier-sync="g4_5" data-en-blaster-tier="g4_5">👑 G4–5</button>
+                  <button class="magic-pill active" data-en-tier-sync="all" data-en-blaster-tier="all">🎲 All</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Speed</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-en-blaster-speed="slow">🐢 Slow</button>
+                  <button class="magic-pill" data-en-blaster-speed="medium">🚀 Med</button>
+                  <button class="magic-pill" data-en-blaster-speed="fast">⚡ Fast</button>
+                </div>
+              </div>
+              <div class="arcade-settings-actions">
+                <button id="btn-en-blaster-repeat" class="mini-btn glass-pill">🔊 Hear Word</button>
+                <button id="btn-en-blaster-cam" class="mini-btn glass-pill">📷 Cam + Galaxy</button>
+                <button id="btn-en-blaster-restart" class="mini-btn glass-pill">🔄 Restart</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="en-blaster-finish-banner" class="arcade-finish-banner hidden">
+            <span id="en-blaster-finish-text"></span>
+            <button id="btn-en-blaster-play-again" class="mini-btn">🔄 Play Again</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: OPTION 3 — PHONICS RUNNER AR -->
+      <section id="view-en-runner" class="view" aria-label="Phonics Runner AR">
+        <div class="arcade-cabinet en-runner-cabinet arcade-fullscreen">
+          <div class="snow-stage-wrap">
+            <canvas id="en-runner-canvas" width="640" height="400" aria-label="Phonics Runner 3-Lane Arcade"></canvas>
+          </div>
+
+          <div class="arcade-top-overlay">
+            <div class="arcade-marquee">
+              <button class="back-btn glass-back" id="btn-en-runner-back" aria-label="Back to English">← Back</button>
+              <div class="arcade-hud">
+                <div class="hud-chip"><span>SCORE</span> <strong id="en-runner-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>STREAK</span> <strong id="en-runner-streak">0</strong></div>
+                <div class="hud-chip hud-timer"><span>⏱️</span> <strong id="en-runner-timer">90</strong>s</div>
+                <div class="hud-chip"><span>⭐</span> <strong id="en-runner-stars">0</strong></div>
+              </div>
+              <button id="btn-en-runner-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
+            </div>
+
+            <div id="en-runner-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Phonics Runner Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Phonics Runner Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-en-runner" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="en-runner-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
+              </div>
+              <div class="snow-status-bar" id="en-runner-status">📷 Starting Phonics Runner Camera...</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Grade Level</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill" data-en-tier-sync="k" data-en-runner-tier="k">🐣 K</button>
+                  <button class="magic-pill" data-en-tier-sync="g1" data-en-runner-tier="g1">🌱 G1</button>
+                  <button class="magic-pill" data-en-tier-sync="g2" data-en-runner-tier="g2">🚀 G2</button>
+                  <button class="magic-pill" data-en-tier-sync="g3" data-en-runner-tier="g3">✨ G3</button>
+                  <button class="magic-pill" data-en-tier-sync="g4_5" data-en-runner-tier="g4_5">👑 G4–5</button>
+                  <button class="magic-pill active" data-en-tier-sync="all" data-en-runner-tier="all">🎲 All</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Speed &amp; World</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-en-runner-speed="slow">🐢 Slow</button>
+                  <button class="magic-pill" data-en-runner-speed="medium">🚀 Med</button>
+                  <button class="magic-pill" data-en-runner-speed="fast">⚡ Fast</button>
+                </div>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-en-runner-world="jungle">🌲 Jungle</button>
+                  <button class="magic-pill" data-en-runner-world="space">🚀 Space</button>
+                  <button class="magic-pill" data-en-runner-world="snow">❄️ Snow</button>
+                  <button class="magic-pill" data-en-runner-world="lava">🌋 Lava</button>
+                </div>
+              </div>
+              <div class="arcade-settings-actions">
+                <button id="btn-en-runner-repeat" class="mini-btn glass-pill">🔊 Hear Word</button>
+                <button id="btn-en-runner-cam" class="mini-btn glass-pill">📷 Cam + World</button>
+                <button id="btn-en-runner-cal" class="mini-btn glass-pill">🎯 Reset Pose</button>
+                <button id="btn-en-runner-restart" class="mini-btn glass-pill">🔄 Restart</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="en-runner-finish-banner" class="arcade-finish-banner hidden">
+            <span id="en-runner-finish-text"></span>
+            <button id="btn-en-runner-play-again" class="mini-btn">🔄 Play Again</button>
+          </div>
+
+          <div class="runner-controls-bar arcade-bottom-overlay">
+            <button id="btn-en-runner-left" class="runner-pad-btn glass-pill" aria-label="Move Left">⬅️</button>
+            <button id="btn-en-runner-jump" class="runner-pad-btn runner-action-btn" aria-label="Jump">🦘 JUMP</button>
+            <button id="btn-en-runner-duck" class="runner-pad-btn runner-action-btn runner-duck-btn" aria-label="Duck">🦆 DUCK</button>
+            <button id="btn-en-runner-right" class="runner-pad-btn glass-pill" aria-label="Move Right">➡️</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: OPTION 4 — AIR-TRACE & GLOW PAD (WRITING & DICTATION) -->
+      <section id="view-en-trace" class="view" aria-label="Air-Trace and Glow Pad">
+        <div class="arcade-cabinet en-trace-cabinet arcade-fullscreen">
+          <div class="snow-stage-wrap">
+            <canvas id="en-trace-canvas" width="640" height="400" aria-label="Air-Trace and Glow Pad Writing Game"></canvas>
+          </div>
+
+          <div class="arcade-top-overlay">
+            <div class="arcade-marquee">
+              <button class="back-btn glass-back" id="btn-en-trace-back" aria-label="Back to English">← Back</button>
+              <div class="arcade-hud">
+                <div class="hud-chip"><span>SCORE</span> <strong id="en-trace-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>WORDS</span> <strong id="en-trace-words">0</strong></div>
+                <div class="hud-chip"><span>🔥</span> <strong id="en-trace-streak">0</strong></div>
+                <div class="hud-chip"><span>⭐</span> <strong id="en-trace-stars">0</strong></div>
+              </div>
+              <button id="btn-en-trace-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
+            </div>
+
+            <div id="en-trace-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Air-Trace Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Air-Trace Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-en-trace" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="en-trace-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
+              </div>
+              <div class="snow-status-bar" id="en-trace-status">✍️ Trace each glowing letter to hear its phonics sound!</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Grade Level</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill" data-en-tier-sync="k" data-en-trace-tier="k">🐣 K</button>
+                  <button class="magic-pill" data-en-tier-sync="g1" data-en-trace-tier="g1">🌱 G1</button>
+                  <button class="magic-pill" data-en-tier-sync="g2" data-en-trace-tier="g2">🚀 G2</button>
+                  <button class="magic-pill" data-en-tier-sync="g3" data-en-trace-tier="g3">✨ G3</button>
+                  <button class="magic-pill" data-en-tier-sync="g4_5" data-en-trace-tier="g4_5">👑 G4–5</button>
+                  <button class="magic-pill active" data-en-tier-sync="all" data-en-trace-tier="all">🎲 All</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Writing Mode</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-en-trace-mode="trace">✍️ Guided Trace</button>
+                  <button class="magic-pill" data-en-trace-mode="dictation">🎧 Dictation</button>
+                </div>
+              </div>
+              <div class="arcade-settings-actions">
+                <button id="btn-en-trace-cam" class="mini-btn glass-pill">📷 Air-Cam: Off</button>
+                <button id="btn-en-trace-next" class="mini-btn glass-pill">⏭️ New Word</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="runner-controls-bar arcade-bottom-overlay">
+            <button id="btn-en-trace-clear" class="runner-pad-btn glass-pill">🧹 Clear</button>
+            <button id="btn-en-trace-speak" class="runner-pad-btn runner-action-btn">🔊 Hear Word</button>
+            <button id="btn-en-trace-skip" class="runner-pad-btn glass-pill">⏭️ Next</button>
           </div>
         </div>
       </section>
@@ -720,11 +1296,27 @@
     </div>
   </div>
 
-  <script src="./audio.js"></script>
-  <script src="./math3d.js"></script>
-  <script src="./snowgame.js"></script>
-  <script src="./squirrelgame.js"></script>
-  <script src="./rockgame.js"></script>
-  <script src="./app.js"></script>
+  <script defer src="./src/core/audio-engine.js"></script>
+  <script defer src="./src/core/treasure-registry.js"></script>
+  <script defer src="./src/core/profile-store.js"></script>
+  <script defer src="./src/core/ui-effects.js"></script>
+  <script defer src="./src/math/math-3d-scene.js"></script>
+  <script defer src="./src/math/math-quest-controller.js"></script>
+  <script defer src="./src/math/times-tables-controller.js"></script>
+  <script defer src="./src/english/phonics-curriculum.js"></script>
+  <script defer src="./src/english/phonics-clap-game.js"></script>
+  <script defer src="./src/english/phonics-blaster-game.js"></script>
+  <script defer src="./src/english/phonics-runner-game.js"></script>
+  <script defer src="./src/english/phonics-trace-game.js"></script>
+  <script defer src="./src/english/english-hub-controller.js"></script>
+  <script defer src="./src/learn/learn-curriculum.js"></script>
+  <script defer src="./src/learn/learn-controller.js"></script>
+  <script defer src="./src/games/magic-mixer-game.js"></script>
+  <script defer src="./src/games/snow-clap-game.js"></script>
+  <script defer src="./src/games/squirrel-bridge-game.js"></script>
+  <script defer src="./src/games/rock-blaster-game.js"></script>
+  <script defer src="./src/games/number-runner-game.js"></script>
+  <script defer src="./src/games/games-hub-controller.js"></script>
+  <script defer src="./src/main.js"></script>
 </body>
 </html>
