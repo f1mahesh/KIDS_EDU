@@ -63,6 +63,34 @@
 
       this._initGalaxy();
       this._bindPointer();
+      this._onResize = () => { if (this.running) this._syncCanvasSize(); };
+      window.addEventListener('resize', this._onResize);
+    }
+
+    _syncCanvasSize() {
+      const vw = Math.max(320, window.innerWidth || 640);
+      const vh = Math.max(320, window.innerHeight || 480);
+      const w = Math.max(480, Math.min(920, vw));
+      const h = Math.max(360, Math.round((w * vh) / vw));
+      if (this.canvas.width !== w || this.canvas.height !== h) {
+        this.canvas.width = w;
+        this.canvas.height = h;
+        this._initGalaxy();
+      }
+    }
+
+    _drawVideoCover(targetCtx, tw, th) {
+      const vw = this.video.videoWidth || tw;
+      const vh = this.video.videoHeight || th;
+      const scale = Math.max(tw / vw, th / vh);
+      const dw = vw * scale;
+      const dh = vh * scale;
+      const dx = (tw - dw) / 2;
+      const dy = (th - dh) / 2;
+      targetCtx.save();
+      targetCtx.scale(-1, 1);
+      targetCtx.drawImage(this.video, -(dx + dw), dy, dw, dh);
+      targetCtx.restore();
     }
 
     _initGalaxy() {
@@ -112,6 +140,7 @@
 
     async start(speedKey = this.speed) {
       this.stop();
+      this._syncCanvasSize();
       this.speed = ROCK_SPEED_PRESETS[speedKey] ? speedKey : 'slow';
       const preset = ROCK_SPEED_PRESETS[this.speed];
 
@@ -299,10 +328,7 @@
       const mw = this.motionCanvas.width;
       const mh = this.motionCanvas.height;
 
-      this.motionCtx.save();
-      this.motionCtx.scale(-1, 1);
-      this.motionCtx.drawImage(this.video, -mw, 0, mw, mh);
-      this.motionCtx.restore();
+      this._drawVideoCover(this.motionCtx, mw, mh);
 
       const data = this.motionCtx.getImageData(0, 0, mw, mh).data;
       if (!this.prevFrame) {
@@ -567,10 +593,7 @@
       const camActive = this.hasCamera && this.showCamera && this.video.readyState >= 2;
 
       if (camActive) {
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.drawImage(this.video, -w, 0, w, h);
-        ctx.restore();
+        this._drawVideoCover(ctx, w, h);
         // Cosmic galaxy tint over camera feed
         const tint = ctx.createLinearGradient(0, 0, w, h);
         tint.addColorStop(0, 'rgba(30, 27, 75, 0.34)');
@@ -603,11 +626,11 @@
       ctx.fillStyle = neb2;
       ctx.fillRect(0, 0, w, h);
 
-      // Distant Ringed Galaxy Planet in top-right corner
+      // Distant Ringed Galaxy Planet (positioned below top scoreboard)
       ctx.save();
       ctx.globalAlpha = camActive ? 0.55 : 0.9;
-      const px = w - 76;
-      const py = 58;
+      const px = w - 68;
+      const py = 152;
       const pGrad = ctx.createRadialGradient(px - 8, py - 8, 4, px, py, 24);
       pGrad.addColorStop(0, '#fde047');
       pGrad.addColorStop(0.6, '#a855f7');

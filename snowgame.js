@@ -63,6 +63,38 @@
 
       this._initAmbientSnow();
       this._bindPointer();
+      this._onResize = () => { if (this.running) this._syncCanvasSize(); };
+      window.addEventListener('resize', this._onResize);
+    }
+
+    _syncCanvasSize() {
+      const vw = Math.max(320, window.innerWidth || 640);
+      const vh = Math.max(320, window.innerHeight || 480);
+      const w = Math.max(480, Math.min(920, vw));
+      const h = Math.max(360, Math.round((w * vh) / vw));
+      if (this.canvas.width !== w || this.canvas.height !== h) {
+        this.canvas.width = w;
+        this.canvas.height = h;
+        this.leftHand.x = w * 0.2;
+        this.leftHand.y = h - 130;
+        this.rightHand.x = w * 0.8;
+        this.rightHand.y = h - 130;
+        this._initAmbientSnow();
+      }
+    }
+
+    _drawVideoCover(targetCtx, tw, th) {
+      const vw = this.video.videoWidth || tw;
+      const vh = this.video.videoHeight || th;
+      const scale = Math.max(tw / vw, th / vh);
+      const dw = vw * scale;
+      const dh = vh * scale;
+      const dx = (tw - dw) / 2;
+      const dy = (th - dh) / 2;
+      targetCtx.save();
+      targetCtx.scale(-1, 1);
+      targetCtx.drawImage(this.video, -(dx + dw), dy, dw, dh);
+      targetCtx.restore();
     }
 
     _initAmbientSnow() {
@@ -123,6 +155,7 @@
 
     async start(op = 'add', speedKey = this.speed) {
       this.stop();
+      this._syncCanvasSize();
       this.op = op;
       this.speed = SPEED_PRESETS[speedKey] ? speedKey : 'slow';
       const preset = SPEED_PRESETS[this.speed];
@@ -289,11 +322,7 @@
       const mw = this.motionCanvas.width;
       const mh = this.motionCanvas.height;
 
-      // Mirror video onto motion canvas
-      this.motionCtx.save();
-      this.motionCtx.scale(-1, 1);
-      this.motionCtx.drawImage(this.video, -mw, 0, mw, mh);
-      this.motionCtx.restore();
+      this._drawVideoCover(this.motionCtx, mw, mh);
 
       const data = this.motionCtx.getImageData(0, 0, mw, mh).data;
       if (!this.prevFrame) {
@@ -492,12 +521,12 @@
 
       // Gently settle idle hands back toward resting palm spots if no camera or still
       if (!this.leftHand.active) {
-        this.leftHand.x += (110 - this.leftHand.x) * 0.04;
-        this.leftHand.y += (h - 78 - this.leftHand.y) * 0.04;
+        this.leftHand.x += (w * 0.2 - this.leftHand.x) * 0.04;
+        this.leftHand.y += (h - 135 - this.leftHand.y) * 0.04;
       }
       if (!this.rightHand.active) {
-        this.rightHand.x += (w - 110 - this.rightHand.x) * 0.04;
-        this.rightHand.y += (h - 78 - this.rightHand.y) * 0.04;
+        this.rightHand.x += (w * 0.8 - this.rightHand.x) * 0.04;
+        this.rightHand.y += (h - 135 - this.rightHand.y) * 0.04;
       }
 
       // Big Snow result timer
@@ -700,13 +729,10 @@
       const h = this.canvas.height;
       ctx.clearRect(0, 0, w, h);
 
-      // Background: Mirrored Camera OR Winter Night Sky
+      // Background: Full-Screen Mirrored Camera OR Winter Night Sky
       if (this.hasCamera && this.video.readyState >= 2) {
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.drawImage(this.video, -w, 0, w, h);
-        ctx.restore();
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.22)';
+        this._drawVideoCover(ctx, w, h);
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.16)';
         ctx.fillRect(0, 0, w, h);
       } else {
         const bg = ctx.createLinearGradient(0, 0, 0, h);
@@ -744,17 +770,17 @@
         this._drawSnowNumber(sb.x, sb.y, sb.fontSize || 48, sb.val, sb.side === 'left' ? '#38bdf8' : '#f472b6');
       }
 
-      // Live Mic Clap Sound Indicator
+      // Live Mic Clap Sound Indicator (positioned below top scoreboard)
       if (this.hasMic) {
         ctx.save();
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
         ctx.beginPath();
-        ctx.roundRect(12, 12, 114, 26, 999);
+        ctx.roundRect(14, 146, 118, 26, 999);
         ctx.fill();
         ctx.fillStyle = this.clapSoundWindow > 0 ? '#fde047' : '#bae6fd';
         ctx.font = '800 11px system-ui, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(this.clapSoundWindow > 0 ? '🎤 CLAP HEARD!' : '🎤 Clap Mic', 22, 29);
+        ctx.fillText(this.clapSoundWindow > 0 ? '🎤 CLAP HEARD!' : '🎤 Clap Mic', 24, 163);
         ctx.restore();
       }
 
@@ -770,9 +796,9 @@
       if (this.heldLeft !== null && this.heldRight !== null && !this.bigSnow) {
         const opSym = this.op === 'add' ? '+' : this.op === 'sub' ? '−' : '×';
         ctx.save();
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
         ctx.beginPath();
-        ctx.roundRect(w / 2 - 150, 18, 300, 56, 20);
+        ctx.roundRect(w / 2 - 150, 142, 300, 52, 20);
         ctx.fill();
         ctx.strokeStyle = '#fde047';
         ctx.lineWidth = 3;
@@ -780,7 +806,7 @@
         ctx.fillStyle = '#fde047';
         ctx.font = '900 19px system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`👏 CLAP PALMS! (${this.heldLeft} ${opSym} ${this.heldRight})`, w / 2, 52);
+        ctx.fillText(`👏 CLAP PALMS! (${this.heldLeft} ${opSym} ${this.heldRight})`, w / 2, 174);
         ctx.restore();
       }
 

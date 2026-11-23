@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mathcube-3d-v20';
+const CACHE_NAME = 'mathcube-3d-v21';
 const ASSETS = [
   './',
   './index.html',

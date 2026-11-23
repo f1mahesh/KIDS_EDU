@@ -1183,7 +1183,7 @@
   $('btn-sq-cam').addEventListener('click', () => {
     if (!squirrelGame) return;
     const on = squirrelGame.toggleCameraView();
-    $('btn-sq-cam').textContent = on ? '📷 Cam Overlay' : '🌴 Jungle View';
+    $('btn-sq-cam').textContent = on ? '📷 Cam' : '🌴 Jungle';
     MathAudio.pop();
   });
   $('btn-sq-cal').addEventListener('click', () => {
