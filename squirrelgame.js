@@ -86,6 +86,8 @@
       if (this.canvas.width !== w || this.canvas.height !== h) {
         this.canvas.width = w;
         this.canvas.height = h;
+        this.motionCanvas.width = 80;
+        this.motionCanvas.height = Math.max(44, Math.round((80 * h) / w));
         const margin = Math.min(125, Math.round(w * 0.18));
         this.pointA.x = margin;
         this.pointA.y = h * 0.56;
@@ -183,6 +185,8 @@
       this.bgFrame = null;
       this.tick = 0;
       this.running = true;
+      this.video.setAttribute('playsinline', '');
+      this.video.setAttribute('webkit-playsinline', '');
 
       this.onStatus('📷 Starting Park Camera...');
       await this._startCamera();

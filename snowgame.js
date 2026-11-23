@@ -30,8 +30,9 @@
       this.analyser = null;
       this.audioBuf = null;
       this.hasMic = false;
+      this.micLiveSignal = false;
       this.micLevel = 0;
-      this.avgNoise = 0.04;
+      this.avgNoise = 0.03;
       this.clapSoundWindow = 0;
 
       this.stream = null;
@@ -75,10 +76,14 @@
       if (this.canvas.width !== w || this.canvas.height !== h) {
         this.canvas.width = w;
         this.canvas.height = h;
-        this.leftHand.x = w * 0.2;
-        this.leftHand.y = h - 130;
-        this.rightHand.x = w * 0.8;
-        this.rightHand.y = h - 130;
+        // Keep motionCanvas aspect-matched so portrait iPhone & landscape desktop track accurately
+        this.motionCanvas.width = 80;
+        this.motionCanvas.height = Math.max(44, Math.round((80 * h) / w));
+        this.prevFrame = null;
+        this.leftHand.x = w * 0.22;
+        this.leftHand.y = h - 135;
+        this.rightHand.x = w * 0.78;
+        this.rightHand.y = h - 135;
         this._initAmbientSnow();
       }
     }
@@ -118,8 +123,8 @@
         const y = ((e.clientY - rect.top) / rect.height) * this.canvas.height;
 
         // If holding both and tapping center -> trigger clap!
-        if (this.heldLeft && this.heldRight) {
-          if (Math.abs(x - this.canvas.width / 2) < 120) {
+        if (this.heldLeft !== null && this.heldRight !== null) {
+          if (Math.abs(x - this.canvas.width / 2) < this.canvas.width * 0.28) {
             this.triggerClap();
             return;
           }
@@ -172,7 +177,24 @@
       this.catchGrace = 0;
       this.handsWereApart = false;
       this.clapSoundWindow = 0;
+      this.micLiveSignal = false;
       this.running = true;
+
+      // Unlock AudioContext synchronously inside user click/tap for iOS Safari!
+      const AudioCtx = global.AudioContext || global.webkitAudioContext;
+      if (AudioCtx) {
+        try {
+          this.audioCtx = new AudioCtx();
+          if (this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume().catch(() => {});
+          }
+        } catch (_) {
+          this.audioCtx = null;
+        }
+      }
+
+      this.video.setAttribute('playsinline', '');
+      this.video.setAttribute('webkit-playsinline', '');
 
       this.onStatus('📷 Starting Snow Camera & Clap Mic...');
       await this._startCamera();
@@ -207,16 +229,13 @@
     _setupMic(stream) {
       try {
         const audioTracks = stream.getAudioTracks();
-        if (!audioTracks || audioTracks.length === 0) {
+        if (!audioTracks || audioTracks.length === 0 || !this.audioCtx) {
           this.hasMic = false;
           return;
         }
-        const AudioCtx = global.AudioContext || global.webkitAudioContext;
-        if (!AudioCtx) {
-          this.hasMic = false;
-          return;
+        if (this.audioCtx.state === 'suspended') {
+          this.audioCtx.resume().catch(() => {});
         }
-        this.audioCtx = new AudioCtx();
         const src = this.audioCtx.createMediaStreamSource(stream);
         this.analyser = this.audioCtx.createAnalyser();
         this.analyser.fftSize = 256;
@@ -236,10 +255,10 @@
         return;
       }
       try {
-        // Request camera + mic so we can hear real clap sounds!
+        // Disable noiseSuppression/echoCancellation so iOS & Android keep sharp clap sounds!
         this.stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: { echoCancellation: true, noiseSuppression: true }
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true }
         });
         this._setupMic(this.stream);
       } catch (_) {
@@ -368,21 +387,28 @@
 
       const w = this.canvas.width;
       const h = this.canvas.height;
-      if (leftSum > 22) {
-        const tx = (leftX / leftSum / mw) * w;
-        const ty = (leftY / leftSum / mh) * h;
-        this.leftHand.x += (tx - this.leftHand.x) * 0.35;
-        this.leftHand.y += (ty - this.leftHand.y) * 0.35;
+      const bothHeld = this.heldLeft !== null && this.heldRight !== null;
+      const minMotionPixels = Math.max(16, Math.round((mw * mh) * 0.004));
+
+      if (leftSum > minMotionPixels) {
+        const rawX = (leftX / leftSum / mw) * w;
+        const rawY = (leftY / leftSum / mh) * h;
+        const tx = Math.max(w * 0.12, Math.min(bothHeld ? w * 0.54 : w * 0.44, rawX));
+        const ty = Math.max(h * 0.34, Math.min(h - 125, rawY));
+        this.leftHand.x += (tx - this.leftHand.x) * 0.24;
+        this.leftHand.y += (ty - this.leftHand.y) * 0.24;
         this.leftHand.active = true;
       } else {
         this.leftHand.active = false;
       }
 
-      if (rightSum > 22) {
-        const tx = (rightX / rightSum / mw) * w;
-        const ty = (rightY / rightSum / mh) * h;
-        this.rightHand.x += (tx - this.rightHand.x) * 0.35;
-        this.rightHand.y += (ty - this.rightHand.y) * 0.35;
+      if (rightSum > minMotionPixels) {
+        const rawX = (rightX / rightSum / mw) * w;
+        const rawY = (rightY / rightSum / mh) * h;
+        const tx = Math.max(bothHeld ? w * 0.46 : w * 0.56, Math.min(w * 0.88, rawX));
+        const ty = Math.max(h * 0.34, Math.min(h - 125, rawY));
+        this.rightHand.x += (tx - this.rightHand.x) * 0.24;
+        this.rightHand.y += (ty - this.rightHand.y) * 0.24;
         this.rightHand.active = true;
       } else {
         this.rightHand.active = false;
@@ -390,19 +416,26 @@
     }
 
     _sampleClapAudio() {
-      if (!this.hasMic || !this.analyser || !this.audioBuf) return;
+      if (!this.hasMic || !this.analyser || !this.audioBuf || !this.audioCtx) return;
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume().catch(() => {});
+        return;
+      }
       this.analyser.getByteTimeDomainData(this.audioBuf);
       let peak = 0;
       for (let i = 0; i < this.audioBuf.length; i++) {
         const amp = Math.abs(this.audioBuf[i] - 128) / 128;
         if (amp > peak) peak = amp;
       }
+      if (peak > 0.002) {
+        this.micLiveSignal = true;
+      }
       this.micLevel = peak;
       this.avgNoise = this.avgNoise * 0.92 + peak * 0.08;
 
       // A clap creates a sharp short transient louder than steady talking/background noise
-      if (peak > 0.20 && peak > this.avgNoise * 2.1) {
-        this.clapSoundWindow = 22; // ~0.35s window to match the visual clap gesture
+      if (peak > 0.14 && peak > this.avgNoise * 1.85) {
+        this.clapSoundWindow = 24;
       } else if (this.clapSoundWindow > 0) {
         this.clapSoundWindow -= 1;
       }
@@ -521,11 +554,11 @@
 
       // Gently settle idle hands back toward resting palm spots if no camera or still
       if (!this.leftHand.active) {
-        this.leftHand.x += (w * 0.2 - this.leftHand.x) * 0.04;
+        this.leftHand.x += (w * 0.22 - this.leftHand.x) * 0.04;
         this.leftHand.y += (h - 135 - this.leftHand.y) * 0.04;
       }
       if (!this.rightHand.active) {
-        this.rightHand.x += (w * 0.8 - this.rightHand.x) * 0.04;
+        this.rightHand.x += (w * 0.78 - this.rightHand.x) * 0.04;
         this.rightHand.y += (h - 135 - this.rightHand.y) * 0.04;
       }
 
@@ -544,6 +577,9 @@
         if (this.fallingSnowballs.length < 3) {
           this._spawnWave();
         }
+        const catchRadius = Math.max(68, Math.round(w * 0.14));
+        const sideMotionMin = Math.max(30, Math.round((this.motionCanvas.width * this.motionCanvas.height) * 0.008));
+
         for (let i = this.fallingSnowballs.length - 1; i >= 0; i--) {
           const sb = this.fallingSnowballs[i];
           sb.y += sb.vy;
@@ -551,14 +587,14 @@
           sb.x += Math.sin(sb.wobble) * 0.6;
 
           // Catch when open palm moves near the falling snow number
-          if (this.hasCamera && sb.y > h * 0.25 && sb.y < h * 0.92) {
+          if (this.hasCamera && sb.y > h * 0.24 && sb.y < h * 0.90) {
             const distL = Math.hypot(sb.x - this.leftHand.x, sb.y - this.leftHand.y);
             const distR = Math.hypot(sb.x - this.rightHand.x, sb.y - this.rightHand.y);
-            if (!this.heldLeft && (distL < 80 || (sb.side === 'left' && this.motionGrid.left > 48))) {
+            if (!this.heldLeft && (distL < catchRadius || (sb.side === 'left' && this.motionGrid.left > sideMotionMin))) {
               this._catchSnowball(sb, i);
               continue;
             }
-            if (!this.heldRight && (distR < 80 || (sb.side === 'right' && this.motionGrid.right > 48))) {
+            if (!this.heldRight && (distR < catchRadius || (sb.side === 'right' && this.motionGrid.right > sideMotionMin))) {
               this._catchSnowball(sb, i);
               continue;
             }
@@ -569,7 +605,7 @@
           }
         }
 
-        // Strict Clap Detection: wait for clap gesture AND clap sound!
+        // Cross-device Clap Detection (scales proportionally for portrait iPhone & widescreen desktop!)
         if (
           this.hasCamera &&
           this.heldLeft !== null &&
@@ -578,27 +614,31 @@
           this.catchGrace === 0
         ) {
           const palmDist = Math.hypot(this.leftHand.x - this.rightHand.x, this.leftHand.y - this.rightHand.y);
-          if (palmDist > 165) {
+          const apartDist = w * 0.34;
+          const closeDist = w * 0.26;
+          const centerBurstMin = Math.max(34, Math.round((this.motionCanvas.width * this.motionCanvas.height) * 0.009));
+
+          if (palmDist > apartDist) {
             this.handsWereApart = true;
           }
 
           const gestureClap =
             this.handsWereApart &&
-            this.leftHand.active &&
-            this.rightHand.active &&
-            palmDist < 128 &&
-            this.motionGrid.center > 50;
+            (this.leftHand.active || this.rightHand.active) &&
+            palmDist < closeDist &&
+            this.motionGrid.center > centerBurstMin;
 
-          if (this.hasMic) {
-            // Require BOTH a clap sound spike AND a clapping palm gesture!
+          const micWorking = this.hasMic && this.micLiveSignal && this.audioCtx && this.audioCtx.state === 'running';
+          if (micWorking) {
+            // When mic is truly streaming audio: accept clap sound + visual clap OR strong unmistakable palm collision
             const soundClap = this.clapSoundWindow > 0;
-            const visualAction = palmDist < 155 || this.motionGrid.center > 55;
+            const visualAction = palmDist < w * 0.36 || this.motionGrid.center > centerBurstMin;
             if (soundClap && visualAction) {
               this.clapSoundWindow = 0;
               this.triggerClap();
             }
           } else if (gestureClap) {
-            // If mic is off, require hands to start apart and actively clap together
+            // Fallback for iOS Safari / muted mic: trigger cleanly when hands come together from apart
             this.triggerClap();
           }
         }

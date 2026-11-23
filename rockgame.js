@@ -75,6 +75,9 @@
       if (this.canvas.width !== w || this.canvas.height !== h) {
         this.canvas.width = w;
         this.canvas.height = h;
+        this.motionCanvas.width = 80;
+        this.motionCanvas.height = Math.max(44, Math.round((80 * h) / w));
+        this.prevFrame = null;
         this._initGalaxy();
       }
     }
@@ -154,6 +157,8 @@
       this.shards = [];
       this.popups = [];
       this.running = true;
+      this.video.setAttribute('playsinline', '');
+      this.video.setAttribute('webkit-playsinline', '');
 
       this.onStatus('📷 Starting Punch & Kick Camera...');
       await this._startCamera();
