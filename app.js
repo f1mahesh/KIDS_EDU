@@ -29,6 +29,7 @@
       solved: 0,
       bestStreak: 0,
       arcadeBest: 0,
+      rockBest: 0,
       stats: {
         add: { attempts: 0, correct: 0, hints: 0 },
         sub: { attempts: 0, correct: 0, hints: 0 },
@@ -109,10 +110,27 @@
     tables: $('view-tables'),
     trophies: $('view-trophies'),
     learn: $('view-learn'),
-    magic: $('view-magic')
+    magic: $('view-magic'),
+    games: $('view-games'),
+    snow: $('view-snow'),
+    squirrel: $('view-squirrel'),
+    rock: $('view-rock')
   };
 
+  let snowGame = null;
+  let squirrelGame = null;
+  let rockGame = null;
+
   function showView(name) {
+    if (name !== 'snow' && snowGame) {
+      snowGame.stop();
+    }
+    if (name !== 'squirrel' && squirrelGame) {
+      squirrelGame.stop();
+    }
+    if (name !== 'rock' && rockGame) {
+      rockGame.stop();
+    }
     Object.values(views).forEach((v) => v.classList.remove('active'));
     views[name].classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -169,8 +187,15 @@
 
   function speakQuestion(q) {
     if (!q) return;
-    const opWord = q.op === 'add' ? 'plus' : q.op === 'sub' ? 'minus' : 'times';
-    MathAudio.speak(`${q.a} ${opWord} ${q.b} equals what?`);
+    const opWord =
+      q.op === 'add'
+        ? 'plus'
+        : q.op === 'sub'
+        ? session.level === 'easy'
+          ? 'take away'
+          : 'minus'
+        : 'times';
+    MathAudio.speak(`What is ${q.a} ${opWord} ${q.b}?`, 'normal');
   }
 
   // Confetti
@@ -484,6 +509,10 @@
     $('sum-best-streak').textContent = `${session.roundBestStreak} 🔥`;
 
     showView('summary');
+    MathAudio.speak(
+      `Woohoo! Awesome job${profile.name ? ', ' + profile.name : ''}! You earned ${session.starsEarned} stars!`,
+      'cheer'
+    );
   }
 
   // Times Tables Playground
@@ -672,7 +701,16 @@
     el.addEventListener('click', () => startQuest(el.dataset.level));
   });
 
-  document.querySelector('[data-action="open-tables"]').addEventListener('click', () => openTables(2));
+  document.querySelectorAll('[data-action="open-tables"]').forEach((el) => {
+    el.addEventListener('click', () => openTables(2));
+  });
+  document.querySelectorAll('[data-action="open-games"]').forEach((el) => {
+    el.addEventListener('click', () => {
+      MathAudio.pop();
+      stopTimer();
+      showView('games');
+    });
+  });
   document.querySelector('[data-action="start-arcade"]').addEventListener('click', startArcade);
   document.querySelector('[data-action="open-trophies"]').addEventListener('click', openTrophies);
   document.querySelector('[data-action="open-learn"]').addEventListener('click', () => openLearn('4-6'));
@@ -894,6 +932,8 @@
         }
       }
     }
+
+    MathAudio.speak(textEl.textContent, 'gentle');
   }
 
   $('btn-step-hint').addEventListener('click', () => showStepHint(true));
@@ -936,8 +976,35 @@
       bodyEl.innerHTML = `
         <ul>
           <li><strong>Drag or Tap:</strong> Drag any 2 Bubbles, Planets, or Fruits into the glowing Magic Portal (or just tap them!).</li>
-          <li><strong>🪄 Mix Magic:</strong> Tap Mix Magic to watch the two numbers combine with a sparkle burst!</li>
+          <li><strong>🪄 Mix Magic:</strong> When 2 items land in the portal, they auto-mix with a sparkle burst!</li>
           <li><strong>🎯 Target vs 🧪 Free Mix:</strong> Hit the target number to earn ⭐ stars, or switch to Free Mix to experiment with any numbers!</li>
+        </ul>
+      `;
+    } else if (topic === 'snow') {
+      titleEl.textContent = '❄️ How Snow Clap AR Works';
+      bodyEl.innerHTML = `
+        <ul>
+          <li><strong>🐢 Pick Speed by Age:</strong> Choose <em>Slow (4–6)</em>, <em>Medium (6–8)</em>, or <em>Fast (8–10)</em>.</li>
+          <li><strong>🙌 Hold 2 Snow Numbers:</strong> Catch one snow-shaped number in each open palm (or tap them).</li>
+          <li><strong>👏 Clap Sound + Gesture:</strong> Bring both palms together AND clap loudly (or tap <strong>👏 CLAP HANDS!</strong>) to form a giant snow number!</li>
+        </ul>
+      `;
+    } else if (topic === 'squirrel') {
+      titleEl.textContent = '🐿️ How Squirrel Bridge Works';
+      bodyEl.innerHTML = `
+        <ul>
+          <li><strong>🙌 Stretch Both Arms:</strong> Stretch your Left Hand to <strong>LEFT HAND</strong> and Right Hand to <strong>RIGHT HAND</strong> in the camera (no fake bridge line—your real arms &amp; shoulders ARE the bridge!).</li>
+          <li><strong>🐿️ Walk Over Your Shoulders:</strong> Sammy the Squirrel walks right over your real outstretched hands &amp; shoulders from Left to Right!</li>
+          <li><strong>🌰 Bonus Mode:</strong> Tap <em>Stretch &amp; Cross</em> to switch to <em>Math Quiz</em> mode!</li>
+        </ul>
+      `;
+    } else if (topic === 'rock') {
+      titleEl.textContent = '🥊 How Rock Blaster AR Works';
+      bodyEl.innerHTML = `
+        <ul>
+          <li><strong>🥊 Punch &amp; 🦶 Kick HARD:</strong> Punch falling rocks, lava, snow, and holiday balls as they drop! Hit HARD to blast one target at a time!</li>
+          <li><strong>🚫 Skip Negative Numbers:</strong> Don't punch dark red <strong>-10 / -20 / -50</strong> hazard rocks — hitting them reduces your score!</li>
+          <li><strong>🐢🚀⚡ Speed Control:</strong> Pick Slow (4–6), Medium (6–8), or Fast (8–10) for your age!</li>
         </ul>
       `;
     }
@@ -952,6 +1019,267 @@
   $('btn-help-setup').addEventListener('click', () => openHelpModal('setup'));
   $('btn-help-tables').addEventListener('click', () => openHelpModal('tables'));
   $('btn-help-magic').addEventListener('click', () => openHelpModal('magic'));
+  $('btn-help-snow').addEventListener('click', () => openHelpModal('snow'));
+  $('btn-help-squirrel').addEventListener('click', () => openHelpModal('squirrel'));
+  $('btn-help-rock').addEventListener('click', () => openHelpModal('rock'));
+
+  // ==========================================
+  // SNOW CLAP AR (Camera Arcade Game)
+  // ==========================================
+  let snowOp = 'add';
+  let snowSpeed = 'slow';
+
+  function initSnowGame() {
+    if (snowGame) return snowGame;
+    snowGame = new SnowClapArcade({
+      canvas: $('snow-canvas'),
+      onStatus(msg) {
+        $('snow-status').textContent = msg;
+      },
+      onScore(info) {
+        $('snow-score').textContent = info.score;
+        $('snow-combo').textContent = `x${info.combo}`;
+        $('snow-timer').textContent = info.timeLeft;
+        $('snow-stars').textContent = info.stars;
+        $('snow-left-readout').textContent = `✋ Left: ${info.heldLeft !== null ? info.heldLeft : '--'}`;
+        $('snow-right-readout').textContent = `Right: ${info.heldRight !== null ? info.heldRight : '--'} 🤚`;
+        $('btn-snow-clap').disabled = !(info.heldLeft !== null && info.heldRight !== null);
+
+        if (info.lastExpr) {
+          profile.stars += 2;
+          profile.solved += 1;
+          if (profile.stats[snowOp]) {
+            profile.stats[snowOp].attempts += 1;
+            profile.stats[snowOp].correct += 1;
+          }
+          saveProfile(profile);
+          refreshHeader();
+          launchConfetti(18);
+        }
+      },
+      onFinish(res) {
+        MathAudio.fanfare();
+        launchConfetti(40);
+        $('snow-status').textContent = `🏆 Time Up! Final Score: ${res.score} • Earned +${res.stars} ⭐! Tap Restart to play again!`;
+        if (res.score > profile.arcadeBest) {
+          profile.arcadeBest = res.score;
+          saveProfile(profile);
+        }
+      }
+    });
+    return snowGame;
+  }
+
+  function openSnowArcade() {
+    MathAudio.pop();
+    stopTimer();
+    const game = initSnowGame();
+    $('snow-score').textContent = '0';
+    $('snow-combo').textContent = 'x1';
+    $('snow-timer').textContent = snowSpeed === 'slow' ? '90' : '60';
+    $('snow-stars').textContent = '0';
+    $('snow-left-readout').textContent = '✋ Left: --';
+    $('snow-right-readout').textContent = 'Right: -- 🤚';
+    $('btn-snow-clap').disabled = true;
+    showView('snow');
+    game.start(snowOp, snowSpeed);
+  }
+
+  document.querySelector('[data-action="open-snow"]').addEventListener('click', openSnowArcade);
+  $('btn-snow-back').addEventListener('click', () => {
+    MathAudio.pop();
+    showView('games');
+  });
+  $('btn-snow-clap').addEventListener('click', () => {
+    if (snowGame) snowGame.triggerClap();
+  });
+  $('btn-snow-restart').addEventListener('click', () => {
+    MathAudio.pop();
+    if (snowGame) snowGame.start(snowOp, snowSpeed);
+  });
+  document.querySelectorAll('[data-snow-op]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      snowOp = btn.dataset.snowOp;
+      document.querySelectorAll('[data-snow-op]').forEach((b) => b.classList.toggle('active', b === btn));
+      MathAudio.pop();
+      if (snowGame) snowGame.setOperation(snowOp);
+    });
+  });
+  document.querySelectorAll('[data-snow-speed]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      snowSpeed = btn.dataset.snowSpeed;
+      document.querySelectorAll('[data-snow-speed]').forEach((b) => b.classList.toggle('active', b === btn));
+      MathAudio.pop();
+      if (snowGame) snowGame.setSpeed(snowSpeed);
+    });
+  });
+
+  // ==========================================
+  // SQUIRREL BRIDGE AR (Park / Jungle Stretch Hands Game)
+  // ==========================================
+  let sqOp = 'add';
+  let sqSpeed = 'slow';
+  let sqQuizMode = false;
+
+  function initSquirrelGame() {
+    if (squirrelGame) return squirrelGame;
+    squirrelGame = new SquirrelBridgeArcade({
+      canvas: $('squirrel-canvas'),
+      onStatus(msg) {
+        $('sq-status').textContent = msg;
+      },
+      onScore(info) {
+        $('sq-score').textContent = info.score;
+        $('sq-crossed').textContent = info.crossed;
+        $('sq-stars').textContent = info.stars;
+        if (info.problem) {
+          $('sq-expr').textContent = `${info.problem.a} ${info.problem.sym} ${info.problem.b}`;
+        }
+        if (info.completedRound) {
+          profile.stars += 2;
+          profile.solved += 1;
+          if (profile.stats[sqOp]) {
+            profile.stats[sqOp].attempts += 1;
+            profile.stats[sqOp].correct += 1;
+          }
+          saveProfile(profile);
+          refreshHeader();
+          launchConfetti(24);
+        }
+      }
+    });
+    return squirrelGame;
+  }
+
+  function openSquirrelArcade() {
+    MathAudio.pop();
+    stopTimer();
+    const game = initSquirrelGame();
+    $('sq-score').textContent = '0';
+    $('sq-crossed').textContent = '0';
+    $('sq-stars').textContent = '0';
+    showView('squirrel');
+    game.start(sqOp, sqSpeed);
+  }
+
+  document.querySelector('[data-action="open-squirrel"]').addEventListener('click', openSquirrelArcade);
+  $('btn-squirrel-back').addEventListener('click', () => {
+    MathAudio.pop();
+    showView('games');
+  });
+  $('btn-sq-connect').addEventListener('click', () => {
+    if (squirrelGame) squirrelGame.connectNow();
+  });
+  $('btn-sq-next').addEventListener('click', () => {
+    MathAudio.pop();
+    if (squirrelGame) squirrelGame.nextRound();
+  });
+  $('btn-sq-mode').addEventListener('click', () => {
+    sqQuizMode = !sqQuizMode;
+    $('btn-sq-mode').textContent = sqQuizMode ? '🌰 Math Quiz Mode' : '🌉 Stretch & Cross';
+    MathAudio.pop();
+    if (squirrelGame) squirrelGame.setQuizMode(sqQuizMode);
+  });
+  $('btn-sq-cam').addEventListener('click', () => {
+    if (!squirrelGame) return;
+    const on = squirrelGame.toggleCameraView();
+    $('btn-sq-cam').textContent = on ? '📷 Cam Overlay' : '🌴 Jungle View';
+    MathAudio.pop();
+  });
+  $('btn-sq-cal').addEventListener('click', () => {
+    if (squirrelGame) squirrelGame.recalibrate();
+    MathAudio.pop();
+  });
+  document.querySelectorAll('[data-sq-op]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      sqOp = btn.dataset.sqOp;
+      document.querySelectorAll('[data-sq-op]').forEach((b) => b.classList.toggle('active', b === btn));
+      MathAudio.pop();
+      if (squirrelGame) squirrelGame.setOperation(sqOp);
+    });
+  });
+  document.querySelectorAll('[data-sq-speed]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      sqSpeed = btn.dataset.sqSpeed;
+      document.querySelectorAll('[data-sq-speed]').forEach((b) => b.classList.toggle('active', b === btn));
+      MathAudio.pop();
+      if (squirrelGame) squirrelGame.setSpeed(sqSpeed);
+    });
+  });
+
+  // ==========================================
+  // ROCK BLASTER AR (Fist & Kick Action Game)
+  // ==========================================
+  let rockSpeed = 'slow';
+
+  function initRockGame() {
+    if (rockGame) return rockGame;
+    rockGame = new RockBlasterArcade({
+      canvas: $('rock-canvas'),
+      onStatus(msg) {
+        $('rock-status').textContent = msg;
+      },
+      onScore(info) {
+        $('rock-score').textContent = info.score;
+        $('rock-blasted').textContent = info.blasted;
+        $('rock-timer').textContent = info.timeLeft;
+        if (info.score > (profile.rockBest || 0)) {
+          profile.rockBest = info.score;
+          $('rock-best').textContent = info.score;
+          saveProfile(profile);
+        }
+        if (info.lastPoints >= 50) {
+          launchConfetti(16);
+        }
+      },
+      onFinish(res) {
+        MathAudio.fanfare();
+        launchConfetti(40);
+        const starsWon = Math.max(1, Math.floor(res.blasted / 3));
+        profile.stars += starsWon;
+        saveProfile(profile);
+        refreshHeader();
+        $('rock-status').textContent = `🏆 Time Up! ${res.score} Points (${res.blasted} rocks blasted) • +${starsWon} ⭐!`;
+      }
+    });
+    return rockGame;
+  }
+
+  function openRockArcade() {
+    MathAudio.pop();
+    stopTimer();
+    const game = initRockGame();
+    $('rock-score').textContent = '0';
+    $('rock-blasted').textContent = '0';
+    $('rock-timer').textContent = rockSpeed === 'slow' ? '90' : '60';
+    $('rock-best').textContent = profile.rockBest || 0;
+    showView('rock');
+    game.start(rockSpeed);
+  }
+
+  document.querySelector('[data-action="open-rock"]').addEventListener('click', openRockArcade);
+  $('btn-rock-back').addEventListener('click', () => {
+    MathAudio.pop();
+    showView('games');
+  });
+  $('btn-rock-restart').addEventListener('click', () => {
+    MathAudio.pop();
+    if (rockGame) rockGame.start(rockSpeed);
+  });
+  $('btn-rock-cam').addEventListener('click', () => {
+    if (!rockGame) return;
+    const on = rockGame.toggleCameraView();
+    $('btn-rock-cam').textContent = on ? '📷 Cam + Galaxy' : '🌌 Full Galaxy';
+    MathAudio.pop();
+  });
+  document.querySelectorAll('[data-rock-speed]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      rockSpeed = btn.dataset.rockSpeed;
+      document.querySelectorAll('[data-rock-speed]').forEach((b) => b.classList.toggle('active', b === btn));
+      MathAudio.pop();
+      if (rockGame) rockGame.setSpeed(rockSpeed);
+    });
+  });
 
   // ==========================================
   // MAGIC MIXER LAB (Drag Bubbles / Planets / Fruits)
@@ -1347,7 +1675,9 @@
   $('btn-voice').addEventListener('click', () => {
     const on = MathAudio.toggleVoice();
     updateVoiceBtn();
-    if (on) MathAudio.speak('Voice is on!');
+    if (on) {
+      MathAudio.speak(`Hi${profile.name ? ', ' + profile.name : ''}! Let's play math together!`, 'cheer');
+    }
   });
 
   $('btn-speak-q').addEventListener('click', () => {

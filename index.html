@@ -66,7 +66,7 @@
             <p>Spin 3D blocks, mix magic bubbles &amp; planets, and feed your buddy with stars!</p>
             <div class="hero-cta-row">
               <button id="btn-quick-play" class="cta-pulse-btn">🚀 Quick Play!</button>
-              <button class="cta-magic-btn" data-action="open-magic">🪄 Magic Mixer</button>
+              <button class="cta-magic-btn" data-action="open-games">🎮 Game Arcade</button>
             </div>
           </div>
           <div class="hero-3d-wrap">
@@ -124,20 +124,11 @@
             <span class="mode-arrow">▶</span>
           </button>
 
-          <button class="mode-card mode-arcade" data-action="start-arcade">
-            <div class="mode-icon">⚡</div>
+          <button class="mode-card mode-games" data-action="open-games">
+            <div class="mode-icon">🎮</div>
             <div class="mode-info">
-              <h2>60s Speed Blitz</h2>
-              <p>Race the clock for high scores!</p>
-            </div>
-            <span class="mode-arrow">▶</span>
-          </button>
-
-          <button class="mode-card mode-magic" data-action="open-magic">
-            <div class="mode-icon">🪄</div>
-            <div class="mode-info">
-              <h2>Magic Mixer Lab</h2>
-              <p>Drag bubbles, planets &amp; fruits for magic math!</p>
+              <h2>Game Arcade</h2>
+              <p>Snow Clap Camera, Magic Mixer &amp; Speed Blitz!</p>
             </div>
             <span class="mode-arrow">▶</span>
           </button>
@@ -480,6 +471,193 @@
           </div>
         </div>
       </section>
+
+      <!-- VIEW: DEDICATED GAME ARCADE -->
+      <section id="view-games" class="view" aria-labelledby="games-title">
+        <div class="panel-card games-hub-card">
+          <div class="tables-top">
+            <button class="back-btn" data-action="go-home">← Back</button>
+            <h2 id="games-title">🎮 Kid's Game Arcade</h2>
+            <span class="arcade-badge">INSERT FUN!</span>
+          </div>
+          <p class="muted" style="margin-top:0">Pick an arcade game to play, earn stars, and boost your math superpowers!</p>
+
+          <div class="mode-grid">
+            <button class="mode-card mode-rock" data-action="open-rock">
+              <div class="mode-icon">🥊</div>
+              <div class="mode-info">
+                <h2>Rock Blaster AR <span class="new-tag">NEW</span></h2>
+                <p>Punch &amp; kick hard to blast rocks, lava, snow &amp; holiday balls!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-squirrel" data-action="open-squirrel">
+              <div class="mode-icon">🐿️</div>
+              <div class="mode-info">
+                <h2>Squirrel Bridge <span class="new-tag">NEW</span></h2>
+                <p>Stretch both hands to build a park/jungle bridge so Squirrel crosses!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-snow" data-action="open-snow">
+              <div class="mode-icon">❄️</div>
+              <div class="mode-info">
+                <h2>Snow Clap Camera <span class="new-tag">NEW</span></h2>
+                <p>Catch falling snow numbers in each hand &amp; clap for a giant snowball!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-magic" data-action="open-magic">
+              <div class="mode-icon">🪄</div>
+              <div class="mode-info">
+                <h2>Magic Mixer Lab</h2>
+                <p>Drag bubbles, planets &amp; fruits for magic math bursts!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-arcade" data-action="start-arcade">
+              <div class="mode-icon">⚡</div>
+              <div class="mode-info">
+                <h2>60s Speed Blitz</h2>
+                <p>Race the arcade clock for high scores!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-tables" data-action="open-tables">
+              <div class="mode-icon">🔢</div>
+              <div class="mode-info">
+                <h2>Times Table Flip</h2>
+                <p>3D flip cards &amp; table challenge (1–12)</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: SNOW CLAP AR CAMERA ARCADE -->
+      <section id="view-snow" class="view" aria-labelledby="snow-title">
+        <div class="arcade-cabinet">
+          <div class="arcade-marquee">
+            <button class="back-btn" id="btn-snow-back">← Arcade</button>
+            <h2 id="snow-title">❄️ SNOW CLAP AR</h2>
+            <button id="btn-help-snow" class="help-pill-btn">❓ Help</button>
+          </div>
+
+          <div class="arcade-hud">
+            <div class="hud-chip">SCORE <strong id="snow-score">0</strong></div>
+            <div class="hud-chip hud-combo">COMBO <strong id="snow-combo">x1</strong></div>
+            <div class="hud-chip hud-timer">⏱️ <strong id="snow-timer">60</strong>s</div>
+            <div class="hud-chip">⭐ <strong id="snow-stars">0</strong></div>
+          </div>
+
+          <div class="snow-op-bar">
+            <button class="magic-pill active" data-snow-op="add">➕ Add</button>
+            <button class="magic-pill" data-snow-op="sub">➖ Sub</button>
+            <button class="magic-pill" data-snow-op="mul">✖️ Mul</button>
+            <button id="btn-snow-restart" class="mini-btn">🔄 Restart</button>
+          </div>
+
+          <div class="snow-op-bar" aria-label="Snow Speed by Kids Age">
+            <button class="magic-pill active" data-snow-speed="slow">🐢 Slow (4–6)</button>
+            <button class="magic-pill" data-snow-speed="medium">🚀 Medium (6–8)</button>
+            <button class="magic-pill" data-snow-speed="fast">⚡ Fast (8–10)</button>
+          </div>
+
+          <div class="snow-status-bar" id="snow-status">📷 Starting Snow Camera...</div>
+
+          <div class="snow-stage-wrap">
+            <canvas id="snow-canvas" width="640" height="400" aria-label="Snow Clap Camera Arcade"></canvas>
+          </div>
+
+          <div class="snow-controls-bar">
+            <div class="hand-readout" id="snow-left-readout">✋ Left: --</div>
+            <button id="btn-snow-clap" class="clap-arcade-btn" disabled>👏 CLAP HANDS!</button>
+            <div class="hand-readout" id="snow-right-readout">Right: -- 🤚</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: SQUIRREL BRIDGE JUNGLE ARCADE -->
+      <section id="view-squirrel" class="view" aria-labelledby="squirrel-title">
+        <div class="arcade-cabinet squirrel-cabinet">
+          <div class="arcade-marquee">
+            <button class="back-btn" id="btn-squirrel-back">← Arcade</button>
+            <h2 id="squirrel-title">🐿️ SQUIRREL BRIDGE</h2>
+            <button id="btn-help-squirrel" class="help-pill-btn">❓ Help</button>
+          </div>
+
+          <div class="arcade-hud">
+            <div class="hud-chip">SCORE <strong id="sq-score">0</strong></div>
+            <div class="hud-chip hud-combo">CROSSED <strong id="sq-crossed">0</strong></div>
+            <div class="hud-chip">BRIDGE <strong id="sq-expr">3 + 4</strong></div>
+            <div class="hud-chip">⭐ <strong id="sq-stars">0</strong></div>
+          </div>
+
+          <div class="snow-op-bar">
+            <button class="magic-pill active" data-sq-op="add">➕ Add</button>
+            <button class="magic-pill" data-sq-op="sub">➖ Sub</button>
+            <button class="magic-pill" data-sq-op="mul">✖️ Mul</button>
+            <button id="btn-sq-mode" class="mini-btn">🌉 Stretch &amp; Cross</button>
+            <button id="btn-sq-cam" class="mini-btn">📷 Cam Overlay</button>
+            <button id="btn-sq-cal" class="mini-btn" title="Recalibrate empty background">🎯 Reset Bg</button>
+          </div>
+
+          <div class="snow-op-bar" aria-label="Squirrel Bridge Speed">
+            <button class="magic-pill active" data-sq-speed="slow">🐢 Slow (4–6)</button>
+            <button class="magic-pill" data-sq-speed="medium">🚀 Medium (6–8)</button>
+            <button class="magic-pill" data-sq-speed="fast">⚡ Fast (8–10)</button>
+          </div>
+
+          <div class="snow-status-bar" id="sq-status">🙌 Stretch both hands to connect Point A &amp; Point B!</div>
+
+          <div class="snow-stage-wrap">
+            <canvas id="squirrel-canvas" width="640" height="400" aria-label="Squirrel Bridge Park and Jungle Game"></canvas>
+          </div>
+
+          <div class="snow-controls-bar">
+            <button id="btn-sq-connect" class="clap-arcade-btn">🙌 CONNECT BRIDGE!</button>
+            <button id="btn-sq-next" class="secondary-btn small-btn">🔄 New Bridge</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: ROCK BLASTER AR (FIST & KICK ACTION GAME) -->
+      <section id="view-rock" class="view" aria-labelledby="rock-title">
+        <div class="arcade-cabinet rock-cabinet">
+          <div class="arcade-marquee">
+            <button class="back-btn" id="btn-rock-back">← Arcade</button>
+            <h2 id="rock-title">🥊 ROCK BLASTER AR</h2>
+            <button id="btn-help-rock" class="help-pill-btn">❓ Help</button>
+          </div>
+
+          <div class="arcade-hud">
+            <div class="hud-chip">POINTS <strong id="rock-score">0</strong></div>
+            <div class="hud-chip hud-combo">BLASTED <strong id="rock-blasted">0</strong></div>
+            <div class="hud-chip hud-timer">⏱️ <strong id="rock-timer">90</strong>s</div>
+            <div class="hud-chip">🏆 BEST <strong id="rock-best">0</strong></div>
+          </div>
+
+          <div class="snow-op-bar" aria-label="Rock Blaster Speed">
+            <button class="magic-pill active" data-rock-speed="slow">🐢 Slow (4–6)</button>
+            <button class="magic-pill" data-rock-speed="medium">🚀 Medium (6–8)</button>
+            <button class="magic-pill" data-rock-speed="fast">⚡ Fast (8–10)</button>
+            <button id="btn-rock-cam" class="mini-btn">📷 Cam + Galaxy</button>
+            <button id="btn-rock-restart" class="mini-btn">🔄 Restart</button>
+          </div>
+
+          <div class="snow-status-bar" id="rock-status">📷 Starting Punch &amp; Kick Camera...</div>
+
+          <div class="snow-stage-wrap">
+            <canvas id="rock-canvas" width="640" height="400" aria-label="Rock Blaster Fist and Kick Arcade"></canvas>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -533,6 +711,9 @@
 
   <script src="./audio.js"></script>
   <script src="./math3d.js"></script>
+  <script src="./snowgame.js"></script>
+  <script src="./squirrelgame.js"></script>
+  <script src="./rockgame.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

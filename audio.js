@@ -3,6 +3,70 @@
   let ctx = null;
   let muted = localStorage.getItem('mathcube_muted') === 'true';
   let voiceOn = localStorage.getItem('mathcube_voice') !== 'false';
+  let cachedKidVoice = null;
+
+  const PREFERRED_VOICES = [
+    'ana',        // Windows / Edge friendly child-like natural voice
+    'aria',       // Edge natural warm voice
+    'jenny',      // Edge natural friendly voice
+    'samantha',   // macOS / iOS friendly voice
+    'karen',
+    'tessa',
+    'flo',
+    'sandy',
+    'google us english',
+    'google uk english female',
+    'zira',       // Windows standard female voice (much warmer than David)
+    'natural'
+  ];
+
+  function pickKidVoice() {
+    if (!global.speechSynthesis) return null;
+    const voices = global.speechSynthesis.getVoices();
+    if (!voices || voices.length === 0) return null;
+
+    const enVoices = voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'));
+    const pool = enVoices.length > 0 ? enVoices : voices;
+
+    let best = null;
+    let bestScore = -1;
+
+    for (const v of pool) {
+      const name = (v.name || '').toLowerCase();
+      let score = 0;
+      PREFERRED_VOICES.forEach((kw, idx) => {
+        if (name.includes(kw)) {
+          score += (PREFERRED_VOICES.length - idx) * 10;
+        }
+      });
+      if (name.includes('online') || name.includes('neural')) score += 15;
+      if (name.includes('female')) score += 8;
+      if (name.includes('david') || name.includes('mark') || name.includes('espeak')) score -= 10;
+      if (v.localService === false) score += 4;
+      if (score > bestScore) {
+        bestScore = score;
+        best = v;
+      }
+    }
+
+    cachedKidVoice = best || pool[0];
+    return cachedKidVoice;
+  }
+
+  if (global.speechSynthesis) {
+    pickKidVoice();
+    if ('onvoiceschanged' in global.speechSynthesis) {
+      global.speechSynthesis.onvoiceschanged = pickKidVoice;
+    }
+  }
+
+  function cleanForSpeech(text) {
+    // Strip emojis & extra symbols so screen/TTS doesn't read emoji descriptions aloud
+    return String(text)
+      .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
 
   function getCtx() {
     if (muted) return null;
@@ -89,6 +153,15 @@
       playTone(460, 0.08, 'triangle', 0.12, 0.09);
       playTone(660, 0.14, 'sine', 0.13, 0.18);
     },
+    crack() {
+      playTone(190, 0.08, 'sawtooth', 0.14, 0);
+      playTone(130, 0.10, 'square', 0.10, 0.04);
+    },
+    boom() {
+      playTone(150, 0.16, 'sawtooth', 0.18, 0);
+      playTone(95, 0.24, 'triangle', 0.20, 0.05);
+      playTone(580, 0.12, 'sine', 0.12, 0.08);
+    },
     isVoiceOn() {
       return voiceOn && !muted;
     },
@@ -100,14 +173,27 @@
       }
       return voiceOn;
     },
-    speak(text) {
+    speak(text, mood = 'normal') {
       if (muted || !voiceOn || !global.speechSynthesis || !text) return;
+      const clean = cleanForSpeech(text);
+      if (!clean) return;
       try {
         global.speechSynthesis.cancel();
-        const utt = new SpeechSynthesisUtterance(text);
-        utt.rate = 0.96;
-        utt.pitch = 1.12;
-        utt.volume = 0.85;
+        const utt = new SpeechSynthesisUtterance(clean);
+        const voice = cachedKidVoice || pickKidVoice();
+        if (voice) utt.voice = voice;
+
+        if (mood === 'cheer') {
+          utt.rate = 0.98;
+          utt.pitch = 1.24;
+        } else if (mood === 'gentle') {
+          utt.rate = 0.88;
+          utt.pitch = 1.12;
+        } else {
+          utt.rate = 0.91;
+          utt.pitch = 1.18;
+        }
+        utt.volume = 0.9;
         global.speechSynthesis.speak(utt);
       } catch (_) {}
     }

@@ -1,10 +1,13 @@
-const CACHE_NAME = 'mathcube-3d-v7';
+const CACHE_NAME = 'mathcube-3d-v20';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './audio.js',
   './math3d.js',
+  './snowgame.js',
+  './squirrelgame.js',
+  './rockgame.js',
   './app.js',
   './manifest.webmanifest',
   './icons/icon.svg',
