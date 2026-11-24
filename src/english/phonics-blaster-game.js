@@ -755,7 +755,12 @@ const PHONICS_SPEED_PRESETS = {
 
       const bonusDrop = true ? pickRandomTreasure() : null;
       if (AudioEngine) AudioEngine.magic();
-      this._speakWord(this.currentWordObj);
+      const solvedWordObj = this.currentWordObj;
+      setTimeout(() => {
+        if (this.running && this.currentWordObj === solvedWordObj) {
+          this._speakWord(solvedWordObj);
+        }
+      }, 420);
 
       // Clear remaining letter orbs in a celebratory burst
       for (const rem of this.orbs) {
@@ -1103,30 +1108,42 @@ const PHONICS_SPEED_PRESETS = {
       if (!this.currentWordText) return;
       const ctx = this.ctx;
       const w = this.canvas.width;
+      const h = this.canvas.height;
       const pulseScale = this.bannerPulse > 0 ? 1 + 0.06 * Math.sin(this.bannerPulse * 0.45) : 1;
       const label = `${this.currentEmoji} Spell ${this.currentWordText}!`;
 
+      // Position safely below the top HUD/camera notch on iPhone & desktop
+      let bannerY = Math.max(88, Math.round(h * 0.12));
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const parentCabinet = this.canvas.closest('.arcade-fullscreen');
+      const marquee = parentCabinet ? parentCabinet.querySelector('.arcade-marquee') : null;
+      if (marquee && canvasRect.height > 0) {
+        const mRect = marquee.getBoundingClientRect();
+        const hudBottomCanvas = ((mRect.bottom - canvasRect.top) / canvasRect.height) * h;
+        bannerY = Math.max(bannerY, Math.round(hudBottomCanvas + 36));
+      }
+
       ctx.save();
-      ctx.translate(w / 2, 58);
+      ctx.translate(w / 2, bannerY);
       ctx.scale(pulseScale, pulseScale);
 
       ctx.font = `900 ${w < 540 ? 20 : 24}px system-ui, sans-serif`;
       const textW = ctx.measureText(label).width;
       const boxW = Math.min(w - 36, Math.max(220, textW + 48));
-      const boxH = 48;
+      const boxH = 46;
 
-      ctx.shadowColor = 'rgba(250, 204, 21, 0.45)';
-      ctx.shadowBlur = 16;
+      ctx.shadowColor = 'rgba(250, 204, 21, 0.28)';
+      ctx.shadowBlur = 12;
       const grad = ctx.createLinearGradient(-boxW / 2, -boxH / 2, boxW / 2, boxH / 2);
-      grad.addColorStop(0, 'rgba(30, 27, 75, 0.90)');
-      grad.addColorStop(1, 'rgba(76, 29, 149, 0.90)');
+      grad.addColorStop(0, 'rgba(15, 23, 42, 0.46)');
+      grad.addColorStop(1, 'rgba(76, 29, 149, 0.46)');
       ctx.fillStyle = grad;
-      drawRoundedRectPath(ctx, -boxW / 2, -boxH / 2, boxW, boxH, 24);
+      drawRoundedRectPath(ctx, -boxW / 2, -boxH / 2, boxW, boxH, 23);
       ctx.fill();
 
       ctx.shadowBlur = 0;
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = this.wordCompleted ? '#4ade80' : '#fde047';
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = this.wordCompleted ? 'rgba(74, 222, 128, 0.85)' : 'rgba(253, 224, 71, 0.82)';
       ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
@@ -1137,17 +1154,18 @@ const PHONICS_SPEED_PRESETS = {
 
       // Gentle hint pill if the player tapped a wrong distractor
       if (this.hintTimer > 0 && this.hintText) {
+        const hintY = bannerY + boxH / 2 + 8;
         ctx.save();
         ctx.globalAlpha = Math.min(1, this.hintTimer / 18);
         ctx.font = '800 14px system-ui, sans-serif';
         const hw = Math.max(140, ctx.measureText(this.hintText).width + 28);
-        ctx.fillStyle = 'rgba(245, 158, 11, 0.92)';
-        drawRoundedRectPath(ctx, w / 2 - hw / 2, 90, hw, 26, 13);
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.78)';
+        drawRoundedRectPath(ctx, w / 2 - hw / 2, hintY, hw, 26, 13);
         ctx.fill();
         ctx.fillStyle = '#0f172a';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(this.hintText, w / 2, 103);
+        ctx.fillText(this.hintText, w / 2, hintY + 13);
         ctx.restore();
       }
     }

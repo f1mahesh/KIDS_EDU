@@ -24,6 +24,7 @@ const SECTION_FOR_VIEW = {
   enBlaster: 'english',
   enRunner: 'english',
   enTrace: 'english',
+  enBuilder: 'english',
   learn: 'learn',
   games: 'games',
   magic: 'games',
@@ -31,6 +32,8 @@ const SECTION_FOR_VIEW = {
   squirrel: 'games',
   rock: 'games',
   runner: 'games',
+  funGames: 'fun',
+  funRacer: 'fun',
   trophies: 'trophies'
 };
 
@@ -62,7 +65,10 @@ const views = {
   enClap: $('view-en-clap'),
   enBlaster: $('view-en-blaster'),
   enRunner: $('view-en-runner'),
-  enTrace: $('view-en-trace')
+  enTrace: $('view-en-trace'),
+  enBuilder: $('view-en-builder'),
+  funGames: $('view-fun-games'),
+  funRacer: $('view-fun-racer')
 };
 
 // 3D Scenes
@@ -302,6 +308,12 @@ function openGamesSection() {
   showView('games');
 }
 
+function openFunGamesSection() {
+  AudioEngine.pop();
+  mathQuest.stopTimer();
+  showView('funGames');
+}
+
 document.querySelectorAll('[data-action="go-home"]').forEach((el) => {
   el.addEventListener('click', () => {
     AudioEngine.pop();
@@ -321,6 +333,9 @@ document.querySelectorAll('[data-action="open-math"]').forEach((el) => {
 });
 document.querySelectorAll('[data-action="open-games"]').forEach((el) => {
   el.addEventListener('click', openGamesSection);
+});
+document.querySelectorAll('[data-action="open-fun-games"]').forEach((el) => {
+  el.addEventListener('click', openFunGamesSection);
 });
 document.querySelectorAll('[data-action="open-learn"]').forEach((el) => {
   el.addEventListener('click', () => learnController.open('math', '4-6'));
@@ -370,7 +385,8 @@ function bindArcadeSettings(btnId, panelId) {
   ['btn-en-clap-settings', 'en-clap-settings-panel'],
   ['btn-en-blaster-settings', 'en-blaster-settings-panel'],
   ['btn-en-runner-settings', 'en-runner-settings-panel'],
-  ['btn-en-trace-settings', 'en-trace-settings-panel']
+  ['btn-en-trace-settings', 'en-trace-settings-panel'],
+  ['btn-racer-settings', 'racer-settings-panel']
 ].forEach(([btnId, panelId]) => bindArcadeSettings(btnId, panelId));
 
 document.querySelectorAll('[data-close-settings]').forEach((btn) => {
@@ -398,7 +414,9 @@ const HELP_BINDINGS = [
   ['btn-help-en-clap', 'en-clap'],
   ['btn-help-en-blaster', 'en-blaster'],
   ['btn-help-en-runner', 'en-runner'],
-  ['btn-help-en-trace', 'en-trace']
+  ['btn-help-en-trace', 'en-trace'],
+  ['btn-help-en-builder', 'en-builder'],
+  ['btn-help-racer', 'fun-racer']
 ];
 HELP_BINDINGS.forEach(([id, topic]) => {
   const el = $(id);
@@ -573,8 +591,23 @@ $('btn-close-name').addEventListener('click', closeNameModal);
 $('btn-profile').addEventListener('click', openNameModal);
 $('btn-switch-kid').addEventListener('click', openNameModal);
 
-// Desktop Keyboard Support for Runners & Air-Trace
+// Desktop Keyboard Support for Runners, Racer, Air-Trace & Word Builder
 window.addEventListener('keydown', (e) => {
+  const activeRacer = gamesHub.getActiveRacer();
+  if (activeRacer) {
+    if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+      e.preventDefault();
+      activeRacer.setManualSteer(-1);
+    } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+      e.preventDefault();
+      activeRacer.setManualSteer(1);
+    } else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') {
+      e.preventDefault();
+      activeRacer.triggerBoost();
+    }
+    return;
+  }
+
   const activeRunner = gamesHub.getActiveRunner() || englishHub.getActiveRunner();
   if (activeRunner) {
     if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
@@ -600,6 +633,24 @@ window.addEventListener('keydown', (e) => {
     } else if (e.key === 'Backspace') {
       activeTrace.clearActiveBox();
     }
+    return;
+  }
+
+  const activeBuilder = englishHub.getActiveBuilder();
+  if (activeBuilder) {
+    if (/^[a-zA-Z]$/.test(e.key) || e.key === 'Backspace' || e.key === 'Enter') {
+      activeBuilder.handleKey(e.key);
+    }
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  const activeRacer = gamesHub.getActiveRacer();
+  if (
+    activeRacer &&
+    ['ArrowLeft', 'ArrowRight', 'a', 'A', 'd', 'D'].includes(e.key)
+  ) {
+    activeRacer.setManualSteer(0);
   }
 });
 

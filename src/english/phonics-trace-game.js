@@ -644,7 +644,7 @@ const FALLBACK_WORDS = {
       }
       setTimeout(() => {
         if (this.running) this.speakCurrentWord();
-      }, 180);
+      }, 420);
 
       // Celebration sparkles across all boxes
       for (const box of this.boxRects) {

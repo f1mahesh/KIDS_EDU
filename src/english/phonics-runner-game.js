@@ -105,31 +105,31 @@ const SPEED_PRESETS = {
     }
   };
 
-  // Safe fallback phonics bank if EnglishPhonics is not loaded
+  // Safe fallback phonics bank if EnglishPhonics is not loaded (UFLI notation)
   const FALLBACK_WORDS = [
-    { word: 'cat',  emoji: '🐱', phonics: '/c/ /a/ /t/',     decoys: ['cot', 'cut'],   tier: 'cvc' },
-    { word: 'dog',  emoji: '🐶', phonics: '/d/ /o/ /g/',     decoys: ['dig', 'dug'],   tier: 'cvc' },
-    { word: 'sun',  emoji: '☀️', phonics: '/s/ /u/ /n/',     decoys: ['bun', 'run'],   tier: 'cvc' },
-    { word: 'pig',  emoji: '🐷', phonics: '/p/ /i/ /g/',     decoys: ['peg', 'pug'],   tier: 'cvc' },
-    { word: 'hat',  emoji: '🎩', phonics: '/h/ /a/ /t/',     decoys: ['hot', 'hit'],   tier: 'cvc' },
-    { word: 'bus',  emoji: '🚌', phonics: '/b/ /u/ /s/',     decoys: ['bug', 'bun'],   tier: 'cvc' },
-    { word: 'cup',  emoji: '☕', phonics: '/c/ /u/ /p/',     decoys: ['cap', 'cop'],   tier: 'cvc' },
-    { word: 'bed',  emoji: '🛏️', phonics: '/b/ /e/ /d/',     decoys: ['bad', 'bud'],   tier: 'cvc' },
-    { word: 'fox',  emoji: '🦊', phonics: '/f/ /o/ /x/',     decoys: ['box', 'fix'],   tier: 'cvc' },
-    { word: 'jam',  emoji: '🍓', phonics: '/j/ /a/ /m/',     decoys: ['ham', 'jet'],   tier: 'cvc' },
-    { word: 'frog', emoji: '🐸', phonics: '/f/ /r/ /o/ /g/', decoys: ['flag', 'flog'], tier: 'blends' },
-    { word: 'ship', emoji: '🚢', phonics: '/sh/ /i/ /p/',    decoys: ['shop', 'chip'], tier: 'digraphs' },
-    { word: 'fish', emoji: '🐟', phonics: '/f/ /i/ /sh/',    decoys: ['wish', 'dish'], tier: 'digraphs' },
-    { word: 'duck', emoji: '🦆', phonics: '/d/ /u/ /ck/',    decoys: ['deck', 'luck'], tier: 'digraphs' },
-    { word: 'crab', emoji: '🦀', phonics: '/c/ /r/ /a/ /b/', decoys: ['crib', 'grab'], tier: 'blends' },
-    { word: 'drum', emoji: '🥁', phonics: '/d/ /r/ /u/ /m/', decoys: ['drop', 'plum'], tier: 'blends' },
+    { word: 'cat',  emoji: '🐱', phonics: '/k/ /ă/ /t/',     decoys: ['cot', 'cut'],   tier: 'cvc' },
+    { word: 'dog',  emoji: '🐶', phonics: '/d/ /ŏ/ /g/',     decoys: ['dig', 'dug'],   tier: 'cvc' },
+    { word: 'sun',  emoji: '☀️', phonics: '/s/ /ŭ/ /n/',     decoys: ['bun', 'run'],   tier: 'cvc' },
+    { word: 'pig',  emoji: '🐷', phonics: '/p/ /ĭ/ /g/',     decoys: ['peg', 'pug'],   tier: 'cvc' },
+    { word: 'hat',  emoji: '🎩', phonics: '/h/ /ă/ /t/',     decoys: ['hot', 'hit'],   tier: 'cvc' },
+    { word: 'bus',  emoji: '🚌', phonics: '/b/ /ŭ/ /s/',     decoys: ['bug', 'bun'],   tier: 'cvc' },
+    { word: 'cup',  emoji: '☕', phonics: '/k/ /ŭ/ /p/',     decoys: ['cap', 'cop'],   tier: 'cvc' },
+    { word: 'bed',  emoji: '🛏️', phonics: '/b/ /ĕ/ /d/',     decoys: ['bad', 'bud'],   tier: 'cvc' },
+    { word: 'fox',  emoji: '🦊', phonics: '/f/ /ŏ/ /ks/',    decoys: ['box', 'fix'],   tier: 'cvc' },
+    { word: 'jam',  emoji: '🍓', phonics: '/j/ /ă/ /m/',     decoys: ['ham', 'jet'],   tier: 'cvc' },
+    { word: 'frog', emoji: '🐸', phonics: '/f/ /r/ /ŏ/ /g/', decoys: ['flag', 'flog'], tier: 'blends' },
+    { word: 'ship', emoji: '🚢', phonics: '/sh/ /ĭ/ /p/',    decoys: ['shop', 'chip'], tier: 'digraphs' },
+    { word: 'fish', emoji: '🐟', phonics: '/f/ /ĭ/ /sh/',    decoys: ['wish', 'dish'], tier: 'digraphs' },
+    { word: 'duck', emoji: '🦆', phonics: '/d/ /ŭ/ /k/',     decoys: ['deck', 'luck'], tier: 'digraphs' },
+    { word: 'crab', emoji: '🦀', phonics: '/k/ /r/ /ă/ /b/', decoys: ['crib', 'grab'], tier: 'blends' },
+    { word: 'drum', emoji: '🥁', phonics: '/d/ /r/ /ŭ/ /m/', decoys: ['drop', 'plum'], tier: 'blends' },
     { word: 'star', emoji: '⭐', phonics: '/s/ /t/ /ar/',    decoys: ['stir', 'scar'], tier: 'blends' },
-    { word: 'tree', emoji: '🌳', phonics: '/t/ /r/ /ee/',    decoys: ['free', 'tray'], tier: 'blends' },
-    { word: 'cake', emoji: '🎂', phonics: '/c/ /ā/ /k/',     decoys: ['bake', 'lake'], tier: 'magic_e' },
+    { word: 'tree', emoji: '🌳', phonics: '/t/ /r/ /ē/',     decoys: ['free', 'tray'], tier: 'blends' },
+    { word: 'cake', emoji: '🎂', phonics: '/k/ /ā/ /k/',     decoys: ['bake', 'lake'], tier: 'magic_e' },
     { word: 'bike', emoji: '🚲', phonics: '/b/ /ī/ /k/',     decoys: ['hike', 'like'], tier: 'magic_e' },
     { word: 'kite', emoji: '🪁', phonics: '/k/ /ī/ /t/',     decoys: ['bite', 'site'], tier: 'magic_e' },
     { word: 'bone', emoji: '🦴', phonics: '/b/ /ō/ /n/',     decoys: ['cone', 'tone'], tier: 'magic_e' },
-    { word: 'moon', emoji: '🌙', phonics: '/m/ /oo/ /n/',    decoys: ['soon', 'noon'], tier: 'magic_e' },
+    { word: 'moon', emoji: '🌙', phonics: '/m/ /ū/ /n/',     decoys: ['soon', 'noon'], tier: 'magic_e' },
     { word: 'home', emoji: '🏠', phonics: '/h/ /ō/ /m/',     decoys: ['hope', 'dome'], tier: 'magic_e' }
   ];
 

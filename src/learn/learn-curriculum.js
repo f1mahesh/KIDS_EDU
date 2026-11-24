@@ -104,42 +104,42 @@ const ENGLISH_LESSONS = [
   {
     emoji: '🐣',
     tierId: 'k',
-    title: 'Kindergarten • 3-Letter CVC Words',
-    body: 'CVC means Consonant – Short Vowel – Consonant! Say each sound smoothly and blend them together.',
-    example: '🐱 c-a-t → cat  •  🐶 d-o-g → dog  •  ☀️ s-u-n → sun',
-    speakText: 'C V C words! c a t spells cat, d o g spells dog, s u n spells sun!'
+    title: 'Kindergarten • UFLI Short Vowels & Clean Sounds',
+    body: 'Clip stop sounds (/b/, /t/, /p/, /k/, /d/, /g/) crisply—never add "uh"! Stretch continuous sounds (/m/, /s/, /f/) and connect sounds smoothly with short vowels: apple /ă/, edge /ĕ/, itch /ĭ/, octopus /ŏ/, up /ŭ/.',
+    example: '🍎 /ă/ apple • 📏 /ĕ/ edge • 🦟 /ĭ/ itch • 🐙 /ŏ/ octopus • ⬆️ /ŭ/ up',
+    speakText: 'Keep stop sounds short and clean without adding uh! Connect sounds smoothly like apple, edge, itch, octopus, up!'
   },
   {
     emoji: '🌱',
     tierId: 'g1',
-    title: 'Grade 1 • 4-Letter Consonant Blends',
-    body: 'Two consonants together at the start or end keep both sounds! Slide through blends like fr-, cl-, st-, -mp, and -nd.',
-    example: '🐸 fr-og → frog  •  👏 cl-ap → clap  •  ✋ ha-nd → hand',
-    speakText: 'Blends keep both sounds! frog, clap, hand!'
+    title: 'Grade 1 • Consonant Blends & Connected Phonation',
+    body: 'Two consonants together at the start or end keep both crisp sounds! Hold continuous sounds smoothly into the next sound (fff-rrr-ŏ-g → frog) instead of adding "uh".',
+    example: '🐸 /f/ /r/ /ŏ/ /g/ → frog  •  👏 /k/ /l/ /ă/ /p/ → clap  •  ✋ /h/ /ă/ /n/ /d/ → hand',
+    speakText: 'In blends, both consonants keep their own clean sound! Slide smoothly from sound to sound like frog, clap, hand!'
   },
   {
     emoji: '🚀',
     tierId: 'g2',
-    title: 'Grade 2 • Digraphs & FLOSS Rule',
-    body: 'Two letters can team up to make ONE brand-new sound: sh, ch, th, ck, ng, and double ll!',
-    example: '🚢 sh-i-p → ship  •  🦆 d-u-ck → duck  •  🔔 b-e-ll → bell',
-    speakText: 'Digraphs make one new sound! ship, duck, bell!'
+    title: 'Grade 2 • Digraphs & FLSZ Spelling Rule',
+    body: 'Digraphs (sh, ch, th, wh, ph, ck, ng) pair two letters for ONE clean phoneme! Under the FLSZ Rule, double f, l, s, or z right after a short vowel in one-syllable words.',
+    example: '🚢 /sh/ /ĭ/ /p/ → ship  •  🦆 /d/ /ŭ/ /k/ → duck  •  🔔 /b/ /ĕ/ /l/ → bell (FLSZ)',
+    speakText: 'Digraphs team up to make one clean sound like ship and duck! And the FLSZ rule doubles f, l, s, or z after a short vowel, like bell!'
   },
   {
     emoji: '✨',
     tierId: 'g3',
-    title: 'Grade 3 • Silent Magic-E & Bossy-R',
-    body: 'A silent E at the end jumps over one consonant to make the vowel say its name! And R after a vowel changes its sound (ar, or).',
-    example: '🎂 cake (long A)  •  🪁 kite (long I)  •  ⭐ star (ar)',
-    speakText: 'Magic E makes the vowel say its name! cake, kite, star!'
+    title: 'Grade 3 • VCe (Silent E) & R-Controlled Vowels',
+    body: 'In a VCe pattern (a_e, i_e, o_e, u_e), the silent final E signals the vowel to say its long name! And Bossy-R controls vowels in ar (/ar/), or (/or/), and er/ir/ur (/er/).',
+    example: '🎂 cake (/k/ /ā/ /k/)  •  🪁 kite (/k/ /ī/ /t/)  •  ⭐ star (/s/ /t/ /ar/)',
+    speakText: 'V C e silent E makes the vowel say its long name like cake and kite! And R-controlled vowels make ar and or like star and fork!'
   },
   {
     emoji: '👑',
     tierId: 'g4_5',
-    title: 'Grades 4–5 • Long Vowel Teams',
-    body: 'When two vowels go walking, the first one often does the talking! Spot teams like ai, ay, ee, ea, oa, oo, and ow.',
-    example: '🌧️ r-ai-n → rain  •  🌳 tr-ee → tree  •  ⛵ b-oa-t → boat',
-    speakText: 'Vowel teams make long vowel sounds! rain, tree, boat!'
+    title: 'Grades 4–5 • UFLI Vowel Teams',
+    body: 'Vowel teams combine letters to spell one vowel phoneme: ai/ay (/ā/), ee/ea (/ē/), oa/ow (/ō/), plus long /ū/ (moon) and short /ʊ/ (book).',
+    example: '🌧️ rain (/r/ /ā/ /n/)  •  🌳 tree (/t/ /r/ /ē/)  •  ⛵ boat (/b/ /ō/ /t/)',
+    speakText: 'Vowel teams spell long vowel sounds like rain, tree, and boat!'
   }
 ];
 

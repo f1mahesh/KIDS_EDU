@@ -3,7 +3,7 @@
 (function (app) {
   'use strict';
 
-  const { AudioEngine, $, launchConfetti, MagicMixerGame, NumberRunnerGame, RockBlasterGame, SnowClapGame, SquirrelBridgeGame } = app;
+  const { AudioEngine, $, launchConfetti, MagicMixerGame, NumberRunnerGame, RockBlasterGame, SnowClapGame, SquirrelBridgeGame, CarRacerGame } = app;
 
 class GamesHubController {
   constructor({ profileStore, showView, refreshHeader, stopMathTimer, closeArcadeSettings }) {
@@ -17,6 +17,7 @@ class GamesHubController {
     this.squirrelGame = null;
     this.rockGame = null;
     this.runnerGame = null;
+    this.racerGame = null;
     this.magicMixer = new MagicMixerGame({
       profileStore,
       showView,
@@ -39,6 +40,10 @@ class GamesHubController {
     this.runnerSpeed = 'slow';
     this.runnerWorld = 'jungle';
 
+    this.racerSpeed = 'slow';
+    this.racerCar = 'racer';
+    this.racerTrack = 'highway';
+
     this._bindEvents();
   }
 
@@ -47,6 +52,7 @@ class GamesHubController {
     if (exceptView !== 'squirrel' && this.squirrelGame) this.squirrelGame.stop();
     if (exceptView !== 'rock' && this.rockGame) this.rockGame.stop();
     if (exceptView !== 'runner' && this.runnerGame) this.runnerGame.stop();
+    if (exceptView !== 'funRacer' && this.racerGame) this.racerGame.stop();
   }
 
   getActiveRunner() {
@@ -56,11 +62,19 @@ class GamesHubController {
     return null;
   }
 
+  getActiveRacer() {
+    if ($('view-fun-racer').classList.contains('active') && this.racerGame) {
+      return this.racerGame;
+    }
+    return null;
+  }
+
   _bindEvents() {
     this._bindSnowEvents();
     this._bindSquirrelEvents();
     this._bindRockEvents();
     this._bindRunnerEvents();
+    this._bindRacerEvents();
   }
 
   // --- Snow Clap AR ---
@@ -472,6 +486,123 @@ class GamesHubController {
         document.querySelectorAll('[data-runner-world]').forEach((b) => b.classList.toggle('active', b === btn));
         AudioEngine.pop();
         if (this.runnerGame) this.runnerGame.setWorld(this.runnerWorld);
+      });
+    });
+  }
+
+  // --- Turbo Hand Racer AR (Fun Games) ---
+  _initRacerGame() {
+    if (this.racerGame) return this.racerGame;
+    this.racerGame = new CarRacerGame({
+      canvas: $('racer-canvas'),
+      onStatus: (msg) => {
+        $('racer-status').textContent = msg;
+      },
+      onScore: (info) => {
+        $('racer-score').textContent = info.score;
+        $('racer-mph').textContent = info.mph;
+        $('racer-timer').textContent = info.timeLeft;
+        $('racer-stars').textContent = info.stars;
+        if (info.collectedMaterial) {
+          this.profileStore.awardTreasure(info.collectedMaterial, true);
+          this.refreshHeader();
+        }
+        if (info.collectedStar) {
+          this.profileStore.profile.stars += 1;
+          this.profileStore.save();
+          this.refreshHeader();
+        }
+      },
+      onFinish: (res) => {
+        AudioEngine.fanfare();
+        launchConfetti(40);
+        const msg = `🏁 Finish Line! ${res.score} pts • +${res.stars} ⭐`;
+        $('racer-status').textContent = msg;
+        $('racer-finish-text').textContent = msg;
+        $('racer-finish-banner').classList.remove('hidden');
+      }
+    });
+    return this.racerGame;
+  }
+
+  openRacer() {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    $('racer-finish-banner').classList.add('hidden');
+    const game = this._initRacerGame();
+    $('racer-score').textContent = '0';
+    $('racer-mph').textContent = this.racerSpeed === 'slow' ? '45' : this.racerSpeed === 'medium' ? '75' : '105';
+    $('racer-timer').textContent = this.racerSpeed === 'slow' ? '90' : this.racerSpeed === 'medium' ? '75' : '60';
+    $('racer-stars').textContent = '0';
+    this.showView('funRacer');
+    game.start(this.racerSpeed, this.racerCar, this.racerTrack);
+  }
+
+  _bindRacerEvents() {
+    document.querySelectorAll('[data-action="open-fun-racer"]').forEach((el) => {
+      el.addEventListener('click', () => this.openRacer());
+    });
+    $('btn-racer-back').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      this.showView('funGames');
+    });
+    const restart = () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      $('racer-finish-banner').classList.add('hidden');
+      if (this.racerGame) this.racerGame.start(this.racerSpeed, this.racerCar, this.racerTrack);
+    };
+    $('btn-racer-restart').addEventListener('click', restart);
+    $('btn-racer-play-again').addEventListener('click', restart);
+    $('btn-racer-cam').addEventListener('click', () => {
+      if (!this.racerGame) return;
+      const on = this.racerGame.toggleCameraView();
+      $('btn-racer-cam').textContent = on ? '📷 Cam + Road' : '🛣️ Full Road';
+      AudioEngine.pop();
+    });
+    $('btn-racer-boost').addEventListener('click', () => {
+      if (this.racerGame) this.racerGame.triggerBoost();
+    });
+
+    const bindSteerHold = (btn, dir) => {
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        if (this.racerGame) this.racerGame.setManualSteer(dir);
+      });
+      const stopSteer = () => {
+        if (this.racerGame) this.racerGame.setManualSteer(0);
+      };
+      btn.addEventListener('pointerup', stopSteer);
+      btn.addEventListener('pointercancel', stopSteer);
+      btn.addEventListener('pointerleave', stopSteer);
+    };
+    bindSteerHold($('btn-racer-left'), -1);
+    bindSteerHold($('btn-racer-right'), 1);
+
+    document.querySelectorAll('[data-racer-speed]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.racerSpeed = btn.dataset.racerSpeed;
+        document.querySelectorAll('[data-racer-speed]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.racerGame) this.racerGame.setSpeed(this.racerSpeed);
+      });
+    });
+    document.querySelectorAll('[data-racer-car]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.racerCar = btn.dataset.racerCar;
+        document.querySelectorAll('[data-racer-car]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.racerGame) this.racerGame.setCar(this.racerCar);
+      });
+    });
+    document.querySelectorAll('[data-racer-track]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.racerTrack = btn.dataset.racerTrack;
+        document.querySelectorAll('[data-racer-track]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.racerGame) this.racerGame.setTrack(this.racerTrack);
       });
     });
   }

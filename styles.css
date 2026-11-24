@@ -2678,3 +2678,319 @@ button {
   font-weight: 900;
   color: var(--text);
 }
+
+/* Word Builder Board (Drag & Drop Phonics Game) */
+.mode-en-builder {
+  background: linear-gradient(135deg, #f59e0b, #ec4899);
+  box-shadow: 0 6px 0 #be185d;
+}
+
+.wb-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wb-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wb-age-group,
+.wb-mode-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.wb-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.wb-stat-pill {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 8px 10px;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.wb-stat-pill strong {
+  color: var(--primary);
+  font-size: 1.08rem;
+  margin-left: 4px;
+}
+
+.wb-stage {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at top, #eef2ff 0%, #f8fafc 65%, #fef3c7 100%);
+  border: 3px solid #c7d2fe;
+  border-radius: 24px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.wb-stage.burst {
+  border-color: #fbbf24;
+  animation: portal-pulse 0.65s ease;
+}
+
+.wb-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wb-prompt-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.wb-emoji-box {
+  width: 104px;
+  height: 104px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 3px solid #a5b4fc;
+  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.14);
+  display: grid;
+  place-items: center;
+  font-size: 3.5rem;
+  flex-shrink: 0;
+}
+
+.wb-emoji-box.mystery {
+  background: linear-gradient(135deg, #6366f1, #ec4899);
+  border-color: #fde047;
+}
+
+.wb-prompt-meta {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.wb-clue-text {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.wb-audio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.wb-slots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wb-slot {
+  width: 68px;
+  height: 74px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px dashed #818cf8;
+  color: #94a3b8;
+  font-size: 2.1rem;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.wb-slot.drag-over {
+  transform: scale(1.1);
+  border-style: solid;
+  border-color: #f59e0b;
+  background: #fef3c7;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.45);
+}
+
+.wb-slot.hint-target {
+  border-style: solid;
+  border-color: #f59e0b;
+  color: rgba(217, 119, 6, 0.45);
+  background: #fffbeb;
+}
+
+.wb-slot.slot-correct {
+  border-style: solid;
+  border-color: #10b981;
+  background: linear-gradient(180deg, #ecfdf5 0%, #a7f3d0 100%);
+  color: #065f46;
+  box-shadow: 0 5px 0 #059669;
+}
+
+.wb-slot.slot-wrong {
+  border-style: solid;
+  border-color: #ef4444;
+  background: #fee2e2;
+  color: #b91c1c;
+  animation: shake 0.32s ease;
+}
+
+.wb-slot.celebrate {
+  animation: wb-bounce 0.5s ease both;
+}
+
+@keyframes wb-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  45% { transform: translateY(-10px) scale(1.1); }
+}
+
+.wb-cheer-strip {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 9px 14px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.wb-cheer-strip.happy {
+  background: linear-gradient(135deg, #fef9c3, #dcfce7);
+  border-color: #22c55e;
+  color: #14532d;
+}
+
+.wb-buddy-avatar {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.wb-cheer-strip.happy .wb-buddy-avatar {
+  animation: wb-bounce 0.55s ease infinite;
+}
+
+.wb-board-wrap {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 14px;
+}
+
+.wb-board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.wb-board-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.wb-board {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.wb-tile {
+  width: 62px;
+  height: 66px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 1.9rem;
+  font-weight: 900;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition: transform 0.14s ease, opacity 0.18s ease;
+}
+
+.wb-tile:active {
+  cursor: grabbing;
+  transform: scale(1.08);
+}
+
+.wb-tile.used {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.wb-tile.hint-glow {
+  animation: cta-pulse 0.9s ease-in-out infinite;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.85) !important;
+}
+
+.wb-color-0 { background: linear-gradient(180deg, #ecfdf5 0%, #a7f3d0 100%); border: 2px solid #10b981; box-shadow: 0 5px 0 #059669; color: #065f46; }
+.wb-color-1 { background: linear-gradient(180deg, #eff6ff 0%, #bfdbfe 100%); border: 2px solid #3b82f6; box-shadow: 0 5px 0 #2563eb; color: #1e3a8a; }
+.wb-color-2 { background: linear-gradient(180deg, #fefce8 0%, #fde68a 100%); border: 2px solid #f59e0b; box-shadow: 0 5px 0 #d97706; color: #78350f; }
+.wb-color-3 { background: linear-gradient(180deg, #fdf2f8 0%, #fbcfe8 100%); border: 2px solid #ec4899; box-shadow: 0 5px 0 #db2777; color: #831843; }
+.wb-color-4 { background: linear-gradient(180deg, #f5f3ff 0%, #ddd6fe 100%); border: 2px solid #8b5cf6; box-shadow: 0 5px 0 #7c3aed; color: #4c1d95; }
+
+.wb-tile-ghost {
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.28) !important;
+}
+
+@media (max-width: 560px) {
+  .wb-stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .wb-slot {
+    width: 56px;
+    height: 62px;
+    font-size: 1.75rem;
+  }
+  .wb-tile {
+    width: 54px;
+    height: 58px;
+    font-size: 1.65rem;
+  }
+}
+
+/* Fun Games & Turbo Hand Racer */
+.mode-fun {
+  background: linear-gradient(135deg, #f97316, #ef4444, #ec4899);
+  box-shadow: 0 6px 0 #991b1b;
+}
+
+.mode-racer {
+  background: linear-gradient(135deg, #ef4444, #f59e0b);
+  box-shadow: 0 6px 0 #b45309;
+}
+
+.racer-cabinet {
+  background: linear-gradient(180deg, #0284c7 0%, #0f172a 100%);
+}

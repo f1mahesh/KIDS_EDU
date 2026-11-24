@@ -1438,7 +1438,9 @@ const SPEED_PRESETS = {
         this.catchGrace = 28;
         this.handsWereApart = false;
         if (AudioEngine) AudioEngine.pop();
-        if (EnglishPhonics && typeof EnglishPhonics.speakPhoneme === 'function') {
+        if (this.mode === 'magic-e' && String(tile.val).toLowerCase() === 'e') {
+          if (AudioEngine) AudioEngine.speak('Magic E', 'gentle');
+        } else if (EnglishPhonics && typeof EnglishPhonics.speakPhoneme === 'function') {
           try { EnglishPhonics.speakPhoneme(tile.val); } catch (_) {}
         }
         this._emitScore();

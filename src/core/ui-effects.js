@@ -68,13 +68,14 @@ const HELP_TOPICS = {
     `
   },
   english: {
-    title: '📖 K–5 English Phonics Guide',
+    title: '📖 K–5 UFLI Phonics Guide',
     body: `
       <ul class="help-list">
-        <li><strong>🐣 K (3-Letter):</strong> Short-vowel CVC words like <em>cat, dog, sun, pig</em>.</li>
-        <li><strong>🌱 G1 (Blends):</strong> 4-letter blend words like <em>frog, clap, stop, drum</em>.</li>
-        <li><strong>🚀 G2 (Digraphs):</strong> Sound chunks like <em>ship, chat, duck, bell</em>.</li>
-        <li><strong>✨ G3 (Magic-E &amp; R):</strong> Long vowels like <em>cake, bike, kite, star</em>.</li>
+        <li><strong>🔊 Clean UFLI Sounds:</strong> Clip stop sounds (<em>/b/, /t/, /p/, /k/, /d/, /g/</em>) sharply with no trailing "uh", and stretch continuous sounds (<em>/m/, /s/, /f/</em>)!</li>
+        <li><strong>🐣 K (CVC):</strong> Short vowels (<em>apple /ă/, edge /ĕ/, itch /ĭ/, octopus /ŏ/, up /ŭ/</em>) in <em>cat, dog, sun, pig</em>.</li>
+        <li><strong>🌱 G1 (Blends):</strong> Smooth connected blending in <em>frog, clap, stop, drum</em>.</li>
+        <li><strong>🚀 G2 (Digraphs &amp; FLSZ):</strong> Digraphs (<em>ship, chat, duck</em>) &amp; FLSZ double letters (<em>bell</em>).</li>
+        <li><strong>✨ G3 (VCe / R-Ctrl):</strong> Silent E long vowels (<em>cake, kite</em>) &amp; R-controlled (<em>star, fork</em>).</li>
         <li><strong>👑 G4–5 (Teams):</strong> Vowel teams like <em>rain, boat, seed, moon</em>.</li>
       </ul>
     `
@@ -108,12 +109,33 @@ const HELP_TOPICS = {
       </ul>
     `
   },
+  'fun-racer': {
+    title: '🏎️ How Turbo Hand Racer Works',
+    body: `
+      <ul class="help-list">
+        <li><strong>🖐️ Hand-Gesture Steering Wheel:</strong> Hold BOTH hands up like an invisible steering wheel and tilt left or right! Uses MediaPipe Hand Tracking with automatic offline fallback.</li>
+        <li><strong>👆 Touch &amp; Keys:</strong> Drag across the road, hold <strong>⬅️ Left / Right ➡️</strong>, or use Arrow keys + Space for Turbo!</li>
+        <li><strong>💎 Collect &amp; Dodge:</strong> Grab Stones, Coins, Jewels, Diamonds &amp; ⚡ Turbo Bolts while dodging 🚧 traffic cones!</li>
+      </ul>
+    `
+  },
   'en-trace': {
     title: '✍️ Air-Trace & Glow Pad',
     body: `
       <ul class="help-list">
         <li><strong>✍️ Guided Trace:</strong> Trace each glowing dotted letter in the box with your finger, mouse, or Air-Cam motion brush to hear its phoneme sound!</li>
         <li><strong>🎧 Dictation Mode:</strong> Switch to Dictation in Settings to hear the word and write or tap letters into the sound boxes from memory!</li>
+      </ul>
+    `
+  },
+  'en-builder': {
+    title: '🧩 Word Builder Board',
+    body: `
+      <ul class="help-list">
+        <li><strong>🎂 Pick Your Age Level:</strong> Start with <em>Ages 4–5 (CVC)</em> 3-letter words and level up to 4-letter blends, digraphs, Magic-E &amp; vowel teams!</li>
+        <li><strong>🔤 Drag Letters to Build:</strong> Drag any letter from the colorful Letter Board into the word boxes (or tap a letter to snap it into the next spot).</li>
+        <li><strong>🖼️ + 🔊 Picture or Sound:</strong> Switch between Picture &amp; Sound, Picture Only, or Sound Only mystery words!</li>
+        <li><strong>🎉 Cheer &amp; Treasures:</strong> Complete words to earn cheering praise, ⭐ Stars, and bonus Stones, Coins, Jewels &amp; Diamonds!</li>
       </ul>
     `
   },

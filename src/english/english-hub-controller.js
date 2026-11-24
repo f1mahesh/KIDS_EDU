@@ -3,7 +3,7 @@
 (function (app) {
   'use strict';
 
-  const { AudioEngine, $, launchConfetti, PhonicsBlasterGame, PhonicsClapGame, PhonicsRunnerGame, PhonicsTraceGame } = app;
+  const { AudioEngine, $, launchConfetti, PhonicsBlasterGame, PhonicsClapGame, PhonicsRunnerGame, PhonicsTraceGame, WordBuilderGame } = app;
 
 class EnglishHubController {
   constructor({ profileStore, showView, refreshHeader, stopMathTimer, closeArcadeSettings }) {
@@ -25,6 +25,7 @@ class EnglishHubController {
     this.enBlasterGame = null;
     this.enRunnerGame = null;
     this.enTraceGame = null;
+    this.enBuilderGame = null;
 
     this._bindEvents();
   }
@@ -34,6 +35,7 @@ class EnglishHubController {
     if (exceptView !== 'enBlaster' && this.enBlasterGame) this.enBlasterGame.stop();
     if (exceptView !== 'enRunner' && this.enRunnerGame) this.enRunnerGame.stop();
     if (exceptView !== 'enTrace' && this.enTraceGame) this.enTraceGame.stop();
+    if (exceptView !== 'enBuilder' && this.enBuilderGame) this.enBuilderGame.stop();
   }
 
   getActiveRunner() {
@@ -46,6 +48,13 @@ class EnglishHubController {
   getActiveTrace() {
     if ($('view-en-trace').classList.contains('active') && this.enTraceGame) {
       return this.enTraceGame;
+    }
+    return null;
+  }
+
+  getActiveBuilder() {
+    if ($('view-en-builder').classList.contains('active') && this.enBuilderGame) {
+      return this.enBuilderGame;
     }
     return null;
   }
@@ -89,6 +98,7 @@ class EnglishHubController {
     this._bindBlasterEvents();
     this._bindRunnerEvents();
     this._bindTraceEvents();
+    this._bindBuilderEvents();
   }
 
   // --- Option 1: Phonics Clap Blender AR ---
@@ -478,6 +488,36 @@ class EnglishHubController {
         AudioEngine.pop();
         if (this.enTraceGame) this.enTraceGame.setMode(this.enTraceMode);
       });
+    });
+  }
+
+  // --- Option 5: Word Builder Board (Drag & Drop Letters) ---
+  _initBuilder() {
+    if (this.enBuilderGame) return this.enBuilderGame;
+    this.enBuilderGame = new WordBuilderGame({
+      profileStore: this.profileStore,
+      refreshHeader: this.refreshHeader
+    });
+    return this.enBuilderGame;
+  }
+
+  openBuilder() {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    const game = this._initBuilder();
+    const startTier = this.englishTier === 'all' ? 'k' : this.englishTier;
+    this.showView('enBuilder');
+    game.start(startTier);
+  }
+
+  _bindBuilderEvents() {
+    document.querySelectorAll('[data-action="open-en-builder"]').forEach((el) => {
+      el.addEventListener('click', () => this.openBuilder());
+    });
+    $('btn-wb-back').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.showView('english');
     });
   }
 }

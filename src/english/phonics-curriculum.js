@@ -5,84 +5,86 @@
   const { AudioEngine } = app;
 
 const TIERS = [
-    { id: 'k', label: '🐣 K (3-Letter)' },
+    { id: 'k', label: '🐣 K (CVC)' },
     { id: 'g1', label: '🌱 G1 (Blends)' },
-    { id: 'g2', label: '🚀 G2 (Digraphs)' },
-    { id: 'g3', label: '✨ G3 (Magic-E)' },
+    { id: 'g2', label: '🚀 G2 (Digraphs & FLSZ)' },
+    { id: 'g3', label: '✨ G3 (VCe / R-Ctrl)' },
     { id: 'g4_5', label: '👑 G4–5 (Teams)' },
     { id: 'all', label: '🎲 All K–5' }
   ];
 
+  // Clean UFLI-aligned phoneme transcription per word (zero trailing "-uh" schwa)
+  // and `soundUnits` mapping to pure acoustic keys in AudioEngine.playPhoneme().
   const RAW_WORDS = [
     // Kindergarten ('k') — 12 regular 3-letter CVC words
-    { word: 'cat', emoji: '🐱', tier: 'k', onset: 'c', rime: 'at', tiles: ['c', 'a', 't'], phonemes: ['kuh', 'ah', 'tuh'], decoys: ['bat', 'hat', 'cot'] },
-    { word: 'dog', emoji: '🐶', tier: 'k', onset: 'd', rime: 'og', tiles: ['d', 'o', 'g'], phonemes: ['duh', 'aw', 'guh'], decoys: ['log', 'fog', 'dig'] },
-    { word: 'sun', emoji: '☀️', tier: 'k', onset: 's', rime: 'un', tiles: ['s', 'u', 'n'], phonemes: ['sss', 'uh', 'nnn'], decoys: ['fun', 'run', 'bun'] },
-    { word: 'pig', emoji: '🐷', tier: 'k', onset: 'p', rime: 'ig', tiles: ['p', 'i', 'g'], phonemes: ['puh', 'ih', 'guh'], decoys: ['dig', 'wig', 'peg'] },
-    { word: 'hat', emoji: '🎩', tier: 'k', onset: 'h', rime: 'at', tiles: ['h', 'a', 't'], phonemes: ['huh', 'ah', 'tuh'], decoys: ['cat', 'bat', 'hot'] },
-    { word: 'bed', emoji: '🛏️', tier: 'k', onset: 'b', rime: 'ed', tiles: ['b', 'e', 'd'], phonemes: ['buh', 'eh', 'duh'], decoys: ['red', 'fed', 'bad'] },
-    { word: 'bus', emoji: '🚌', tier: 'k', onset: 'b', rime: 'us', tiles: ['b', 'u', 's'], phonemes: ['buh', 'uh', 'sss'], decoys: ['bug', 'bun', 'bat'] },
-    { word: 'fox', emoji: '🦊', tier: 'k', onset: 'f', rime: 'ox', tiles: ['f', 'o', 'x'], phonemes: ['fff', 'aw', 'ks'], decoys: ['box', 'fix', 'fan'] },
-    { word: 'cup', emoji: '☕', tier: 'k', onset: 'c', rime: 'up', tiles: ['c', 'u', 'p'], phonemes: ['kuh', 'uh', 'puh'], decoys: ['pup', 'cap', 'cub'] },
-    { word: 'bug', emoji: '🐛', tier: 'k', onset: 'b', rime: 'ug', tiles: ['b', 'u', 'g'], phonemes: ['buh', 'uh', 'guh'], decoys: ['hug', 'mug', 'bag'] },
-    { word: 'map', emoji: '🗺️', tier: 'k', onset: 'm', rime: 'ap', tiles: ['m', 'a', 'p'], phonemes: ['mmm', 'ah', 'puh'], decoys: ['cap', 'nap', 'mop'] },
-    { word: 'net', emoji: '🥅', tier: 'k', onset: 'n', rime: 'et', tiles: ['n', 'e', 't'], phonemes: ['nnn', 'eh', 'tuh'], decoys: ['pet', 'jet', 'nut'] },
+    { word: 'cat', emoji: '🐱', tier: 'k', onset: 'c', rime: 'at', tiles: ['c', 'a', 't'], phonemes: ['k', 'ă', 't'], soundUnits: ['c', 'a', 't'], decoys: ['bat', 'hat', 'cot'] },
+    { word: 'dog', emoji: '🐶', tier: 'k', onset: 'd', rime: 'og', tiles: ['d', 'o', 'g'], phonemes: ['d', 'ŏ', 'g'], soundUnits: ['d', 'o', 'g'], decoys: ['log', 'fog', 'dig'] },
+    { word: 'sun', emoji: '☀️', tier: 'k', onset: 's', rime: 'un', tiles: ['s', 'u', 'n'], phonemes: ['s', 'ŭ', 'n'], soundUnits: ['s', 'u', 'n'], decoys: ['fun', 'run', 'bun'] },
+    { word: 'pig', emoji: '🐷', tier: 'k', onset: 'p', rime: 'ig', tiles: ['p', 'i', 'g'], phonemes: ['p', 'ĭ', 'g'], soundUnits: ['p', 'i', 'g'], decoys: ['dig', 'wig', 'peg'] },
+    { word: 'hat', emoji: '🎩', tier: 'k', onset: 'h', rime: 'at', tiles: ['h', 'a', 't'], phonemes: ['h', 'ă', 't'], soundUnits: ['h', 'a', 't'], decoys: ['cat', 'bat', 'hot'] },
+    { word: 'bed', emoji: '🛏️', tier: 'k', onset: 'b', rime: 'ed', tiles: ['b', 'e', 'd'], phonemes: ['b', 'ĕ', 'd'], soundUnits: ['b', 'e', 'd'], decoys: ['red', 'fed', 'bad'] },
+    { word: 'bus', emoji: '🚌', tier: 'k', onset: 'b', rime: 'us', tiles: ['b', 'u', 's'], phonemes: ['b', 'ŭ', 's'], soundUnits: ['b', 'u', 's'], decoys: ['bug', 'bun', 'bat'] },
+    { word: 'fox', emoji: '🦊', tier: 'k', onset: 'f', rime: 'ox', tiles: ['f', 'o', 'x'], phonemes: ['f', 'ŏ', 'ks'], soundUnits: ['f', 'o', 'x'], decoys: ['box', 'fix', 'fan'] },
+    { word: 'cup', emoji: '☕', tier: 'k', onset: 'c', rime: 'up', tiles: ['c', 'u', 'p'], phonemes: ['k', 'ŭ', 'p'], soundUnits: ['c', 'u', 'p'], decoys: ['pup', 'cap', 'cub'] },
+    { word: 'bug', emoji: '🐛', tier: 'k', onset: 'b', rime: 'ug', tiles: ['b', 'u', 'g'], phonemes: ['b', 'ŭ', 'g'], soundUnits: ['b', 'u', 'g'], decoys: ['hug', 'mug', 'bag'] },
+    { word: 'map', emoji: '🗺️', tier: 'k', onset: 'm', rime: 'ap', tiles: ['m', 'a', 'p'], phonemes: ['m', 'ă', 'p'], soundUnits: ['m', 'a', 'p'], decoys: ['cap', 'nap', 'mop'] },
+    { word: 'net', emoji: '🥅', tier: 'k', onset: 'n', rime: 'et', tiles: ['n', 'e', 't'], phonemes: ['n', 'ĕ', 't'], soundUnits: ['n', 'e', 't'], decoys: ['pet', 'jet', 'nut'] },
 
-    // Grade 1 ('g1') — 12 regular 4-letter initial/final blend words
-    { word: 'frog', emoji: '🐸', tier: 'g1', onset: 'fr', rime: 'og', tiles: ['f', 'r', 'o', 'g'], phonemes: ['fff', 'rrr', 'aw', 'guh'], decoys: ['flag', 'fog', 'from'] },
-    { word: 'crab', emoji: '🦀', tier: 'g1', onset: 'cr', rime: 'ab', tiles: ['c', 'r', 'a', 'b'], phonemes: ['kuh', 'rrr', 'ah', 'buh'], decoys: ['crib', 'clam', 'cab'] },
-    { word: 'drum', emoji: '🥁', tier: 'g1', onset: 'dr', rime: 'um', tiles: ['d', 'r', 'u', 'm'], phonemes: ['duh', 'rrr', 'uh', 'mmm'], decoys: ['drop', 'plum', 'dam'] },
-    { word: 'flag', emoji: '🚩', tier: 'g1', onset: 'fl', rime: 'ag', tiles: ['f', 'l', 'a', 'g'], phonemes: ['fff', 'lll', 'ah', 'guh'], decoys: ['flat', 'frog', 'bag'] },
-    { word: 'clap', emoji: '👏', tier: 'g1', onset: 'cl', rime: 'ap', tiles: ['c', 'l', 'a', 'p'], phonemes: ['kuh', 'lll', 'ah', 'puh'], decoys: ['clip', 'flap', 'cap'] },
-    { word: 'swim', emoji: '🏊', tier: 'g1', onset: 'sw', rime: 'im', tiles: ['s', 'w', 'i', 'm'], phonemes: ['sss', 'wuh', 'ih', 'mmm'], decoys: ['slim', 'spin', 'win'] },
-    { word: 'stop', emoji: '🛑', tier: 'g1', onset: 'st', rime: 'op', tiles: ['s', 't', 'o', 'p'], phonemes: ['sss', 'tuh', 'aw', 'puh'], decoys: ['step', 'spot', 'top'] },
-    { word: 'plum', emoji: '🫐', tier: 'g1', onset: 'pl', rime: 'um', tiles: ['p', 'l', 'u', 'm'], phonemes: ['puh', 'lll', 'uh', 'mmm'], decoys: ['plan', 'plug', 'drum'] },
-    { word: 'lamp', emoji: '💡', tier: 'g1', onset: 'l', rime: 'amp', tiles: ['l', 'a', 'm', 'p'], phonemes: ['lll', 'ah', 'mmm', 'puh'], decoys: ['camp', 'damp', 'limp'] },
-    { word: 'tent', emoji: '⛺', tier: 'g1', onset: 't', rime: 'ent', tiles: ['t', 'e', 'n', 't'], phonemes: ['tuh', 'eh', 'nnn', 'tuh'], decoys: ['bent', 'sent', 'tint'] },
-    { word: 'hand', emoji: '✋', tier: 'g1', onset: 'h', rime: 'and', tiles: ['h', 'a', 'n', 'd'], phonemes: ['huh', 'ah', 'nnn', 'duh'], decoys: ['land', 'sand', 'band'] },
-    { word: 'nest', emoji: '🪺', tier: 'g1', onset: 'n', rime: 'est', tiles: ['n', 'e', 's', 't'], phonemes: ['nnn', 'eh', 'sss', 'tuh'], decoys: ['best', 'rest', 'test'] },
+    // Grade 1 ('g1') — 12 regular 4-letter initial/final blend words (each consonant sound kept distinct)
+    { word: 'frog', emoji: '🐸', tier: 'g1', onset: 'fr', rime: 'og', tiles: ['f', 'r', 'o', 'g'], phonemes: ['f', 'r', 'ŏ', 'g'], soundUnits: ['f', 'r', 'o', 'g'], decoys: ['flag', 'fog', 'from'] },
+    { word: 'crab', emoji: '🦀', tier: 'g1', onset: 'cr', rime: 'ab', tiles: ['c', 'r', 'a', 'b'], phonemes: ['k', 'r', 'ă', 'b'], soundUnits: ['c', 'r', 'a', 'b'], decoys: ['crib', 'clam', 'cab'] },
+    { word: 'drum', emoji: '🥁', tier: 'g1', onset: 'dr', rime: 'um', tiles: ['d', 'r', 'u', 'm'], phonemes: ['d', 'r', 'ŭ', 'm'], soundUnits: ['d', 'r', 'u', 'm'], decoys: ['drop', 'plum', 'dam'] },
+    { word: 'flag', emoji: '🚩', tier: 'g1', onset: 'fl', rime: 'ag', tiles: ['f', 'l', 'a', 'g'], phonemes: ['f', 'l', 'ă', 'g'], soundUnits: ['f', 'l', 'a', 'g'], decoys: ['flat', 'frog', 'bag'] },
+    { word: 'clap', emoji: '👏', tier: 'g1', onset: 'cl', rime: 'ap', tiles: ['c', 'l', 'a', 'p'], phonemes: ['k', 'l', 'ă', 'p'], soundUnits: ['c', 'l', 'a', 'p'], decoys: ['clip', 'flap', 'cap'] },
+    { word: 'swim', emoji: '🏊', tier: 'g1', onset: 'sw', rime: 'im', tiles: ['s', 'w', 'i', 'm'], phonemes: ['s', 'w', 'ĭ', 'm'], soundUnits: ['s', 'w', 'i', 'm'], decoys: ['slim', 'spin', 'win'] },
+    { word: 'stop', emoji: '🛑', tier: 'g1', onset: 'st', rime: 'op', tiles: ['s', 't', 'o', 'p'], phonemes: ['s', 't', 'ŏ', 'p'], soundUnits: ['s', 't', 'o', 'p'], decoys: ['step', 'spot', 'top'] },
+    { word: 'plum', emoji: '🫐', tier: 'g1', onset: 'pl', rime: 'um', tiles: ['p', 'l', 'u', 'm'], phonemes: ['p', 'l', 'ŭ', 'm'], soundUnits: ['p', 'l', 'u', 'm'], decoys: ['plan', 'plug', 'drum'] },
+    { word: 'lamp', emoji: '💡', tier: 'g1', onset: 'l', rime: 'amp', tiles: ['l', 'a', 'm', 'p'], phonemes: ['l', 'ă', 'm', 'p'], soundUnits: ['l', 'a', 'm', 'p'], decoys: ['camp', 'damp', 'limp'] },
+    { word: 'tent', emoji: '⛺', tier: 'g1', onset: 't', rime: 'ent', tiles: ['t', 'e', 'n', 't'], phonemes: ['t', 'ĕ', 'n', 't'], soundUnits: ['t', 'e', 'n', 't'], decoys: ['bent', 'sent', 'tint'] },
+    { word: 'hand', emoji: '✋', tier: 'g1', onset: 'h', rime: 'and', tiles: ['h', 'a', 'n', 'd'], phonemes: ['h', 'ă', 'n', 'd'], soundUnits: ['h', 'a', 'n', 'd'], decoys: ['land', 'sand', 'band'] },
+    { word: 'nest', emoji: '🪺', tier: 'g1', onset: 'n', rime: 'est', tiles: ['n', 'e', 's', 't'], phonemes: ['n', 'ĕ', 's', 't'], soundUnits: ['n', 'e', 's', 't'], decoys: ['best', 'rest', 'test'] },
 
-    // Grade 2 ('g2') — 12 regular 4-letter digraph & FLOSS words
-    { word: 'ship', emoji: '🚢', tier: 'g2', onset: 'sh', rime: 'ip', tiles: ['sh', 'i', 'p'], phonemes: ['shh', 'ih', 'puh'], decoys: ['shop', 'chip', 'slip'] },
-    { word: 'fish', emoji: '🐟', tier: 'g2', onset: 'f', rime: 'ish', tiles: ['f', 'i', 'sh'], phonemes: ['fff', 'ih', 'shh'], decoys: ['dish', 'wish', 'fist'] },
-    { word: 'shop', emoji: '🛍️', tier: 'g2', onset: 'sh', rime: 'op', tiles: ['sh', 'o', 'p'], phonemes: ['shh', 'aw', 'puh'], decoys: ['ship', 'chop', 'stop'] },
-    { word: 'chip', emoji: '🍟', tier: 'g2', onset: 'ch', rime: 'ip', tiles: ['ch', 'i', 'p'], phonemes: ['chuh', 'ih', 'puh'], decoys: ['chop', 'ship', 'clip'] },
-    { word: 'chat', emoji: '💬', tier: 'g2', onset: 'ch', rime: 'at', tiles: ['ch', 'a', 't'], phonemes: ['chuh', 'ah', 'tuh'], decoys: ['that', 'chap', 'flat'] },
-    { word: 'chin', emoji: '😊', tier: 'g2', onset: 'ch', rime: 'in', tiles: ['ch', 'i', 'n'], phonemes: ['chuh', 'ih', 'nnn'], decoys: ['thin', 'shin', 'spin'] },
-    { word: 'bath', emoji: '🛁', tier: 'g2', onset: 'b', rime: 'ath', tiles: ['b', 'a', 'th'], phonemes: ['buh', 'ah', 'thh'], decoys: ['path', 'math', 'bash'] },
-    { word: 'moth', emoji: '🦋', tier: 'g2', onset: 'm', rime: 'oth', tiles: ['m', 'o', 'th'], phonemes: ['mmm', 'aw', 'thh'], decoys: ['math', 'moss', 'with'] },
-    { word: 'duck', emoji: '🦆', tier: 'g2', onset: 'd', rime: 'uck', tiles: ['d', 'u', 'ck'], phonemes: ['duh', 'uh', 'kuh'], decoys: ['luck', 'truck', 'dock'] },
-    { word: 'lock', emoji: '🔒', tier: 'g2', onset: 'l', rime: 'ock', tiles: ['l', 'o', 'ck'], phonemes: ['lll', 'aw', 'kuh'], decoys: ['rock', 'sock', 'lick'] },
-    { word: 'ring', emoji: '💍', tier: 'g2', onset: 'r', rime: 'ing', tiles: ['r', 'i', 'ng'], phonemes: ['rrr', 'ih', 'ng'], decoys: ['king', 'sing', 'wing'] },
-    { word: 'bell', emoji: '🔔', tier: 'g2', onset: 'b', rime: 'ell', tiles: ['b', 'e', 'll'], phonemes: ['buh', 'eh', 'lll'], decoys: ['well', 'tell', 'ball'] },
+    // Grade 2 ('g2') — 12 regular digraph, nasal ng, & FLSZ words
+    { word: 'ship', emoji: '🚢', tier: 'g2', onset: 'sh', rime: 'ip', tiles: ['sh', 'i', 'p'], phonemes: ['sh', 'ĭ', 'p'], soundUnits: ['sh', 'i', 'p'], decoys: ['shop', 'chip', 'slip'] },
+    { word: 'fish', emoji: '🐟', tier: 'g2', onset: 'f', rime: 'ish', tiles: ['f', 'i', 'sh'], phonemes: ['f', 'ĭ', 'sh'], soundUnits: ['f', 'i', 'sh'], decoys: ['dish', 'wish', 'fist'] },
+    { word: 'shop', emoji: '🛍️', tier: 'g2', onset: 'sh', rime: 'op', tiles: ['sh', 'o', 'p'], phonemes: ['sh', 'ŏ', 'p'], soundUnits: ['sh', 'o', 'p'], decoys: ['ship', 'chop', 'stop'] },
+    { word: 'chip', emoji: '🍟', tier: 'g2', onset: 'ch', rime: 'ip', tiles: ['ch', 'i', 'p'], phonemes: ['ch', 'ĭ', 'p'], soundUnits: ['ch', 'i', 'p'], decoys: ['chop', 'ship', 'clip'] },
+    { word: 'chat', emoji: '💬', tier: 'g2', onset: 'ch', rime: 'at', tiles: ['ch', 'a', 't'], phonemes: ['ch', 'ă', 't'], soundUnits: ['ch', 'a', 't'], decoys: ['that', 'chap', 'flat'] },
+    { word: 'chin', emoji: '😊', tier: 'g2', onset: 'ch', rime: 'in', tiles: ['ch', 'i', 'n'], phonemes: ['ch', 'ĭ', 'n'], soundUnits: ['ch', 'i', 'n'], decoys: ['thin', 'shin', 'spin'] },
+    { word: 'bath', emoji: '🛁', tier: 'g2', onset: 'b', rime: 'ath', tiles: ['b', 'a', 'th'], phonemes: ['b', 'ă', 'th'], soundUnits: ['b', 'a', 'th'], decoys: ['path', 'math', 'bash'] },
+    { word: 'moth', emoji: '🦋', tier: 'g2', onset: 'm', rime: 'oth', tiles: ['m', 'o', 'th'], phonemes: ['m', 'ŏ', 'th'], soundUnits: ['m', 'o', 'th'], decoys: ['math', 'moss', 'with'] },
+    { word: 'duck', emoji: '🦆', tier: 'g2', onset: 'd', rime: 'uck', tiles: ['d', 'u', 'ck'], phonemes: ['d', 'ŭ', 'k'], soundUnits: ['d', 'u', 'ck'], decoys: ['luck', 'truck', 'dock'] },
+    { word: 'lock', emoji: '🔒', tier: 'g2', onset: 'l', rime: 'ock', tiles: ['l', 'o', 'ck'], phonemes: ['l', 'ŏ', 'k'], soundUnits: ['l', 'o', 'ck'], decoys: ['rock', 'sock', 'lick'] },
+    { word: 'ring', emoji: '💍', tier: 'g2', onset: 'r', rime: 'ing', tiles: ['r', 'i', 'ng'], phonemes: ['r', 'ĭ', 'ng'], soundUnits: ['r', 'i', 'ng'], decoys: ['king', 'sing', 'wing'] },
+    { word: 'bell', emoji: '🔔', tier: 'g2', onset: 'b', rime: 'ell', tiles: ['b', 'e', 'll'], phonemes: ['b', 'ĕ', 'l'], soundUnits: ['b', 'e', 'll'], decoys: ['well', 'tell', 'ball'] },
 
-    // Grade 3 ('g3') — 12 regular 4-letter Magic-E & r-controlled words
-    { word: 'cake', emoji: '🎂', tier: 'g3', onset: 'c', rime: 'ake', tiles: ['c', 'a', 'k', 'e'], phonemes: ['kuh', 'ay', 'kuh', 'silent e'], decoys: ['bake', 'lake', 'make'] },
-    { word: 'bike', emoji: '🚲', tier: 'g3', onset: 'b', rime: 'ike', tiles: ['b', 'i', 'k', 'e'], phonemes: ['buh', 'eye', 'kuh', 'silent e'], decoys: ['hike', 'like', 'bake'] },
-    { word: 'kite', emoji: '🪁', tier: 'g3', onset: 'k', rime: 'ite', tiles: ['k', 'i', 't', 'e'], phonemes: ['kuh', 'eye', 'tuh', 'silent e'], decoys: ['bite', 'kit', 'kate'] },
-    { word: 'bone', emoji: '🦴', tier: 'g3', onset: 'b', rime: 'one', tiles: ['b', 'o', 'n', 'e'], phonemes: ['buh', 'oh', 'nnn', 'silent e'], decoys: ['cone', 'tone', 'done'] },
-    { word: 'cube', emoji: '🧊', tier: 'g3', onset: 'c', rime: 'ube', tiles: ['c', 'u', 'b', 'e'], phonemes: ['kuh', 'yoo', 'buh', 'silent e'], decoys: ['tube', 'cub', 'cute'] },
-    { word: 'tape', emoji: '🩹', tier: 'g3', onset: 't', rime: 'ape', tiles: ['t', 'a', 'p', 'e'], phonemes: ['tuh', 'ay', 'puh', 'silent e'], decoys: ['cape', 'tap', 'take'] },
-    { word: 'cape', emoji: '🦸', tier: 'g3', onset: 'c', rime: 'ape', tiles: ['c', 'a', 'p', 'e'], phonemes: ['kuh', 'ay', 'puh', 'silent e'], decoys: ['tape', 'cap', 'cake'] },
-    { word: 'pine', emoji: '🌲', tier: 'g3', onset: 'p', rime: 'ine', tiles: ['p', 'i', 'n', 'e'], phonemes: ['puh', 'eye', 'nnn', 'silent e'], decoys: ['line', 'pin', 'fine'] },
-    { word: 'star', emoji: '⭐', tier: 'g3', onset: 'st', rime: 'ar', tiles: ['s', 't', 'ar'], phonemes: ['sss', 'tuh', 'ar'], decoys: ['scar', 'stir', 'stay'] },
-    { word: 'bark', emoji: '🐕', tier: 'g3', onset: 'b', rime: 'ark', tiles: ['b', 'ar', 'k'], phonemes: ['buh', 'ar', 'kuh'], decoys: ['park', 'dark', 'barn'] },
-    { word: 'fork', emoji: '🍴', tier: 'g3', onset: 'f', rime: 'ork', tiles: ['f', 'or', 'k'], phonemes: ['fff', 'or', 'kuh'], decoys: ['cork', 'pork', 'fort'] },
-    { word: 'corn', emoji: '🌽', tier: 'g3', onset: 'c', rime: 'orn', tiles: ['c', 'or', 'n'], phonemes: ['kuh', 'or', 'nnn'], decoys: ['horn', 'born', 'cord'] },
+    // Grade 3 ('g3') — 12 regular VCe (Silent E) & R-controlled vowel words
+    { word: 'cake', emoji: '🎂', tier: 'g3', onset: 'c', rime: 'ake', tiles: ['c', 'a', 'k', 'e'], phonemes: ['k', 'ā', 'k'], soundUnits: ['c', 'a_e', 'k'], decoys: ['bake', 'lake', 'make'] },
+    { word: 'bike', emoji: '🚲', tier: 'g3', onset: 'b', rime: 'ike', tiles: ['b', 'i', 'k', 'e'], phonemes: ['b', 'ī', 'k'], soundUnits: ['b', 'i_e', 'k'], decoys: ['hike', 'like', 'bake'] },
+    { word: 'kite', emoji: '🪁', tier: 'g3', onset: 'k', rime: 'ite', tiles: ['k', 'i', 't', 'e'], phonemes: ['k', 'ī', 't'], soundUnits: ['k', 'i_e', 't'], decoys: ['bite', 'kit', 'kate'] },
+    { word: 'bone', emoji: '🦴', tier: 'g3', onset: 'b', rime: 'one', tiles: ['b', 'o', 'n', 'e'], phonemes: ['b', 'ō', 'n'], soundUnits: ['b', 'o_e', 'n'], decoys: ['cone', 'tone', 'done'] },
+    { word: 'cube', emoji: '🧊', tier: 'g3', onset: 'c', rime: 'ube', tiles: ['c', 'u', 'b', 'e'], phonemes: ['k', 'yū', 'b'], soundUnits: ['c', 'u_e', 'b'], decoys: ['tube', 'cub', 'cute'] },
+    { word: 'tape', emoji: '🩹', tier: 'g3', onset: 't', rime: 'ape', tiles: ['t', 'a', 'p', 'e'], phonemes: ['t', 'ā', 'p'], soundUnits: ['t', 'a_e', 'p'], decoys: ['cape', 'tap', 'take'] },
+    { word: 'cape', emoji: '🦸', tier: 'g3', onset: 'c', rime: 'ape', tiles: ['c', 'a', 'p', 'e'], phonemes: ['k', 'ā', 'p'], soundUnits: ['c', 'a_e', 'p'], decoys: ['tape', 'cap', 'cake'] },
+    { word: 'pine', emoji: '🌲', tier: 'g3', onset: 'p', rime: 'ine', tiles: ['p', 'i', 'n', 'e'], phonemes: ['p', 'ī', 'n'], soundUnits: ['p', 'i_e', 'n'], decoys: ['line', 'pin', 'fine'] },
+    { word: 'star', emoji: '⭐', tier: 'g3', onset: 'st', rime: 'ar', tiles: ['s', 't', 'ar'], phonemes: ['s', 't', 'ar'], soundUnits: ['s', 't', 'ar'], decoys: ['scar', 'stir', 'stay'] },
+    { word: 'bark', emoji: '🐕', tier: 'g3', onset: 'b', rime: 'ark', tiles: ['b', 'ar', 'k'], phonemes: ['b', 'ar', 'k'], soundUnits: ['b', 'ar', 'k'], decoys: ['park', 'dark', 'barn'] },
+    { word: 'fork', emoji: '🍴', tier: 'g3', onset: 'f', rime: 'ork', tiles: ['f', 'or', 'k'], phonemes: ['f', 'or', 'k'], soundUnits: ['f', 'or', 'k'], decoys: ['cork', 'pork', 'fort'] },
+    { word: 'corn', emoji: '🌽', tier: 'g3', onset: 'c', rime: 'orn', tiles: ['c', 'or', 'n'], phonemes: ['k', 'or', 'n'], soundUnits: ['c', 'or', 'n'], decoys: ['horn', 'born', 'cord'] },
 
-    // Grades 4–5 ('g4_5') — 12 regular 4-letter vowel-team words
-    { word: 'rain', emoji: '🌧️', tier: 'g4_5', onset: 'r', rime: 'ain', tiles: ['r', 'ai', 'n'], phonemes: ['rrr', 'ay', 'nnn'], decoys: ['pain', 'train', 'ran'] },
-    { word: 'tail', emoji: '🦊', tier: 'g4_5', onset: 't', rime: 'ail', tiles: ['t', 'ai', 'l'], phonemes: ['tuh', 'ay', 'lll'], decoys: ['mail', 'sail', 'tall'] },
-    { word: 'play', emoji: '🎮', tier: 'g4_5', onset: 'pl', rime: 'ay', tiles: ['p', 'l', 'ay'], phonemes: ['puh', 'lll', 'ay'], decoys: ['clay', 'stay', 'plan'] },
-    { word: 'tree', emoji: '🌳', tier: 'g4_5', onset: 'tr', rime: 'ee', tiles: ['t', 'r', 'ee'], phonemes: ['tuh', 'rrr', 'ee'], decoys: ['free', 'three', 'try'] },
-    { word: 'seed', emoji: '🌱', tier: 'g4_5', onset: 's', rime: 'eed', tiles: ['s', 'ee', 'd'], phonemes: ['sss', 'ee', 'duh'], decoys: ['feed', 'need', 'sled'] },
-    { word: 'leaf', emoji: '🍃', tier: 'g4_5', onset: 'l', rime: 'eaf', tiles: ['l', 'ea', 'f'], phonemes: ['lll', 'ee', 'fff'], decoys: ['loaf', 'bead', 'left'] },
-    { word: 'seal', emoji: '🦭', tier: 'g4_5', onset: 's', rime: 'eal', tiles: ['s', 'ea', 'l'], phonemes: ['sss', 'ee', 'lll'], decoys: ['meal', 'real', 'sail'] },
-    { word: 'boat', emoji: '⛵', tier: 'g4_5', onset: 'b', rime: 'oat', tiles: ['b', 'oa', 't'], phonemes: ['buh', 'oh', 'tuh'], decoys: ['coat', 'goat', 'boot'] },
-    { word: 'goat', emoji: '🐐', tier: 'g4_5', onset: 'g', rime: 'oat', tiles: ['g', 'oa', 't'], phonemes: ['guh', 'oh', 'tuh'], decoys: ['boat', 'coat', 'goal'] },
-    { word: 'moon', emoji: '🌙', tier: 'g4_5', onset: 'm', rime: 'oon', tiles: ['m', 'oo', 'n'], phonemes: ['mmm', 'ooo', 'nnn'], decoys: ['noon', 'spoon', 'moan'] },
-    { word: 'book', emoji: '📖', tier: 'g4_5', onset: 'b', rime: 'ook', tiles: ['b', 'oo', 'k'], phonemes: ['buh', 'uhh', 'kuh'], decoys: ['look', 'cook', 'boot'] },
-    { word: 'snow', emoji: '❄️', tier: 'g4_5', onset: 'sn', rime: 'ow', tiles: ['s', 'n', 'ow'], phonemes: ['sss', 'nnn', 'oh'], decoys: ['slow', 'glow', 'show'] }
+    // Grades 4–5 ('g4_5') — 12 regular vowel-team words
+    { word: 'rain', emoji: '🌧️', tier: 'g4_5', onset: 'r', rime: 'ain', tiles: ['r', 'ai', 'n'], phonemes: ['r', 'ā', 'n'], soundUnits: ['r', 'ai', 'n'], decoys: ['pain', 'train', 'ran'] },
+    { word: 'tail', emoji: '🦊', tier: 'g4_5', onset: 't', rime: 'ail', tiles: ['t', 'ai', 'l'], phonemes: ['t', 'ā', 'l'], soundUnits: ['t', 'ai', 'l'], decoys: ['mail', 'sail', 'tall'] },
+    { word: 'play', emoji: '🎮', tier: 'g4_5', onset: 'pl', rime: 'ay', tiles: ['p', 'l', 'ay'], phonemes: ['p', 'l', 'ā'], soundUnits: ['p', 'l', 'ay'], decoys: ['clay', 'stay', 'plan'] },
+    { word: 'tree', emoji: '🌳', tier: 'g4_5', onset: 'tr', rime: 'ee', tiles: ['t', 'r', 'ee'], phonemes: ['t', 'r', 'ē'], soundUnits: ['t', 'r', 'ee'], decoys: ['free', 'three', 'try'] },
+    { word: 'seed', emoji: '🌱', tier: 'g4_5', onset: 's', rime: 'eed', tiles: ['s', 'ee', 'd'], phonemes: ['s', 'ē', 'd'], soundUnits: ['s', 'ee', 'd'], decoys: ['feed', 'need', 'sled'] },
+    { word: 'leaf', emoji: '🍃', tier: 'g4_5', onset: 'l', rime: 'eaf', tiles: ['l', 'ea', 'f'], phonemes: ['l', 'ē', 'f'], soundUnits: ['l', 'ea', 'f'], decoys: ['loaf', 'bead', 'left'] },
+    { word: 'seal', emoji: '🦭', tier: 'g4_5', onset: 's', rime: 'eal', tiles: ['s', 'ea', 'l'], phonemes: ['s', 'ē', 'l'], soundUnits: ['s', 'ea', 'l'], decoys: ['meal', 'real', 'sail'] },
+    { word: 'boat', emoji: '⛵', tier: 'g4_5', onset: 'b', rime: 'oat', tiles: ['b', 'oa', 't'], phonemes: ['b', 'ō', 't'], soundUnits: ['b', 'oa', 't'], decoys: ['coat', 'goat', 'boot'] },
+    { word: 'goat', emoji: '🐐', tier: 'g4_5', onset: 'g', rime: 'oat', tiles: ['g', 'oa', 't'], phonemes: ['g', 'ō', 't'], soundUnits: ['g', 'oa', 't'], decoys: ['boat', 'coat', 'goal'] },
+    { word: 'moon', emoji: '🌙', tier: 'g4_5', onset: 'm', rime: 'oon', tiles: ['m', 'oo', 'n'], phonemes: ['m', 'ū', 'n'], soundUnits: ['m', 'oo', 'n'], decoys: ['noon', 'spoon', 'moan'] },
+    { word: 'book', emoji: '📖', tier: 'g4_5', onset: 'b', rime: 'ook', tiles: ['b', 'oo', 'k'], phonemes: ['b', 'ʊ', 'k'], soundUnits: ['b', 'oo_short', 'k'], decoys: ['look', 'cook', 'boot'] },
+    { word: 'snow', emoji: '❄️', tier: 'g4_5', onset: 'sn', rime: 'ow', tiles: ['s', 'n', 'ow'], phonemes: ['s', 'n', 'ō'], soundUnits: ['s', 'n', 'ow'], decoys: ['slow', 'glow', 'show'] }
   ];
 
   const WORD_MEANINGS = {
@@ -192,137 +194,121 @@ const TIERS = [
     tiles: entry.tiles.slice(),
     letters: entry.word.split(''),
     phonemes: entry.phonemes.slice(),
+    soundUnits: (entry.soundUnits || entry.tiles).slice(),
     decoys: entry.decoys.slice(),
     meaning: WORD_MEANINGS[entry.word] || ''
   }));
 
   const MAGIC_E_PAIRS = [
-    { base: 'cap', baseEmoji: '🧢', magic: 'cape', magicEmoji: '🦸', shortVowel: 'ah', longVowel: 'ay' },
-    { base: 'tap', baseEmoji: '🚰', magic: 'tape', magicEmoji: '🩹', shortVowel: 'ah', longVowel: 'ay' },
-    { base: 'kit', baseEmoji: '🧰', magic: 'kite', magicEmoji: '🪁', shortVowel: 'ih', longVowel: 'eye' },
-    { base: 'pin', baseEmoji: '📌', magic: 'pine', magicEmoji: '🌲', shortVowel: 'ih', longVowel: 'eye' },
-    { base: 'cub', baseEmoji: '🐻', magic: 'cube', magicEmoji: '🧊', shortVowel: 'uh', longVowel: 'yoo' },
-    { base: 'tub', baseEmoji: '🛁', magic: 'tube', magicEmoji: '🧪', shortVowel: 'uh', longVowel: 'yoo' },
-    { base: 'hop', baseEmoji: '🐇', magic: 'hope', magicEmoji: '🌟', shortVowel: 'aw', longVowel: 'oh' },
-    { base: 'mad', baseEmoji: '😠', magic: 'made', magicEmoji: '🎨', shortVowel: 'ah', longVowel: 'ay' }
+    { base: 'cap', baseEmoji: '🧢', magic: 'cape', magicEmoji: '🦸', shortVowel: '/ă/', longVowel: '/ā/' },
+    { base: 'tap', baseEmoji: '🚰', magic: 'tape', magicEmoji: '🩹', shortVowel: '/ă/', longVowel: '/ā/' },
+    { base: 'kit', baseEmoji: '🧰', magic: 'kite', magicEmoji: '🪁', shortVowel: '/ĭ/', longVowel: '/ī/' },
+    { base: 'pin', baseEmoji: '📌', magic: 'pine', magicEmoji: '🌲', shortVowel: '/ĭ/', longVowel: '/ī/' },
+    { base: 'cub', baseEmoji: '🐻', magic: 'cube', magicEmoji: '🧊', shortVowel: '/ŭ/', longVowel: '/yū/' },
+    { base: 'tub', baseEmoji: '🛁', magic: 'tube', magicEmoji: '🧪', shortVowel: '/ŭ/', longVowel: '/yū/' },
+    { base: 'hop', baseEmoji: '🐇', magic: 'hope', magicEmoji: '🌟', shortVowel: '/ŏ/', longVowel: '/ō/' },
+    { base: 'mad', baseEmoji: '😠', magic: 'made', magicEmoji: '🎨', shortVowel: '/ă/', longVowel: '/ā/' }
   ];
 
+  // UFLI Foundations Sound Wall metadata (aligned with ufli.education.ufl.edu)
+  // Clipped stops never add a trailing "-uh" schwa; continuous sounds stretch smoothly.
+  const UFLI_GRAPHEMES = {
+    a:  { symbol: '/ă/',  keyword: 'apple',      emoji: '🍎', kind: 'vowel-short', cue: 'Jaw drops low — /ă/ as in apple' },
+    b:  { symbol: '/b/',  keyword: 'bat',        emoji: '🦇', kind: 'stop',        cue: 'Clipped stop — quick lip pop, no "uh"' },
+    c:  { symbol: '/k/',  keyword: 'cat',        emoji: '🐱', kind: 'stop',        cue: 'Clipped unvoiced stop — quick /k/, no "uh"' },
+    d:  { symbol: '/d/',  keyword: 'dog',        emoji: '🐶', kind: 'stop',        cue: 'Clipped voiced stop — quick tongue tap, no "uh"' },
+    e:  { symbol: '/ĕ/',  keyword: 'edge',       emoji: '📏', kind: 'vowel-short', cue: 'Mid-open relaxed — /ĕ/ as in edge' },
+    f:  { symbol: '/f/',  keyword: 'fish',       emoji: '🐟', kind: 'continuous',  cue: 'Continuous unvoiced air — stretch /f/' },
+    g:  { symbol: '/g/',  keyword: 'goat',       emoji: '🐐', kind: 'stop',        cue: 'Clipped voiced stop — quick /g/, no "uh"' },
+    h:  { symbol: '/h/',  keyword: 'hat',        emoji: '🎩', kind: 'continuous',  cue: 'Soft unvoiced breath — /h/ as in hat' },
+    i:  { symbol: '/ĭ/',  keyword: 'itch',       emoji: '🦟', kind: 'vowel-short', cue: 'Smile corners slightly — /ĭ/ as in itch' },
+    j:  { symbol: '/j/',  keyword: 'jar',        emoji: '🫙', kind: 'affricate',   cue: 'Clipped affricate — clean /j/, no "uh"' },
+    k:  { symbol: '/k/',  keyword: 'kite',       emoji: '🪁', kind: 'stop',        cue: 'Clipped unvoiced stop — quick /k/, no "uh"' },
+    l:  { symbol: '/l/',  keyword: 'leaf',       emoji: '🍃', kind: 'continuous',  cue: 'Continuous liquid — tongue tip behind top teeth' },
+    m:  { symbol: '/m/',  keyword: 'mouse',      emoji: '🐭', kind: 'continuous',  cue: 'Continuous nasal — lips closed, hum /m/' },
+    n:  { symbol: '/n/',  keyword: 'nose',       emoji: '👃', kind: 'continuous',  cue: 'Continuous nasal — tongue up, hum /n/' },
+    o:  { symbol: '/ŏ/',  keyword: 'octopus',    emoji: '🐙', kind: 'vowel-short', cue: 'Jaw drops open round — /ŏ/ as in octopus' },
+    p:  { symbol: '/p/',  keyword: 'pig',        emoji: '🐷', kind: 'stop',        cue: 'Clipped unvoiced pop — puff of air, no "uh"' },
+    q:  { symbol: '/kw/', keyword: 'queen',      emoji: '👑', kind: 'glide',       cue: 'Clean /k/ + glide /w/ — no "uh"' },
+    qu: { symbol: '/kw/', keyword: 'queen',      emoji: '👑', kind: 'glide',       cue: 'Clean /k/ + glide /w/ — no "uh"' },
+    r:  { symbol: '/r/',  keyword: 'red',        emoji: '🔴', kind: 'continuous',  cue: 'Continuous liquid — tongue curled back softly' },
+    s:  { symbol: '/s/',  keyword: 'sun',        emoji: '☀️', kind: 'continuous',  cue: 'Continuous unvoiced hiss — stretch /s/' },
+    t:  { symbol: '/t/',  keyword: 'tiger',      emoji: '🐯', kind: 'stop',        cue: 'Clipped unvoiced tap — quick /t/, no "uh"' },
+    u:  { symbol: '/ŭ/',  keyword: 'up',         emoji: '⬆️', kind: 'vowel-short', cue: 'Relaxed center mouth — /ŭ/ as in up' },
+    v:  { symbol: '/v/',  keyword: 'volcano',    emoji: '🌋', kind: 'continuous',  cue: 'Continuous voiced — top teeth buzz bottom lip' },
+    w:  { symbol: '/w/',  keyword: 'watermelon', emoji: '🍉', kind: 'glide',       cue: 'Rounded lips glide open — clean /w/' },
+    x:  { symbol: '/ks/', keyword: 'fox',        emoji: '🦊', kind: 'stop',        cue: 'Two sounds /k/ + /s/ — crisp finish' },
+    y:  { symbol: '/y/',  keyword: 'yellow',     emoji: '💛', kind: 'glide',       cue: 'Tongue arches forward — clean glide /y/' },
+    z:  { symbol: '/z/',  keyword: 'zipper',     emoji: '🤐', kind: 'continuous',  cue: 'Continuous voiced buzz — stretch /z/' },
+
+    // UFLI Digraphs & FLSZ Spelling Rule (ff, ll, ss, zz)
+    sh:       { symbol: '/sh/', keyword: 'ship',    emoji: '🚢', kind: 'continuous', cue: 'Rounded lips continuous airflow /sh/' },
+    ch:       { symbol: '/ch/', keyword: 'chat',    emoji: '💬', kind: 'affricate',  cue: 'Crisp unvoiced /ch/ release, no "uh"' },
+    th:       { symbol: '/th/', keyword: 'thumb',   emoji: '👍', kind: 'continuous', cue: 'Tongue lightly between teeth — stretch /th/' },
+    wh:       { symbol: '/wh/', keyword: 'whistle', emoji: '📣', kind: 'glide',      cue: 'Rounded lips breathy glide /wh/' },
+    ph:       { symbol: '/f/',  keyword: 'phone',   emoji: '📱', kind: 'continuous', cue: 'Two letters make /f/ like fish' },
+    ck:       { symbol: '/k/',  keyword: 'duck',    emoji: '🦆', kind: 'stop',       cue: 'Used after short vowels — clipped /k/' },
+    ng:       { symbol: '/ng/', keyword: 'ring',    emoji: '💍', kind: 'continuous', cue: 'Nasal sound in back of throat — /ng/' },
+    ff:       { symbol: '/f/',  keyword: 'puff',    emoji: '💨', kind: 'continuous', cue: 'FLSZ doubled f — continuous /f/' },
+    ll:       { symbol: '/l/',  keyword: 'bell',    emoji: '🔔', kind: 'continuous', cue: 'FLSZ doubled l — continuous /l/' },
+    ss:       { symbol: '/s/',  keyword: 'grass',   emoji: '🌿', kind: 'continuous', cue: 'FLSZ doubled s — continuous /s/' },
+    zz:       { symbol: '/z/',  keyword: 'buzz',    emoji: '🐝', kind: 'continuous', cue: 'FLSZ doubled z — continuous /z/' },
+
+    // VCe (Silent Magic-E)
+    a_e:      { symbol: '/ā/',  keyword: 'cake',    emoji: '🎂', kind: 'vowel-long', cue: 'VCe long A — says its name /ā/' },
+    i_e:      { symbol: '/ī/',  keyword: 'kite',    emoji: '🪁', kind: 'vowel-long', cue: 'VCe long I — says its name /ī/' },
+    o_e:      { symbol: '/ō/',  keyword: 'bone',    emoji: '🦴', kind: 'vowel-long', cue: 'VCe long O — says its name /ō/' },
+    u_e:      { symbol: '/yū/', keyword: 'cube',    emoji: '🧊', kind: 'vowel-long', cue: 'VCe long U — says /yū/ or /ū/' },
+    e_e:      { symbol: '/ē/',  keyword: 'these',   emoji: '👉', kind: 'vowel-long', cue: 'VCe long E — says its name /ē/' },
+
+    // Vowel Teams & R-Controlled Vowels
+    ai:       { symbol: '/ā/',  keyword: 'rain',    emoji: '🌧️', kind: 'vowel-team', cue: 'Vowel team ai says long /ā/' },
+    ay:       { symbol: '/ā/',  keyword: 'play',    emoji: '🎮', kind: 'vowel-team', cue: 'Vowel team ay says long /ā/' },
+    ee:       { symbol: '/ē/',  keyword: 'tree',    emoji: '🌳', kind: 'vowel-team', cue: 'Vowel team ee says long /ē/' },
+    ea:       { symbol: '/ē/',  keyword: 'leaf',    emoji: '🍃', kind: 'vowel-team', cue: 'Vowel team ea says long /ē/' },
+    oa:       { symbol: '/ō/',  keyword: 'boat',    emoji: '⛵', kind: 'vowel-team', cue: 'Vowel team oa says long /ō/' },
+    ow:       { symbol: '/ō/',  keyword: 'snow',    emoji: '❄️', kind: 'vowel-team', cue: 'Vowel team ow says long /ō/' },
+    oo:       { symbol: '/ū/',  keyword: 'moon',    emoji: '🌙', kind: 'vowel-team', cue: 'Long oo as in moon' },
+    oo_short: { symbol: '/ʊ/',  keyword: 'book',    emoji: '📖', kind: 'vowel-team', cue: 'Short oo as in book' },
+    ar:       { symbol: '/ar/', keyword: 'star',    emoji: '⭐', kind: 'vowel-r',    cue: 'R-controlled /ar/ as in star' },
+    or:       { symbol: '/or/', keyword: 'fork',    emoji: '🍴', kind: 'vowel-r',    cue: 'R-controlled /or/ as in fork' },
+    er:       { symbol: '/er/', keyword: 'fern',    emoji: '🌿', kind: 'vowel-r',    cue: 'R-controlled /er/ as in fern' },
+    ir:       { symbol: '/er/', keyword: 'bird',    emoji: '🐦', kind: 'vowel-r',    cue: 'R-controlled /er/ as in bird' },
+    ur:       { symbol: '/er/', keyword: 'surf',    emoji: '🏄', kind: 'vowel-r',    cue: 'R-controlled /er/ as in surf' }
+  };
+
+  // Clean UFLI display symbols (no "-uh" schwa anywhere)
   const PHONEME_SOUNDS = {
-    // Single letters (a-z)
-    a: 'ah',
-    b: 'buh',
-    c: 'kuh',
-    d: 'duh',
-    e: 'eh',
-    f: 'fff',
-    g: 'guh',
-    h: 'huh',
-    i: 'ih',
-    j: 'juh',
-    k: 'kuh',
-    l: 'lll',
-    m: 'mmm',
-    n: 'nnn',
-    o: 'aw',
-    p: 'puh',
-    q: 'kwuh',
-    r: 'rrr',
-    s: 'sss',
-    t: 'tuh',
-    u: 'uh',
-    v: 'vvv',
-    w: 'wuh',
-    x: 'ks',
-    y: 'yuh',
-    z: 'zzz',
+    a: '/ă/', b: '/b/', c: '/k/', d: '/d/', e: '/ĕ/', f: '/f/', g: '/g/', h: '/h/',
+    i: '/ĭ/', j: '/j/', k: '/k/', l: '/l/', m: '/m/', n: '/n/', o: '/ŏ/', p: '/p/',
+    q: '/kw/', qu: '/kw/', r: '/r/', s: '/s/', t: '/t/', u: '/ŭ/', v: '/v/', w: '/w/',
+    x: '/ks/', y: '/y/', z: '/z/',
+    sh: '/sh/', ch: '/ch/', th: '/th/', wh: '/wh/', ph: '/f/', ck: '/k/', ng: '/ng/',
+    ff: '/f/', ll: '/l/', ss: '/s/', zz: '/z/',
+    fr: '/f/ /r/', cr: '/k/ /r/', dr: '/d/ /r/', fl: '/f/ /l/', cl: '/k/ /l/',
+    sw: '/s/ /w/', st: '/s/ /t/', pl: '/p/ /l/', sn: '/s/ /n/', tr: '/t/ /r/',
+    ai: '/ā/', ay: '/ā/', ee: '/ē/', ea: '/ē/', oa: '/ō/', oo: '/ū/', oo_short: '/ʊ/', ow: '/ō/',
+    a_e: '/ā/', i_e: '/ī/', o_e: '/ō/', u_e: '/yū/', e_e: '/ē/',
+    ar: '/ar/', or: '/or/', er: '/er/', ir: '/er/', ur: '/er/',
+    at: 'at', og: 'og', un: 'un', ig: 'ig', ed: 'ed', us: 'us', ox: 'ox', up: 'up', ug: 'ug', ap: 'ap',
+    et: 'et', ab: 'ab', um: 'um', ag: 'ag', im: 'im', op: 'op', amp: 'amp', ent: 'ent', and: 'and',
+    est: 'est', ip: 'ip', ish: 'ish', in: 'in', ath: 'ath', oth: 'oth', uck: 'uck', ock: 'ock',
+    ing: 'ing', ell: 'ell', ake: 'ake', ike: 'ike', ite: 'ite', one: 'one', ube: 'ube', ape: 'ape',
+    ine: 'ine', ark: 'ark', ork: 'ork', orn: 'orn', ain: 'ain', ail: 'ail', eed: 'eed', eaf: 'eaf',
+    eal: 'eal', oat: 'oat', oon: 'oon', ook: 'ook'
+  };
 
-    // Digraphs & FLOSS
-    sh: 'shh',
-    ch: 'chuh',
-    th: 'thh',
-    wh: 'wuh',
-    ph: 'fff',
-    ck: 'kuh',
-    ng: 'ng',
-    ll: 'lll',
-    ss: 'sss',
-    ff: 'fff',
-    zz: 'zzz',
+  // Consonant blends that must be played as two connected individual phonemes (never "fruh"/"stuh")
+  const CONSONANT_BLENDS = {
+    fr: ['f', 'r'], cr: ['c', 'r'], dr: ['d', 'r'], fl: ['f', 'l'], cl: ['c', 'l'],
+    sw: ['s', 'w'], st: ['s', 't'], pl: ['p', 'l'], sn: ['s', 'n'], tr: ['t', 'r']
+  };
 
-    // Common initial blends
-    fr: 'fruh',
-    cr: 'kruh',
-    dr: 'druh',
-    fl: 'fluh',
-    cl: 'kluh',
-    sw: 'swuh',
-    st: 'stuh',
-    pl: 'pluh',
-    sn: 'snuh',
-    tr: 'truh',
-
-    // Vowel teams & r-controlled vowels
-    ai: 'ay',
-    ay: 'ay',
-    ee: 'ee',
-    ea: 'ee',
-    oa: 'oh',
-    oo: 'ooo',
-    ow: 'oh',
-    ar: 'ar',
-    or: 'or',
-    er: 'er',
-    ir: 'er',
-    ur: 'er',
-
-    // Common rimes across K-5 word list
-    at: 'at',
-    og: 'og',
-    un: 'un',
-    ig: 'ig',
-    ed: 'ed',
-    us: 'us',
-    ox: 'ox',
-    up: 'up',
-    ug: 'ug',
-    ap: 'ap',
-    et: 'et',
-    ab: 'ab',
-    um: 'um',
-    ag: 'ag',
-    im: 'im',
-    op: 'op',
-    amp: 'amp',
-    ent: 'ent',
-    and: 'and',
-    est: 'est',
-    ip: 'ip',
-    ish: 'ish',
-    in: 'in',
-    ath: 'ath',
-    oth: 'oth',
-    uck: 'uck',
-    ock: 'ock',
-    ing: 'ing',
-    ell: 'ell',
-    ake: 'ayk',
-    ike: 'ike',
-    ite: 'ite',
-    one: 'ohn',
-    ube: 'yoob',
-    ape: 'ayp',
-    ine: 'ine',
-    ark: 'ark',
-    ork: 'ork',
-    orn: 'orn',
-    ain: 'ayn',
-    ail: 'ayl',
-    eed: 'eed',
-    eaf: 'eef',
-    eal: 'eel',
-    oat: 'oht',
-    oon: 'oon',
-    ook: 'ook'
+  // Spoken Unicode phoneme symbols -> Web Audio phoneme key mapping
+  const PHONEME_ALIAS = {
+    'ă': 'a', 'ĕ': 'e', 'ĭ': 'i', 'ŏ': 'o', 'ŭ': 'u',
+    'ā': 'ai', 'ē': 'ee', 'ī': 'i_e', 'ō': 'oa', 'ū': 'oo', 'yū': 'u_e', 'ʊ': 'oo_short',
+    'ks': 'x', 'kw': 'qu'
   };
 
   function getWords(tier) {
@@ -354,22 +340,119 @@ const TIERS = [
     return WORDS.find((entry) => entry.word === key) || null;
   }
 
-  function getLetterSound(ch) {
-    if (ch === undefined || ch === null) return '';
-    const key = String(ch).trim().toLowerCase();
-    if (!key) return '';
-    return PHONEME_SOUNDS[key] || key;
+  let soundSequenceTimers = [];
+
+  function clearSoundSequence() {
+    soundSequenceTimers.forEach((id) => clearTimeout(id));
+    soundSequenceTimers = [];
   }
 
-  function speakPhoneme(token) {
-    if (token === undefined || token === null) return '';
-    const key = String(token).trim().toLowerCase();
+  function getUfliGrapheme(token) {
+    if (token === undefined || token === null) return null;
+    const raw = String(token).trim().toLowerCase().replace(/^\/|\/$/g, '');
+    const key = PHONEME_ALIAS[raw] || raw;
+    return UFLI_GRAPHEMES[key] || null;
+  }
+
+  function getLetterSound(ch) {
+    if (ch === undefined || ch === null) return '';
+    const key = String(ch).trim().toLowerCase().replace(/^\/|\/$/g, '');
     if (!key) return '';
-    const cue = PHONEME_SOUNDS[key] || String(token).trim();
+    if (UFLI_GRAPHEMES[key]) return UFLI_GRAPHEMES[key].symbol;
+    return PHONEME_SOUNDS[key] || `/${key}/`;
+  }
+
+  function speakPhoneme(token, cancelActive = true) {
+    if (token === undefined || token === null) return '';
+    const raw = String(token).trim().toLowerCase().replace(/^\/|\/$/g, '');
+    if (!raw) return '';
+    const key = PHONEME_ALIAS[raw] || raw;
+    const cue = getLetterSound(key);
+
+    if (cancelActive) {
+      clearSoundSequence();
+      if (AudioEngine && typeof AudioEngine.stopSpeech === 'function') {
+        AudioEngine.stopSpeech();
+      }
+    }
+
+    // Consonant blends play both constituent phonemes smoothly (connected phonation)
+    if (CONSONANT_BLENDS[key] && AudioEngine && typeof AudioEngine.playPhoneme === 'function') {
+      const [c1, c2] = CONSONANT_BLENDS[key];
+      const ok1 = AudioEngine.playPhoneme(c1, 0);
+      const ok2 = AudioEngine.playPhoneme(c2, 0.16);
+      if (ok1 || ok2) return cue;
+    }
+
+    if (AudioEngine && typeof AudioEngine.playPhoneme === 'function') {
+      if (AudioEngine.playPhoneme(key, 0)) {
+        return cue;
+      }
+    }
+
+    // Whole rimes/words or fallback if Web Audio unavailable
+    const info = UFLI_GRAPHEMES[key];
     if (AudioEngine && typeof AudioEngine.speak === 'function') {
-      AudioEngine.speak(cue, 'gentle');
+      if (info && info.keyword) {
+        AudioEngine.speak(`like ${info.keyword}`, 'gentle');
+      } else {
+        AudioEngine.speak(raw, 'gentle');
+      }
     }
     return cue;
+  }
+
+  // Separated Letter + Phoneme cue ("Letter M sounds ... /mmm/") so they never blend together
+  function speakLetterAndSound(token) {
+    if (token === undefined || token === null) return;
+    const raw = String(token).trim().toLowerCase().replace(/^\/|\/$/g, '');
+    if (!raw) return;
+    clearSoundSequence();
+    const letterSpoken = raw.length === 1 ? raw.toUpperCase() : raw;
+    if (AudioEngine && typeof AudioEngine.speak === 'function') {
+      AudioEngine.speak(`Letter ${letterSpoken} sounds`, 'gentle', () => {
+        const id = setTimeout(() => {
+          speakPhoneme(raw, false);
+        }, 90);
+        soundSequenceTimers.push(id);
+      });
+    } else {
+      speakPhoneme(raw, false);
+    }
+  }
+
+  // UFLI Connected Phonation Routine: play clean phoneme-by-phoneme, then smoothly blend the word
+  function speakWordSounds(wordOrEntry, onStep) {
+    clearSoundSequence();
+    if (AudioEngine && typeof AudioEngine.stopSpeech === 'function') {
+      AudioEngine.stopSpeech();
+    }
+    const entry = typeof wordOrEntry === 'string' ? findWord(wordOrEntry) : wordOrEntry;
+    const units = entry && Array.isArray(entry.soundUnits) && entry.soundUnits.length > 0
+      ? entry.soundUnits
+      : (entry && Array.isArray(entry.phonemes) ? entry.phonemes : []);
+    const wordText = typeof wordOrEntry === 'string' ? wordOrEntry : (entry && entry.word) || '';
+
+    if (units.length === 0) {
+      if (wordText) speakWord(wordText);
+      return;
+    }
+
+    const stepMs = 390;
+    units.forEach((unit, idx) => {
+      const id = setTimeout(() => {
+        speakPhoneme(unit, false);
+        if (typeof onStep === 'function') onStep(idx, unit);
+      }, idx * stepMs);
+      soundSequenceTimers.push(id);
+    });
+
+    if (wordText) {
+      const blendId = setTimeout(() => {
+        speakWord(wordText);
+      }, units.length * stepMs + 180);
+      soundSequenceTimers.push(blendId);
+    }
   }
 
   function getMeaning(word) {
@@ -394,13 +477,17 @@ const EnglishPhonics = {
     WORDS,
     MAGIC_E_PAIRS,
     PHONEME_SOUNDS,
+    UFLI_GRAPHEMES,
     WORD_MEANINGS,
     getWords,
     pickWord,
     findWord,
     getMeaning,
+    getUfliGrapheme,
     getLetterSound,
     speakPhoneme,
+    speakLetterAndSound,
+    speakWordSounds,
     speakWord
   };
 
