@@ -1,4 +1,4 @@
-/* Picture Puzzle Game — Built-in Pictures, Custom Photo Upload, Difficulty Levels & Swap/Slide Modes */
+/* Picture Puzzle Game — Built-in Pictures, Custom Photo Upload, Difficulty Levels & Real Jigsaw / Swap / Slide Modes */
 
 (function (app) {
   'use strict';
@@ -31,7 +31,6 @@
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, s, s);
 
-    // Stars
     const stars = [
       [0.1, 0.12, 4], [0.22, 0.08, 3], [0.35, 0.18, 5], [0.55, 0.09, 3],
       [0.72, 0.14, 4], [0.88, 0.1, 5], [0.15, 0.34, 3], [0.46, 0.28, 3],
@@ -45,7 +44,6 @@
       ctx.fill();
     });
 
-    // Earth bottom-left
     ctx.save();
     ctx.beginPath();
     ctx.arc(s * 0.16, s * 0.86, s * 0.2, 0, Math.PI * 2);
@@ -58,7 +56,6 @@
     ctx.fill();
     ctx.restore();
 
-    // Smiling Moon top-left
     ctx.save();
     ctx.fillStyle = '#fef08a';
     ctx.beginPath();
@@ -82,7 +79,6 @@
     ctx.stroke();
     ctx.restore();
 
-    // Ringed Planet top-right
     ctx.save();
     ctx.translate(s * 0.78, s * 0.24);
     ctx.rotate(-0.3);
@@ -100,12 +96,10 @@
     ctx.stroke();
     ctx.restore();
 
-    // Rainbow Rocket in center
     ctx.save();
     ctx.translate(s * 0.52, s * 0.52);
     ctx.rotate(-0.42);
 
-    // Flame
     ctx.fillStyle = '#f97316';
     ctx.beginPath();
     ctx.moveTo(-26, 95);
@@ -117,7 +111,6 @@
     ctx.quadraticCurveTo(0, 158, 14, 95);
     ctx.fill();
 
-    // Fins
     ctx.fillStyle = '#ec4899';
     ctx.beginPath();
     ctx.moveTo(-48, 30);
@@ -132,7 +125,6 @@
     ctx.closePath();
     ctx.fill();
 
-    // Body
     const rGrad = ctx.createLinearGradient(-55, -120, 55, 100);
     rGrad.addColorStop(0, '#ffffff');
     rGrad.addColorStop(1, '#cbd5e1');
@@ -144,7 +136,6 @@
     ctx.quadraticCurveTo(-70, -40, 0, -145);
     ctx.fill();
 
-    // Nose cone
     ctx.fillStyle = '#ef4444';
     ctx.beginPath();
     ctx.moveTo(0, -145);
@@ -153,7 +144,6 @@
     ctx.quadraticCurveTo(-36, -90, 0, -145);
     ctx.fill();
 
-    // Window
     ctx.fillStyle = '#38bdf8';
     ctx.strokeStyle = '#f59e0b';
     ctx.lineWidth = 10;
@@ -162,7 +152,6 @@
     ctx.fill();
     ctx.stroke();
 
-    // Cute shine in window
     ctx.fillStyle = 'rgba(255,255,255,0.65)';
     ctx.beginPath();
     ctx.arc(-10, -22, 9, 0, Math.PI * 2);
@@ -177,7 +166,6 @@
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, s, s);
 
-    // Rainbow
     const rColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'];
     rColors.forEach((col, i) => {
       ctx.strokeStyle = col;
@@ -187,13 +175,11 @@
       ctx.stroke();
     });
 
-    // Sun
     ctx.fillStyle = '#fde047';
     ctx.beginPath();
     ctx.arc(s * 0.14, s * 0.15, s * 0.085, 0, Math.PI * 2);
     ctx.fill();
 
-    // Distant friendly volcano
     ctx.fillStyle = '#78350f';
     ctx.beginPath();
     ctx.moveTo(s * 0.56, s * 0.72);
@@ -211,7 +197,6 @@
     ctx.closePath();
     ctx.fill();
 
-    // Hills
     ctx.fillStyle = '#4ade80';
     ctx.beginPath();
     ctx.ellipse(s * 0.25, s * 0.82, s * 0.45, s * 0.22, 0, 0, Math.PI * 2);
@@ -222,7 +207,6 @@
     ctx.fill();
     ctx.fillRect(0, s * 0.78, s, s * 0.22);
 
-    // Palm tree left
     ctx.strokeStyle = '#92400e';
     ctx.lineWidth = 22;
     ctx.lineCap = 'round';
@@ -237,9 +221,7 @@
       ctx.fill();
     });
 
-    // Cute green Dinosaur
     ctx.save();
-    // Tail & body
     ctx.fillStyle = '#16a34a';
     ctx.beginPath();
     ctx.ellipse(s * 0.48, s * 0.68, s * 0.17, s * 0.12, -0.1, 0, Math.PI * 2);
@@ -250,7 +232,6 @@
     ctx.quadraticCurveTo(s * 0.24, s * 0.76, s * 0.38, s * 0.75);
     ctx.fill();
 
-    // Neck & head
     ctx.lineWidth = 54;
     ctx.strokeStyle = '#16a34a';
     ctx.beginPath();
@@ -262,7 +243,6 @@
     ctx.ellipse(s * 0.66, s * 0.34, 62, 46, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Belly & spots
     ctx.fillStyle = '#bbf7d0';
     ctx.beginPath();
     ctx.ellipse(s * 0.51, s * 0.71, s * 0.11, s * 0.08, 0, 0, Math.PI * 2);
@@ -274,12 +254,10 @@
       ctx.fill();
     });
 
-    // Legs
     ctx.fillStyle = '#15803d';
     ctx.fillRect(s * 0.38, s * 0.76, 36, 56);
     ctx.fillRect(s * 0.53, s * 0.76, 36, 56);
 
-    // Eye & smile
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(s * 0.68, s * 0.31, 14, 0, Math.PI * 2);
@@ -304,7 +282,6 @@
     ctx.fillStyle = sea;
     ctx.fillRect(0, 0, s, s);
 
-    // Sunbeams
     ctx.fillStyle = 'rgba(255,255,255,0.12)';
     for (let i = 0; i < 4; i++) {
       ctx.beginPath();
@@ -316,7 +293,6 @@
       ctx.fill();
     }
 
-    // Sandy floor
     ctx.fillStyle = '#fcd34d';
     ctx.beginPath();
     ctx.moveTo(0, s * 0.82);
@@ -327,7 +303,6 @@
     ctx.closePath();
     ctx.fill();
 
-    // Seaweed & coral
     ctx.strokeStyle = '#10b981';
     ctx.lineWidth = 18;
     ctx.lineCap = 'round';
@@ -338,14 +313,12 @@
       ctx.stroke();
     });
 
-    // Coral pink
     ctx.fillStyle = '#f472b6';
     ctx.beginPath();
     ctx.arc(s * 0.26, s * 0.82, 34, Math.PI, 0);
     ctx.arc(s * 0.32, s * 0.8, 26, Math.PI, 0);
     ctx.fill();
 
-    // Treasure chest bottom right
     ctx.fillStyle = '#92400e';
     ctx.fillRect(s * 0.66, s * 0.72, 110, 72);
     ctx.fillStyle = '#fbbf24';
@@ -358,14 +331,12 @@
     ctx.arc(s * 0.71, s * 0.71, 10, 0, Math.PI * 2);
     ctx.fill();
 
-    // Friendly Blue Whale center
     ctx.save();
     ctx.translate(s * 0.44, s * 0.42);
     ctx.fillStyle = '#38bdf8';
     ctx.beginPath();
     ctx.ellipse(0, 0, 145, 92, -0.06, 0, Math.PI * 2);
     ctx.fill();
-    // Tail
     ctx.beginPath();
     ctx.moveTo(-130, 10);
     ctx.lineTo(-205, -45);
@@ -373,12 +344,10 @@
     ctx.lineTo(-205, 65);
     ctx.closePath();
     ctx.fill();
-    // Belly
     ctx.fillStyle = '#e0f2fe';
     ctx.beginPath();
     ctx.ellipse(15, 36, 102, 42, 0, 0, Math.PI);
     ctx.fill();
-    // Eye & smile
     ctx.fillStyle = '#0f172a';
     ctx.beginPath();
     ctx.arc(78, -14, 11, 0, Math.PI * 2);
@@ -394,7 +363,6 @@
     ctx.stroke();
     ctx.restore();
 
-    // Orange clownfish
     ctx.save();
     ctx.translate(s * 0.78, s * 0.28);
     ctx.fillStyle = '#f97316';
@@ -415,7 +383,6 @@
     ctx.fill();
     ctx.restore();
 
-    // Bubbles
     ctx.strokeStyle = 'rgba(255,255,255,0.7)';
     ctx.lineWidth = 4;
     [[0.62, 0.26, 16], [0.66, 0.18, 11], [0.22, 0.24, 18], [0.26, 0.15, 10]].forEach(([x, y, r]) => {
@@ -432,7 +399,6 @@
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, s, s);
 
-    // Rainbow
     ['#ef4444', '#f97316', '#facc15', '#4ade80', '#38bdf8', '#a855f7'].forEach((c, i) => {
       ctx.strokeStyle = c;
       ctx.lineWidth = 14;
@@ -441,19 +407,16 @@
       ctx.stroke();
     });
 
-    // Sun
     ctx.fillStyle = '#fde047';
     ctx.beginPath();
     ctx.arc(s * 0.84, s * 0.16, s * 0.08, 0, Math.PI * 2);
     ctx.fill();
 
-    // Green hills
     ctx.fillStyle = '#4ade80';
     ctx.beginPath();
     ctx.ellipse(s * 0.5, s * 0.92, s * 0.7, s * 0.25, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Castle main walls
     ctx.fillStyle = '#f8fafc';
     ctx.fillRect(s * 0.26, s * 0.44, s * 0.48, s * 0.34);
     ctx.fillStyle = '#e2e8f0';
@@ -462,7 +425,6 @@
     ctx.fillStyle = '#f1f5f9';
     ctx.fillRect(s * 0.43, s * 0.28, s * 0.14, s * 0.5);
 
-    // Turret roofs
     const drawRoof = (cx, y, w, h, color) => {
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -485,7 +447,6 @@
     drawRoof(s * 0.75, s * 0.38, s * 0.14, s * 0.14, '#8b5cf6');
     drawRoof(s * 0.5, s * 0.28, s * 0.19, s * 0.16, '#3b82f6');
 
-    // Arched door
     ctx.fillStyle = '#92400e';
     ctx.beginPath();
     ctx.arc(s * 0.5, s * 0.68, s * 0.065, Math.PI, 0);
@@ -494,7 +455,6 @@
     ctx.closePath();
     ctx.fill();
 
-    // Flowers in grass
     ['#ec4899', '#facc15', '#a855f7', '#fb7185'].forEach((col, i) => {
       const fx = s * (0.16 + i * 0.22);
       const fy = s * (0.85 + (i % 2) * 0.04);
@@ -584,6 +544,132 @@
     return tiles;
   }
 
+  /* -------------------------------------------------------------------------
+     Real Interlocking Jigsaw Geometry & Piece Slicing
+     ------------------------------------------------------------------------- */
+  function generateJigsawTopology(gridSize) {
+    const hEdges = Array.from({ length: gridSize + 1 }, (_, r) =>
+      Array.from({ length: gridSize }, () =>
+        r === 0 || r === gridSize ? 0 : Math.random() < 0.5 ? 1 : -1
+      )
+    );
+    const vEdges = Array.from({ length: gridSize }, () =>
+      Array.from({ length: gridSize + 1 }, (_, c) =>
+        c === 0 || c === gridSize ? 0 : Math.random() < 0.5 ? 1 : -1
+      )
+    );
+    return { hEdges, vEdges };
+  }
+
+  function drawJigsawSide(ctx, x1, y1, x2, y2, tabDir) {
+    if (!tabDir) {
+      ctx.lineTo(x2, y2);
+      return;
+    }
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const len = Math.hypot(dx, dy);
+    // Outward normal for clockwise rectangle traversal in screen coords (+x right, +y down)
+    const nx = (dy / len) * tabDir;
+    const ny = (-dx / len) * tabDir;
+    const px = (t, n) => x1 + t * dx + n * len * nx;
+    const py = (t, n) => y1 + t * dy + n * len * ny;
+
+    ctx.lineTo(px(0.35, 0), py(0.35, 0));
+    ctx.bezierCurveTo(
+      px(0.38, 0.02), py(0.38, 0.02),
+      px(0.42, 0.06), py(0.42, 0.06),
+      px(0.40, 0.12), py(0.40, 0.12)
+    );
+    ctx.bezierCurveTo(
+      px(0.36, 0.22), py(0.36, 0.22),
+      px(0.64, 0.22), py(0.64, 0.22),
+      px(0.60, 0.12), py(0.60, 0.12)
+    );
+    ctx.bezierCurveTo(
+      px(0.58, 0.06), py(0.58, 0.06),
+      px(0.62, 0.02), py(0.62, 0.02),
+      px(0.65, 0), py(0.65, 0)
+    );
+    ctx.lineTo(x2, y2);
+  }
+
+  function traceJigsawPath(ctx, x, y, cell, edges) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    drawJigsawSide(ctx, x, y, x + cell, y, edges.top);
+    drawJigsawSide(ctx, x + cell, y, x + cell, y + cell, edges.right);
+    drawJigsawSide(ctx, x + cell, y + cell, x, y + cell, edges.bottom);
+    drawJigsawSide(ctx, x, y + cell, x, y, edges.left);
+    ctx.closePath();
+  }
+
+  function sliceCanvasToJigsawPieces(sourceCanvas, gridSize) {
+    const { hEdges, vEdges } = generateJigsawTopology(gridSize);
+    const cell = CANVAS_SIZE / gridSize;
+    const pad = Math.ceil(cell * 0.24);
+    const fullSize = Math.ceil(cell + pad * 2);
+
+    const pieceUrls = [];
+    const pieceEdges = [];
+    const temp = document.createElement('canvas');
+    temp.width = fullSize;
+    temp.height = fullSize;
+    const tCtx = temp.getContext('2d');
+
+    for (let r = 0; r < gridSize; r++) {
+      for (let c = 0; c < gridSize; c++) {
+        const edges = {
+          top: hEdges[r][c] ? -hEdges[r][c] : 0,
+          right: vEdges[r][c + 1],
+          bottom: hEdges[r + 1][c],
+          left: vEdges[r][c] ? -vEdges[r][c] : 0
+        };
+        pieceEdges.push(edges);
+
+        tCtx.clearRect(0, 0, fullSize, fullSize);
+        tCtx.save();
+        traceJigsawPath(tCtx, pad, pad, cell, edges);
+        tCtx.clip();
+
+        // Draw expanded source region so protruding tabs carry exact image pixels
+        const srcX = c * cell - pad;
+        const srcY = r * cell - pad;
+        tCtx.drawImage(sourceCanvas, srcX, srcY, fullSize, fullSize, 0, 0, fullSize, fullSize);
+        tCtx.restore();
+
+        // Crisp bevel highlight + dark seam outline
+        tCtx.save();
+        traceJigsawPath(tCtx, pad, pad, cell, edges);
+        tCtx.strokeStyle = 'rgba(255, 255, 255, 0.72)';
+        tCtx.lineWidth = 4;
+        tCtx.stroke();
+        tCtx.strokeStyle = 'rgba(15, 23, 42, 0.36)';
+        tCtx.lineWidth = 1.8;
+        tCtx.stroke();
+        tCtx.restore();
+
+        pieceUrls.push(temp.toDataURL('image/png'));
+      }
+    }
+
+    return {
+      pieceUrls,
+      pieceEdges,
+      overhangPct: (pad / cell) * 100,
+      sizePct: ((cell + pad * 2) / cell) * 100
+    };
+  }
+
+  function shuffleArray(arr) {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
   function createDerangedBoard(total) {
     const arr = Array.from({ length: total }, (_, i) => i);
     for (let attempt = 0; attempt < 15; attempt++) {
@@ -593,7 +679,6 @@
       }
       if (arr.every((val, idx) => val !== idx)) return arr;
     }
-    // Fallback explicit derangement fix
     for (let i = 0; i < total; i++) {
       if (arr[i] === i) {
         const j = (i + 1) % total;
@@ -626,7 +711,6 @@
       emptyIdx = next;
     }
 
-    // Ensure it is not accidentally solved
     if (board.every((v, i) => v === i)) {
       const r = Math.floor(emptyIdx / gridSize);
       const swapWith = r > 0 ? emptyIdx - gridSize : emptyIdx + gridSize;
@@ -644,19 +728,24 @@
       this.customPicture = null;
       this.activePictureId = 'rocket';
       this.difficulty = 'easy';
-      this.mode = 'swap'; // 'swap' | 'slide'
+      this.mode = 'jigsaw'; // 'jigsaw' | 'swap' | 'slide'
       this.showNumbers = false;
       this.peeking = false;
 
       this.board = [];
+      this.trayPieces = [];
       this.tileUrls = [];
+      this.jigsawData = null;
       this.fullImageUrl = '';
       this.moves = 0;
       this.elapsedSec = 0;
       this.timerId = null;
       this.selectedPos = null;
+      this.selectedTrayPiece = null;
       this.hintPositions = [];
+      this.hintTrayPiece = null;
       this.hintTimer = null;
+      this.breakTimer = null;
       this.solved = false;
       this.loadToken = 0;
 
@@ -703,8 +792,7 @@
       });
 
       $('btn-puzzle-shuffle').addEventListener('click', () => {
-        AudioEngine.pop();
-        this.newRound();
+        this.breakPuzzle();
       });
 
       $('btn-puzzle-numbers').addEventListener('click', () => {
@@ -712,7 +800,7 @@
         $('btn-puzzle-numbers').classList.toggle('active', this.showNumbers);
         $('btn-puzzle-numbers').textContent = this.showNumbers ? '🔢 Numbers: On' : '🔢 Numbers: Off';
         AudioEngine.pop();
-        this._renderBoard();
+        this._renderAll();
       });
 
       $('btn-puzzle-hint').addEventListener('click', () => this.showHint());
@@ -753,7 +841,7 @@
 
       $('btn-puzzle-again').addEventListener('click', () => {
         AudioEngine.pop();
-        this.newRound();
+        this.breakPuzzle();
       });
 
       $('btn-puzzle-next-pic').addEventListener('click', () => {
@@ -788,6 +876,10 @@
         clearTimeout(this.hintTimer);
         this.hintTimer = null;
       }
+      if (this.breakTimer) {
+        clearTimeout(this.breakTimer);
+        this.breakTimer = null;
+      }
     }
 
     setDifficulty(diffId) {
@@ -798,7 +890,7 @@
     }
 
     setMode(mode) {
-      if (mode !== 'swap' && mode !== 'slide') return;
+      if (mode !== 'jigsaw' && mode !== 'swap' && mode !== 'slide') return;
       this.mode = mode;
       this._syncToolbarUI();
       this.newRound();
@@ -815,6 +907,24 @@
       const idx = all.findIndex((p) => p.id === this.activePictureId);
       const next = all[(idx + 1) % all.length];
       this.selectPicture(next.id);
+    }
+
+    breakPuzzle() {
+      if (this.breakTimer) {
+        clearTimeout(this.breakTimer);
+        this.breakTimer = null;
+      }
+      AudioEngine.crack();
+      const wrap = $('puzzle-board-wrap');
+      if (wrap) {
+        wrap.classList.remove('breaking-burst');
+        void wrap.offsetWidth;
+        wrap.classList.add('breaking-burst');
+        this.breakTimer = setTimeout(() => {
+          wrap.classList.remove('breaking-burst');
+        }, 420);
+      }
+      this.newRound(true);
     }
 
     handleUploadFile(file) {
@@ -840,7 +950,7 @@
           this.activePictureId = 'custom';
           AudioEngine.magic();
           this._renderPictureGallery();
-          this.newRound();
+          this.breakPuzzle();
         };
         img.onerror = () => {
           this._setStatus('Oops! Could not read that picture. Try another photo!');
@@ -883,24 +993,21 @@
           img.src = pic.thumbUrl;
           img.alt = pic.title;
           thumb.appendChild(img);
-        } else {
-          // Pre-render procedural thumbnails immediately
-          if (typeof pic.draw === 'function') {
-            renderPictureToCanvas(pic).then(() => {
-              const img = document.createElement('img');
-              img.src = pic.thumbUrl;
-              img.alt = pic.title;
-              thumb.innerHTML = '';
-              thumb.appendChild(img);
-            });
-          } else if (pic.src) {
+        } else if (typeof pic.draw === 'function') {
+          renderPictureToCanvas(pic).then(() => {
             const img = document.createElement('img');
-            img.src = pic.src;
+            img.src = pic.thumbUrl;
             img.alt = pic.title;
+            thumb.innerHTML = '';
             thumb.appendChild(img);
-          } else {
-            thumb.textContent = pic.emoji;
-          }
+          });
+        } else if (pic.src) {
+          const img = document.createElement('img');
+          img.src = pic.src;
+          img.alt = pic.title;
+          thumb.appendChild(img);
+        } else {
+          thumb.textContent = pic.emoji;
         }
 
         const label = document.createElement('span');
@@ -917,13 +1024,23 @@
       });
     }
 
-    async newRound() {
-      this.stop();
+    async newRound(animateScatter = false) {
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
+      if (this.hintTimer) {
+        clearTimeout(this.hintTimer);
+        this.hintTimer = null;
+      }
+
       this.solved = false;
       this.moves = 0;
       this.elapsedSec = 0;
       this.selectedPos = null;
+      this.selectedTrayPiece = null;
       this.hintPositions = [];
+      this.hintTrayPiece = null;
       this.peeking = false;
       $('btn-puzzle-peek').classList.remove('active');
       $('puzzle-peek-overlay').classList.add('hidden');
@@ -939,23 +1056,34 @@
         if (token !== this.loadToken) return;
 
         this.fullImageUrl = pic.thumbUrl || canvas.toDataURL('image/jpeg', 0.9);
-        this.tileUrls = sliceCanvasToTiles(canvas, diff.size);
-
         $('puzzle-preview-img').src = this.fullImageUrl;
         $('puzzle-peek-img').src = this.fullImageUrl;
+        $('puzzle-board-ghost').src = this.fullImageUrl;
 
         const total = diff.size * diff.size;
-        this.board = this.mode === 'slide'
-          ? createSolvableSlideBoard(diff.size)
-          : createDerangedBoard(total);
+        if (this.mode === 'jigsaw') {
+          this.jigsawData = sliceCanvasToJigsawPieces(canvas, diff.size);
+          this.tileUrls = this.jigsawData.pieceUrls;
+          this.board = Array(total).fill(null);
+          this.trayPieces = shuffleArray(Array.from({ length: total }, (_, i) => i));
+        } else {
+          this.jigsawData = null;
+          this.tileUrls = sliceCanvasToTiles(canvas, diff.size);
+          this.trayPieces = [];
+          this.board = this.mode === 'slide'
+            ? createSolvableSlideBoard(diff.size)
+            : createDerangedBoard(total);
+        }
 
         this._updateStats();
         this._setStatus(
-          this.mode === 'swap'
-            ? `Drag or tap two pieces to swap! (${diff.label})`
-            : `Tap or slide tiles next to the empty space! (${diff.label})`
+          this.mode === 'jigsaw'
+            ? `Drag or tap a jigsaw piece into its matching spot! (${diff.label})`
+            : this.mode === 'swap'
+              ? `Drag or tap two pieces to swap! (${diff.label})`
+              : `Tap or slide tiles next to the empty space! (${diff.label})`
         );
-        this._renderBoard();
+        this._renderAll(animateScatter);
         this._startTimer();
       } catch (_) {
         if (token !== this.loadToken) return;
@@ -1019,14 +1147,31 @@
       return r1 === r2 || c1 === c2;
     }
 
+    _renderAll(animateScatter = false) {
+      const isJigsaw = this.mode === 'jigsaw';
+      $('puzzle-board').classList.toggle('jigsaw-mode', isJigsaw);
+      $('puzzle-board-ghost').classList.toggle('hidden', !isJigsaw || this.solved);
+      $('puzzle-tray-wrap').classList.toggle('hidden', !isJigsaw);
+
+      this._renderBoard();
+      if (isJigsaw) {
+        this._renderJigsawTray(animateScatter);
+      }
+    }
+
     _renderBoard() {
       const grid = $('puzzle-board');
       if (!grid) return;
       const size = DIFFICULTIES[this.difficulty].size;
-      const emptyVal = size * size - 1;
-
       grid.style.setProperty('--puzzle-cols', String(size));
       grid.innerHTML = '';
+
+      if (this.mode === 'jigsaw') {
+        this._renderJigsawBoard(grid);
+        return;
+      }
+
+      const emptyVal = size * size - 1;
 
       this.board.forEach((pieceId, pos) => {
         const isEmpty = this.mode === 'slide' && pieceId === emptyVal && !this.solved;
@@ -1075,6 +1220,211 @@
 
         grid.appendChild(cell);
       });
+    }
+
+    _renderJigsawBoard(grid) {
+      const { overhangPct, sizePct } = this.jigsawData || { overhangPct: 24, sizePct: 148 };
+
+      this.board.forEach((pieceId, pos) => {
+        const isPlaced = pieceId !== null;
+        const isHint = this.hintPositions.includes(pos);
+
+        const slot = document.createElement('button');
+        slot.type = 'button';
+        slot.dataset.pos = String(pos);
+        slot.className = 'puzzle-jigsaw-slot';
+        if (isPlaced) slot.classList.add('placed');
+        if (isHint) slot.classList.add('hint-glow');
+        if (this.solved) slot.classList.add('solved');
+
+        if (isPlaced) {
+          slot.setAttribute('aria-label', `Placed puzzle piece ${pieceId + 1}`);
+          const img = document.createElement('img');
+          img.className = 'puzzle-jigsaw-placed-img';
+          img.src = this.tileUrls[pieceId];
+          img.alt = '';
+          img.draggable = false;
+          img.style.width = `${sizePct}%`;
+          img.style.height = `${sizePct}%`;
+          img.style.left = `-${overhangPct}%`;
+          img.style.top = `-${overhangPct}%`;
+          slot.appendChild(img);
+        } else {
+          slot.setAttribute('aria-label', `Empty puzzle spot ${pos + 1}`);
+          if (this.showNumbers) {
+            const num = document.createElement('span');
+            num.className = 'puzzle-slot-num';
+            num.textContent = String(pos + 1);
+            slot.appendChild(num);
+          }
+          slot.addEventListener('click', () => {
+            if (this.selectedTrayPiece !== null) {
+              this._placeJigsawPiece(this.selectedTrayPiece, pos);
+            }
+          });
+        }
+
+        grid.appendChild(slot);
+      });
+    }
+
+    _renderJigsawTray(animateScatter = false) {
+      const tray = $('puzzle-tray');
+      if (!tray) return;
+      tray.innerHTML = '';
+
+      if (this.trayPieces.length === 0) {
+        tray.innerHTML = '<div class="puzzle-tray-done">🎉 All jigsaw pieces placed!</div>';
+        return;
+      }
+
+      this.trayPieces.forEach((pieceId, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'puzzle-jigsaw-piece-btn';
+        if (animateScatter) {
+          btn.classList.add('scatter-in');
+          btn.style.animationDelay = `${Math.min(idx * 22, 260)}ms`;
+        }
+        if (this.selectedTrayPiece === pieceId) btn.classList.add('selected');
+        if (this.hintTrayPiece === pieceId) btn.classList.add('hint-glow');
+        btn.dataset.pieceId = String(pieceId);
+        btn.setAttribute('aria-label', `Jigsaw piece ${pieceId + 1}`);
+
+        const img = document.createElement('img');
+        img.src = this.tileUrls[pieceId];
+        img.alt = '';
+        img.draggable = false;
+        btn.appendChild(img);
+
+        if (this.showNumbers) {
+          const num = document.createElement('span');
+          num.className = 'puzzle-num-badge';
+          num.textContent = String(pieceId + 1);
+          btn.appendChild(num);
+        }
+
+        this._attachJigsawTrayPointer(btn, pieceId);
+        tray.appendChild(btn);
+      });
+    }
+
+    _attachJigsawTrayPointer(btn, pieceId) {
+      if (this.solved) return;
+
+      btn.addEventListener('pointerdown', (e) => {
+        if (this.solved) return;
+        e.preventDefault();
+        const startX = e.clientX;
+        const startY = e.clientY;
+        let dragging = false;
+        let ghost = null;
+        let hoverSlot = null;
+
+        const onMove = (ev) => {
+          const dx = ev.clientX - startX;
+          const dy = ev.clientY - startY;
+          if (!dragging && Math.hypot(dx, dy) > 8) {
+            dragging = true;
+            this.selectedTrayPiece = null;
+            btn.classList.add('dragging-src');
+
+            const sampleSlot = $('puzzle-board').querySelector('.puzzle-jigsaw-slot');
+            const slotSize = sampleSlot ? sampleSlot.getBoundingClientRect().width : 90;
+            const factor = this.jigsawData ? this.jigsawData.sizePct / 100 : 1.48;
+            const ghostSize = Math.round(slotSize * factor);
+
+            ghost = document.createElement('div');
+            ghost.className = 'puzzle-jigsaw-ghost';
+            ghost.style.width = `${ghostSize}px`;
+            ghost.style.height = `${ghostSize}px`;
+            const img = document.createElement('img');
+            img.src = this.tileUrls[pieceId];
+            img.alt = '';
+            ghost.appendChild(img);
+            document.body.appendChild(ghost);
+          }
+
+          if (dragging && ghost) {
+            ghost.style.left = `${ev.clientX - ghost.offsetWidth / 2}px`;
+            ghost.style.top = `${ev.clientY - ghost.offsetHeight / 2}px`;
+
+            ghost.style.visibility = 'hidden';
+            const el = document.elementFromPoint(ev.clientX, ev.clientY);
+            ghost.style.visibility = '';
+
+            const slotEl = el && el.closest ? el.closest('.puzzle-jigsaw-slot[data-pos]') : null;
+            const pos = slotEl ? Number(slotEl.dataset.pos) : null;
+            document.querySelectorAll('.puzzle-jigsaw-slot.drag-over').forEach((n) => n.classList.remove('drag-over'));
+
+            if (pos !== null && this.board[pos] === null) {
+              slotEl.classList.add('drag-over');
+              hoverSlot = pos;
+            } else {
+              hoverSlot = null;
+            }
+          }
+        };
+
+        const cleanup = () => {
+          window.removeEventListener('pointermove', onMove);
+          window.removeEventListener('pointerup', onUp);
+          window.removeEventListener('pointercancel', onCancel);
+          btn.classList.remove('dragging-src');
+          document.querySelectorAll('.puzzle-jigsaw-slot.drag-over').forEach((n) => n.classList.remove('drag-over'));
+          if (ghost) ghost.remove();
+        };
+
+        const onUp = () => {
+          cleanup();
+          if (dragging) {
+            if (hoverSlot !== null) {
+              this._placeJigsawPiece(pieceId, hoverSlot);
+            } else {
+              this._renderAll();
+            }
+          } else {
+            this.selectedTrayPiece = this.selectedTrayPiece === pieceId ? null : pieceId;
+            AudioEngine.pop();
+            this._renderJigsawTray();
+          }
+        };
+
+        const onCancel = () => {
+          cleanup();
+          this._renderAll();
+        };
+
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+        window.addEventListener('pointercancel', onCancel);
+      });
+    }
+
+    _placeJigsawPiece(pieceId, pos) {
+      if (this.solved || this.board[pos] !== null) return;
+      this.moves += 1;
+      this.hintPositions = [];
+      this.hintTrayPiece = null;
+
+      if (pieceId === pos) {
+        this.board[pos] = pieceId;
+        this.trayPieces = this.trayPieces.filter((id) => id !== pieceId);
+        this.selectedTrayPiece = null;
+        AudioEngine.correct();
+        this._setStatus('Nice snap! Keep going! 🧩');
+        this._checkCompletionOrRender();
+        return;
+      }
+
+      AudioEngine.wrong();
+      this._setStatus('Almost! Look closely at the puzzle tabs and picture colors!');
+      this._updateStats();
+      const slotEl = $('puzzle-board').querySelector(`.puzzle-jigsaw-slot[data-pos="${pos}"]`);
+      if (slotEl) {
+        slotEl.classList.add('slot-shake');
+        setTimeout(() => slotEl.classList.remove('slot-shake'), 360);
+      }
     }
 
     _attachTilePointer(cell, pos) {
@@ -1224,7 +1574,6 @@
       const r2 = Math.floor(emptyPos / size);
       const c2 = emptyPos % size;
 
-      // Support single or multi-tile line slide toward empty slot
       if (r1 === r2) {
         const step = c1 < c2 ? -1 : 1;
         for (let c = c2; c !== c1; c += step) {
@@ -1258,7 +1607,6 @@
       const ec = emptyPos % size;
 
       let targetPos = -1;
-      // Pressing ArrowUp slides the tile BELOW the empty slot up into the empty slot
       if (key === 'ArrowUp' && er < size - 1) targetPos = emptyPos + size;
       else if (key === 'ArrowDown' && er > 0) targetPos = emptyPos - size;
       else if (key === 'ArrowLeft' && ec < size - 1) targetPos = emptyPos + 1;
@@ -1276,7 +1624,13 @@
         this.hintTimer = null;
       }
 
-      if (this.mode === 'swap') {
+      if (this.mode === 'jigsaw') {
+        if (this.trayPieces.length === 0) return;
+        const pieceId = this.trayPieces[0];
+        this.hintTrayPiece = pieceId;
+        this.hintPositions = [pieceId];
+        this._setStatus('💡 Hint: Drag the glowing jigsaw piece into the glowing spot!');
+      } else if (this.mode === 'swap') {
         const wrongPos = this.board.findIndex((val, idx) => val !== idx);
         if (wrongPos === -1) return;
         const neededFrom = this.board.indexOf(wrongPos);
@@ -1295,7 +1649,6 @@
         if (ec > 0) candidates.push(emptyPos - 1);
         if (ec < size - 1) candidates.push(emptyPos + 1);
 
-        // Prefer moving a tile closer to its home coordinate
         let bestMove = candidates[0];
         let bestGain = -999;
         for (const cand of candidates) {
@@ -1317,10 +1670,11 @@
       }
 
       AudioEngine.flip();
-      this._renderBoard();
+      this._renderAll();
       this.hintTimer = setTimeout(() => {
         this.hintPositions = [];
-        this._renderBoard();
+        this.hintTrayPiece = null;
+        this._renderAll();
       }, 2200);
     }
 
@@ -1328,14 +1682,19 @@
       const isSolved = this.board.every((val, idx) => val === idx);
       if (!isSolved) {
         this._updateStats();
-        this._renderBoard();
+        this._renderAll();
         return;
       }
 
       this.solved = true;
-      this.stop();
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
       this.selectedPos = null;
+      this.selectedTrayPiece = null;
       this.hintPositions = [];
+      this.hintTrayPiece = null;
 
       const diff = DIFFICULTIES[this.difficulty];
       const bestKey = `${this.difficulty}_${this.mode}`;
@@ -1347,7 +1706,7 @@
       }
 
       this._updateStats();
-      this._renderBoard();
+      this._renderAll();
       $('puzzle-board').classList.add('solved-board');
 
       const profile = this.profileStore.profile;

@@ -722,7 +722,17 @@ installBtn.addEventListener('click', async () => {
 
 if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let refreshedForUpdate = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || refreshedForUpdate) return;
+      refreshedForUpdate = true;
+      window.location.reload();
+    });
+    navigator.serviceWorker
+      .register('./sw.js', { updateViaCache: 'none' })
+      .then((reg) => reg.update().catch(() => {}))
+      .catch(() => {});
   });
 }
 

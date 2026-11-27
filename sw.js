@@ -1,4 +1,4 @@
-const CACHE_NAME = 'playspark-v52';
+const CACHE_NAME = 'playspark-v53';
 const ASSETS = [
   './',
   './index.html',
@@ -41,9 +41,33 @@ const ASSETS = [
   './ganeshsa.jpeg'
 ];
 
+function isCodeOrDocumentRequest(request) {
+  if (request.mode === 'navigate') return true;
+  const dest = request.destination || '';
+  if (dest === 'document' || dest === 'script' || dest === 'style' || dest === 'manifest') {
+    return true;
+  }
+  const url = request.url.split('?')[0].toLowerCase();
+  return (
+    url.endsWith('/') ||
+    url.endsWith('.html') ||
+    url.endsWith('.js') ||
+    url.endsWith('.css') ||
+    url.endsWith('.webmanifest')
+  );
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        ASSETS.map((asset) =>
+          fetch(new Request(asset, { cache: 'reload' }))
+            .then((res) => (res && res.ok ? cache.put(asset, res) : null))
+            .catch(() => null)
+        )
+      )
+    )
   );
   self.skipWaiting();
 });
@@ -52,13 +76,32 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  // Network-first for HTML, JS, CSS, and manifest so deployed updates appear immediately
+  if (isCodeOrDocumentRequest(event.request)) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-cache' })
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(event.request).then((cached) => cached || caches.match('./index.html'))
+        )
+    );
+    return;
+  }
+
+  // Cache-first with background refresh for images and static media
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;

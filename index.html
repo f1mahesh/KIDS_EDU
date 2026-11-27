@@ -1611,8 +1611,9 @@
               <button type="button" class="magic-pill" data-puzzle-diff="master">👑 Master (5×5)</button>
             </div>
             <div class="puzzle-tool-group" role="group" aria-label="Choose Puzzle Mode">
-              <span class="puzzle-group-lbl">Mode:</span>
-              <button type="button" class="magic-pill active" data-puzzle-mode="swap">🧩 Swap &amp; Snap</button>
+              <span class="puzzle-group-lbl">Style:</span>
+              <button type="button" class="magic-pill active" data-puzzle-mode="jigsaw">🧩 Real Jigsaw</button>
+              <button type="button" class="magic-pill" data-puzzle-mode="swap">🔄 Swap &amp; Snap</button>
               <button type="button" class="magic-pill" data-puzzle-mode="slide">🔀 Slide Tiles</button>
             </div>
           </div>
@@ -1626,13 +1627,16 @@
           </div>
 
           <div class="puzzle-status-strip" id="puzzle-status" aria-live="polite">
-            Drag or tap two pieces to swap!
+            Drag or tap a jigsaw piece into its matching spot!
           </div>
 
           <!-- Main Puzzle Stage: Board + Preview/Controls -->
           <div class="puzzle-workspace">
             <div class="puzzle-board-wrap" id="puzzle-board-wrap">
-              <div class="puzzle-board" id="puzzle-board" role="grid" aria-label="Picture puzzle board"></div>
+              <div class="puzzle-board-stage">
+                <img id="puzzle-board-ghost" class="puzzle-board-ghost" alt="" aria-hidden="true" />
+                <div class="puzzle-board" id="puzzle-board" role="grid" aria-label="Picture puzzle board"></div>
+              </div>
               <div class="puzzle-peek-overlay hidden" id="puzzle-peek-overlay">
                 <img id="puzzle-peek-img" alt="Full picture peek" />
               </div>
@@ -1645,12 +1649,18 @@
                 <img id="puzzle-preview-img" class="puzzle-preview-img" alt="Target puzzle picture preview" />
               </div>
               <div class="puzzle-side-actions">
+                <button type="button" id="btn-puzzle-shuffle" class="primary-btn small-btn">💥 Break Puzzle!</button>
                 <button type="button" id="btn-puzzle-peek" class="secondary-btn small-btn">👁️ Peek Full</button>
                 <button type="button" id="btn-puzzle-hint" class="help-pill-btn">💡 Hint</button>
                 <button type="button" id="btn-puzzle-numbers" class="mini-btn">🔢 Numbers: Off</button>
-                <button type="button" id="btn-puzzle-shuffle" class="mini-btn">🔀 Shuffle</button>
               </div>
             </aside>
+          </div>
+
+          <!-- Real Jigsaw Piece Tray -->
+          <div class="puzzle-tray-wrap" id="puzzle-tray-wrap">
+            <div class="puzzle-tray-header">🧩 Jigsaw Pieces — Drag or tap a piece onto the board!</div>
+            <div class="puzzle-tray" id="puzzle-tray" aria-label="Jigsaw pieces tray"></div>
           </div>
 
           <div id="puzzle-win-banner" class="puzzle-win-banner hidden" aria-live="polite">
