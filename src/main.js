@@ -36,6 +36,7 @@ const SECTION_FOR_VIEW = {
   runner: 'games',
   funGames: 'fun',
   funRacer: 'fun',
+  puzzle: 'fun',
   trophies: 'trophies'
 };
 
@@ -72,7 +73,8 @@ const views = {
   enTrace: $('view-en-trace'),
   enBuilder: $('view-en-builder'),
   funGames: $('view-fun-games'),
-  funRacer: $('view-fun-racer')
+  funRacer: $('view-fun-racer'),
+  puzzle: $('view-puzzle')
 };
 
 // 3D Scenes
@@ -434,7 +436,8 @@ const HELP_BINDINGS = [
   ['btn-help-en-runner', 'en-runner'],
   ['btn-help-en-trace', 'en-trace'],
   ['btn-help-en-builder', 'en-builder'],
-  ['btn-help-racer', 'fun-racer']
+  ['btn-help-racer', 'fun-racer'],
+  ['btn-help-puzzle', 'puzzle']
 ];
 HELP_BINDINGS.forEach(([id, topic]) => {
   const el = $(id);
@@ -677,6 +680,15 @@ window.addEventListener('keydown', (e) => {
 
   if (views.story && views.story.classList.contains('active')) {
     storyController.handleKey(e.key);
+    return;
+  }
+
+  const activePuzzle = gamesHub.getActivePuzzle();
+  if (activePuzzle) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      e.preventDefault();
+      activePuzzle.handleKey(e.key);
+    }
   }
 });
 

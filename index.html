@@ -143,7 +143,7 @@
             <div class="mode-icon">🎉</div>
             <div class="mode-info">
               <h2>Fun Games <span class="new-tag">NEW</span></h2>
-              <p>Turbo Hand Racer — Steer a race car with your hands!</p>
+              <p>Picture Puzzle (Upload Photos!), Turbo Hand Racer &amp; AR Fun!</p>
             </div>
             <span class="mode-arrow">▶</span>
           </button>
@@ -660,8 +660,17 @@
             </button>
           </div>
 
-          <h3 class="arcade-subhead">🧪 Interactive Lab &amp; Speed Challenges</h3>
+          <h3 class="arcade-subhead">🧪 Interactive Lab, Puzzles &amp; Speed Challenges</h3>
           <div class="mode-grid">
+            <button class="mode-card mode-puzzle" data-action="open-puzzle" data-puzzle-from="games">
+              <div class="mode-icon">🖼️</div>
+              <div class="mode-info">
+                <h2>Picture Puzzle <span class="new-tag">NEW</span></h2>
+                <p>Solve picture puzzles with built-in art or upload your own photo!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
             <button class="mode-card mode-magic" data-action="open-magic">
               <div class="mode-icon">🪄</div>
               <div class="mode-info">
@@ -1463,6 +1472,15 @@
           <p class="muted" style="margin-top:0">Pure play &amp; motion fun for kids! Collect Diamonds, Gold, Jewels, Bronze Coins &amp; Stones while playing!</p>
 
           <div class="mode-grid">
+            <button class="mode-card mode-puzzle" data-action="open-puzzle" data-puzzle-from="funGames">
+              <div class="mode-icon">🖼️</div>
+              <div class="mode-info">
+                <h2>Picture Puzzle <span class="new-tag">UPLOAD PHOTO</span></h2>
+                <p>Solve fun picture puzzles with difficulty levels — or upload your own picture!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
             <button class="mode-card mode-racer" data-action="open-fun-racer">
               <div class="mode-icon">🏎️</div>
               <div class="mode-info">
@@ -1560,6 +1578,88 @@
             <button id="btn-racer-left" class="runner-pad-btn glass-pill" aria-label="Steer Left">⬅️ Left</button>
             <button id="btn-racer-boost" class="runner-pad-btn runner-action-btn" aria-label="Turbo Boost">⚡ TURBO!</button>
             <button id="btn-racer-right" class="runner-pad-btn glass-pill" aria-label="Steer Right">Right ➡️</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: PICTURE PUZZLE GAME -->
+      <section id="view-puzzle" class="view" aria-labelledby="puzzle-title">
+        <div class="panel-card puzzle-card">
+          <div class="tables-top">
+            <button class="back-btn" id="btn-puzzle-back">← Back</button>
+            <h2 id="puzzle-title">🖼️ Picture Puzzle</h2>
+            <div class="tables-actions">
+              <button id="btn-puzzle-upload" type="button" class="primary-btn small-btn">📷 Upload Photo</button>
+              <button id="btn-help-puzzle" type="button" class="help-pill-btn">❓ Help</button>
+            </div>
+            <input id="puzzle-upload-input" type="file" accept="image/*" class="hidden" aria-label="Upload your own puzzle picture" />
+          </div>
+
+          <!-- Picture Picker Strip -->
+          <div class="puzzle-gallery-wrap">
+            <span class="puzzle-section-lbl">🎨 Pick a Picture (or upload / drop your own photo!):</span>
+            <div class="puzzle-pic-strip" id="puzzle-pic-strip" role="list" aria-label="Choose puzzle picture"></div>
+          </div>
+
+          <!-- Difficulty & Mode Toolbar -->
+          <div class="puzzle-toolbar">
+            <div class="puzzle-tool-group" role="group" aria-label="Choose Difficulty Level">
+              <span class="puzzle-group-lbl">Difficulty:</span>
+              <button type="button" class="magic-pill active" data-puzzle-diff="easy">🐣 Starter (2×2)</button>
+              <button type="button" class="magic-pill" data-puzzle-diff="medium">🌱 Explorer (3×3)</button>
+              <button type="button" class="magic-pill" data-puzzle-diff="hard">🚀 Challenger (4×4)</button>
+              <button type="button" class="magic-pill" data-puzzle-diff="master">👑 Master (5×5)</button>
+            </div>
+            <div class="puzzle-tool-group" role="group" aria-label="Choose Puzzle Mode">
+              <span class="puzzle-group-lbl">Mode:</span>
+              <button type="button" class="magic-pill active" data-puzzle-mode="swap">🧩 Swap &amp; Snap</button>
+              <button type="button" class="magic-pill" data-puzzle-mode="slide">🔀 Slide Tiles</button>
+            </div>
+          </div>
+
+          <!-- Stats Bar -->
+          <div class="puzzle-stats-bar">
+            <div class="wb-stat-pill">🔄 Moves <strong id="puzzle-moves">0</strong></div>
+            <div class="wb-stat-pill">✅ Placed <strong id="puzzle-placed">0/4</strong></div>
+            <div class="wb-stat-pill">⏱️ Time <strong id="puzzle-timer">0:00</strong></div>
+            <div class="wb-stat-pill">🏆 Best <strong id="puzzle-best">—</strong></div>
+          </div>
+
+          <div class="puzzle-status-strip" id="puzzle-status" aria-live="polite">
+            Drag or tap two pieces to swap!
+          </div>
+
+          <!-- Main Puzzle Stage: Board + Preview/Controls -->
+          <div class="puzzle-workspace">
+            <div class="puzzle-board-wrap" id="puzzle-board-wrap">
+              <div class="puzzle-board" id="puzzle-board" role="grid" aria-label="Picture puzzle board"></div>
+              <div class="puzzle-peek-overlay hidden" id="puzzle-peek-overlay">
+                <img id="puzzle-peek-img" alt="Full picture peek" />
+              </div>
+              <div class="puzzle-drop-hint">📷 Drop an image here to play with it!</div>
+            </div>
+
+            <aside class="puzzle-side">
+              <div class="puzzle-preview-card">
+                <span class="puzzle-preview-title">🎯 Goal Picture</span>
+                <img id="puzzle-preview-img" class="puzzle-preview-img" alt="Target puzzle picture preview" />
+              </div>
+              <div class="puzzle-side-actions">
+                <button type="button" id="btn-puzzle-peek" class="secondary-btn small-btn">👁️ Peek Full</button>
+                <button type="button" id="btn-puzzle-hint" class="help-pill-btn">💡 Hint</button>
+                <button type="button" id="btn-puzzle-numbers" class="mini-btn">🔢 Numbers: Off</button>
+                <button type="button" id="btn-puzzle-shuffle" class="mini-btn">🔀 Shuffle</button>
+              </div>
+            </aside>
+          </div>
+
+          <div id="puzzle-win-banner" class="puzzle-win-banner hidden" aria-live="polite">
+            <span id="puzzle-win-text">🎉 Puzzle Complete!</span>
+            <div class="puzzle-win-actions">
+              <button type="button" id="btn-puzzle-again" class="primary-btn small-btn">🔄 Play Again</button>
+              <button type="button" id="btn-puzzle-next-pic" class="secondary-btn small-btn">🖼️ Next Picture</button>
+              <button type="button" id="btn-puzzle-harder" class="mini-btn">⚡ Harder Level</button>
+            </div>
           </div>
         </div>
       </section>
@@ -1682,6 +1782,7 @@
   <script defer src="./src/games/rock-blaster-game.js"></script>
   <script defer src="./src/games/number-runner-game.js"></script>
   <script defer src="./src/games/car-racer-game.js"></script>
+  <script defer src="./src/games/picture-puzzle-game.js"></script>
   <script defer src="./src/games/games-hub-controller.js"></script>
   <script defer src="./src/story/story-controller.js"></script>
   <script defer src="./src/main.js"></script>

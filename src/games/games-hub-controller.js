@@ -3,7 +3,7 @@
 (function (app) {
   'use strict';
 
-  const { AudioEngine, $, launchConfetti, MagicMixerGame, NumberRunnerGame, RockBlasterGame, SnowClapGame, SquirrelBridgeGame, CarRacerGame } = app;
+  const { AudioEngine, $, launchConfetti, MagicMixerGame, NumberRunnerGame, RockBlasterGame, SnowClapGame, SquirrelBridgeGame, CarRacerGame, PicturePuzzleGame } = app;
 
 class GamesHubController {
   constructor({ profileStore, showView, refreshHeader, stopMathTimer, closeArcadeSettings }) {
@@ -24,6 +24,11 @@ class GamesHubController {
       refreshHeader,
       stopMathTimer
     });
+    this.picturePuzzle = new PicturePuzzleGame({
+      profileStore,
+      refreshHeader
+    });
+    this.puzzleReturnView = 'funGames';
 
     this.snowOp = 'add';
     this.snowSpeed = 'slow';
@@ -53,6 +58,7 @@ class GamesHubController {
     if (exceptView !== 'rock' && this.rockGame) this.rockGame.stop();
     if (exceptView !== 'runner' && this.runnerGame) this.runnerGame.stop();
     if (exceptView !== 'funRacer' && this.racerGame) this.racerGame.stop();
+    if (exceptView !== 'puzzle' && this.picturePuzzle) this.picturePuzzle.stop();
   }
 
   getActiveRunner() {
@@ -69,12 +75,20 @@ class GamesHubController {
     return null;
   }
 
+  getActivePuzzle() {
+    if ($('view-puzzle').classList.contains('active') && this.picturePuzzle) {
+      return this.picturePuzzle;
+    }
+    return null;
+  }
+
   _bindEvents() {
     this._bindSnowEvents();
     this._bindSquirrelEvents();
     this._bindRockEvents();
     this._bindRunnerEvents();
     this._bindRacerEvents();
+    this._bindPuzzleEvents();
   }
 
   // --- Snow Clap AR ---
@@ -604,6 +618,27 @@ class GamesHubController {
         AudioEngine.pop();
         if (this.racerGame) this.racerGame.setTrack(this.racerTrack);
       });
+    });
+  }
+
+  // --- Picture Puzzle ---
+  openPuzzle(fromView = 'funGames') {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    this.puzzleReturnView = fromView === 'games' ? 'games' : 'funGames';
+    this.showView('puzzle');
+    this.picturePuzzle.open();
+  }
+
+  _bindPuzzleEvents() {
+    document.querySelectorAll('[data-action="open-puzzle"]').forEach((el) => {
+      el.addEventListener('click', () => this.openPuzzle(el.dataset.puzzleFrom || 'funGames'));
+    });
+    $('btn-puzzle-back').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      this.showView(this.puzzleReturnView || 'funGames');
     });
   }
 }

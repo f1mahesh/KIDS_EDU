@@ -129,6 +129,17 @@ const HELP_TOPICS = {
       </ul>
     `
   },
+  puzzle: {
+    title: '🖼️ How Picture Puzzle Works',
+    body: `
+      <ul class="help-list">
+        <li><strong>🎨 Pick or Upload a Picture:</strong> Choose any built-in picture (Space Rocket, Dino Meadow, Ocean Reef, Rainbow Castle, Little Ganesha, or Mount Kailash) — or tap <strong>📷 Upload Photo</strong> (or drag &amp; drop an image) to puzzle your own photo!</li>
+        <li><strong>🎯 Difficulty Levels:</strong> Pick <strong>🐣 Starter (2×2)</strong>, <strong>🌱 Explorer (3×3)</strong>, <strong>🚀 Challenger (4×4)</strong>, or <strong>👑 Master (5×5)</strong>!</li>
+        <li><strong>🧩 Swap or Slide:</strong> In <strong>Swap &amp; Snap</strong>, drag or tap any two pieces to swap them (correct pieces lock in green!). In <strong>Slide Tiles</strong>, tap or use arrow keys to slide tiles into the empty space!</li>
+        <li><strong>👁️ Peek &amp; 💡 Hint:</strong> Tap <strong>👁️ Peek Full</strong> to see the whole picture, toggle <strong>🔢 Numbers</strong> for numbered clues, or tap <strong>💡 Hint</strong> when stuck!</li>
+      </ul>
+    `
+  },
   'en-trace': {
     title: '✍️ Air-Trace & Glow Pad',
     body: `

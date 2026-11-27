@@ -1,4 +1,4 @@
-const CACHE_NAME = 'playspark-v51';
+const CACHE_NAME = 'playspark-v52';
 const ASSETS = [
   './',
   './index.html',
@@ -31,6 +31,7 @@ const ASSETS = [
   './src/games/rock-blaster-game.js',
   './src/games/number-runner-game.js',
   './src/games/car-racer-game.js',
+  './src/games/picture-puzzle-game.js',
   './src/games/games-hub-controller.js',
   './src/story/story-controller.js',
   './mountain.jpeg',
