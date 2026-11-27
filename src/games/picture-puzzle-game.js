@@ -13,6 +13,8 @@
   const CANVAS_SIZE = 720;
   const BEST_STORAGE_KEY = 'playspark_puzzle_best_v1';
 
+  const DIFFICULTY_ORDER = ['easy', 'medium', 'hard', 'master'];
+
   const DIFFICULTIES = {
     easy: { id: 'easy', size: 2, label: '🐣 Starter (2×2)', short: '2×2', stars: 2 },
     medium: { id: 'medium', size: 3, label: '🌱 Explorer (3×3)', short: '3×3', stars: 3 },
@@ -777,6 +779,62 @@
     }
 
     _bindEvents() {
+      const picSelect = $('puzzle-pic-select');
+      if (picSelect) {
+        picSelect.addEventListener('change', () => {
+          if (picSelect.value === '__upload__') {
+            picSelect.value = this.activePictureId;
+            AudioEngine.pop();
+            $('puzzle-upload-input').click();
+            return;
+          }
+          AudioEngine.pop();
+          this.selectPicture(picSelect.value);
+        });
+      }
+
+      const diffSelect = $('puzzle-diff-select');
+      if (diffSelect) {
+        diffSelect.addEventListener('change', () => {
+          AudioEngine.pop();
+          this.setDifficulty(diffSelect.value);
+        });
+      }
+
+      const diffSlider = $('puzzle-diff-slider');
+      if (diffSlider) {
+        diffSlider.addEventListener('input', () => {
+          const diffId = DIFFICULTY_ORDER[Number(diffSlider.value)] || 'easy';
+          const lbl = $('puzzle-diff-slider-label');
+          if (lbl) lbl.textContent = DIFFICULTIES[diffId].label;
+        });
+        diffSlider.addEventListener('change', () => {
+          const diffId = DIFFICULTY_ORDER[Number(diffSlider.value)] || 'easy';
+          AudioEngine.pop();
+          this.setDifficulty(diffId);
+        });
+      }
+
+      const optsBtn = $('btn-puzzle-options');
+      const optsDrawer = $('puzzle-options-drawer');
+      const optsClose = $('btn-puzzle-options-close');
+      if (optsBtn && optsDrawer) {
+        optsBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const willOpen = optsDrawer.classList.contains('hidden');
+          optsDrawer.classList.toggle('hidden', !willOpen);
+          optsBtn.setAttribute('aria-expanded', String(willOpen));
+          AudioEngine.pop();
+        });
+      }
+      if (optsClose && optsDrawer && optsBtn) {
+        optsClose.addEventListener('click', () => {
+          optsDrawer.classList.add('hidden');
+          optsBtn.setAttribute('aria-expanded', 'false');
+          AudioEngine.pop();
+        });
+      }
+
       document.querySelectorAll('[data-puzzle-diff]').forEach((btn) => {
         btn.addEventListener('click', () => {
           this.setDifficulty(btn.dataset.puzzleDiff);
@@ -868,6 +926,10 @@
     }
 
     stop() {
+      const optsDrawer = $('puzzle-options-drawer');
+      const optsBtn = $('btn-puzzle-options');
+      if (optsDrawer) optsDrawer.classList.add('hidden');
+      if (optsBtn) optsBtn.setAttribute('aria-expanded', 'false');
       if (this.timerId) {
         clearInterval(this.timerId);
         this.timerId = null;
@@ -966,6 +1028,18 @@
     }
 
     _syncToolbarUI() {
+      const diffSelect = $('puzzle-diff-select');
+      if (diffSelect) diffSelect.value = this.difficulty;
+
+      const diffSlider = $('puzzle-diff-slider');
+      const diffIdx = Math.max(0, DIFFICULTY_ORDER.indexOf(this.difficulty));
+      if (diffSlider) diffSlider.value = String(diffIdx);
+
+      const sliderLbl = $('puzzle-diff-slider-label');
+      if (sliderLbl && DIFFICULTIES[this.difficulty]) {
+        sliderLbl.textContent = DIFFICULTIES[this.difficulty].label;
+      }
+
       document.querySelectorAll('[data-puzzle-diff]').forEach((btn) => {
         btn.classList.toggle('active', btn.dataset.puzzleDiff === this.difficulty);
       });
@@ -975,11 +1049,28 @@
     }
 
     _renderPictureGallery() {
+      const all = this.customPicture ? [this.customPicture, ...this.pictures] : this.pictures;
+
+      const picSelect = $('puzzle-pic-select');
+      if (picSelect) {
+        picSelect.innerHTML = '';
+        all.forEach((pic) => {
+          const opt = document.createElement('option');
+          opt.value = pic.id;
+          opt.textContent = `${pic.emoji} ${pic.title}`;
+          picSelect.appendChild(opt);
+        });
+        const uploadOpt = document.createElement('option');
+        uploadOpt.value = '__upload__';
+        uploadOpt.textContent = '📷 Upload My Photo...';
+        picSelect.appendChild(uploadOpt);
+        picSelect.value = this.activePictureId;
+      }
+
       const strip = $('puzzle-pic-strip');
       if (!strip) return;
       strip.innerHTML = '';
 
-      const all = this.customPicture ? [this.customPicture, ...this.pictures] : this.pictures;
       all.forEach((pic) => {
         const btn = document.createElement('button');
         btn.type = 'button';

@@ -133,10 +133,10 @@ const HELP_TOPICS = {
     title: '🖼️ How Picture Puzzle Works',
     body: `
       <ul class="help-list">
-        <li><strong>🎨 Pick or Upload a Picture:</strong> Choose any built-in picture (Space Rocket, Dino Meadow, Ocean Reef, Rainbow Castle, Little Ganesha, or Mount Kailash) — or tap <strong>📷 Upload Photo</strong> (or drag &amp; drop an image) to puzzle your own photo!</li>
-        <li><strong>🎯 Difficulty Levels:</strong> Pick <strong>🐣 Starter (2×2)</strong>, <strong>🌱 Explorer (3×3)</strong>, <strong>🚀 Challenger (4×4)</strong>, or <strong>👑 Master (5×5)</strong>!</li>
-        <li><strong>🧩 Real Jigsaw, Swap, or Slide:</strong> In <strong>Real Jigsaw</strong>, tap <strong>💥 Break Puzzle!</strong> to scatter interlocking jigsaw pieces with tabs &amp; holes, then drag or tap each piece into its spot! You can also play <strong>🔄 Swap &amp; Snap</strong> or <strong>🔀 Slide Tiles</strong>!</li>
-        <li><strong>👁️ Peek &amp; 💡 Hint:</strong> Tap <strong>👁️ Peek Full</strong> to see the whole picture, toggle <strong>🔢 Numbers</strong> for numbered clues, or tap <strong>💡 Hint</strong> when stuck!</li>
+        <li><strong>🎨 Pick or Upload a Picture:</strong> Use the top Picture dropdown or tap <strong>📷 Photo</strong> to upload your own picture!</li>
+        <li><strong>🎯 Difficulty Level:</strong> Pick <strong>🐣 2×2</strong>, <strong>🌱 3×3</strong>, <strong>🚀 4×4</strong>, or <strong>👑 5×5</strong> from the Level dropdown or the slide bar inside <strong>⚙️ Options</strong>!</li>
+        <li><strong>🧩 Real Jigsaw, Swap, or Slide:</strong> Tap <strong>💥 Break</strong> to scatter pieces! Drag or tap jigsaw pieces into place, or switch styles inside <strong>⚙️ Options</strong>.</li>
+        <li><strong>👁️ Peek &amp; 💡 Hint:</strong> Tap <strong>👁️ Peek</strong> to see the whole picture or <strong>💡 Hint</strong> to highlight your next piece!</li>
       </ul>
     `
   },

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'playspark-v53';
+const CACHE_NAME = 'playspark-v54';
 const ASSETS = [
   './',
   './index.html',
