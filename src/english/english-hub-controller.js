@@ -3,7 +3,7 @@
 (function (app) {
   'use strict';
 
-  const { AudioEngine, $, launchConfetti, PhonicsBlasterGame, PhonicsClapGame, PhonicsRunnerGame, PhonicsTraceGame, WordBuilderGame } = app;
+  const { AudioEngine, $, launchConfetti, PhonicsBlasterGame, PhonicsClapGame, PhonicsPopGame, PhonicsRunnerGame, PhonicsTraceGame, WordBuilderGame } = app;
 
 class EnglishHubController {
   constructor({ profileStore, showView, refreshHeader, stopMathTimer, closeArcadeSettings }) {
@@ -14,6 +14,8 @@ class EnglishHubController {
     this.closeArcadeSettings = closeArcadeSettings;
 
     this.englishTier = 'all';
+    this.enPopSpeed = 'slow';
+    this.enPopClue = 'clue';
     this.enClapSpeed = 'slow';
     this.enClapMode = 'blend';
     this.enBlasterSpeed = 'slow';
@@ -21,6 +23,7 @@ class EnglishHubController {
     this.enRunnerWorld = 'jungle';
     this.enTraceMode = 'trace';
 
+    this.enPopGame = null;
     this.enClapGame = null;
     this.enBlasterGame = null;
     this.enRunnerGame = null;
@@ -31,11 +34,19 @@ class EnglishHubController {
   }
 
   stopAll(exceptView = '') {
+    if (exceptView !== 'enPop' && this.enPopGame) this.enPopGame.stop();
     if (exceptView !== 'enClap' && this.enClapGame) this.enClapGame.stop();
     if (exceptView !== 'enBlaster' && this.enBlasterGame) this.enBlasterGame.stop();
     if (exceptView !== 'enRunner' && this.enRunnerGame) this.enRunnerGame.stop();
     if (exceptView !== 'enTrace' && this.enTraceGame) this.enTraceGame.stop();
     if (exceptView !== 'enBuilder' && this.enBuilderGame) this.enBuilderGame.stop();
+  }
+
+  getActivePop() {
+    if ($('view-en-pop').classList.contains('active') && this.enPopGame) {
+      return this.enPopGame;
+    }
+    return null;
   }
 
   getActiveRunner() {
@@ -94,11 +105,162 @@ class EnglishHubController {
       });
     });
 
+    this._bindPopEvents();
     this._bindClapEvents();
     this._bindBlasterEvents();
     this._bindRunnerEvents();
     this._bindTraceEvents();
     this._bindBuilderEvents();
+  }
+
+  // --- Phonics Bubble Pop AR ---
+  _initPop() {
+    if (this.enPopGame) return this.enPopGame;
+    this.enPopGame = new PhonicsPopGame({
+      canvas: $('en-pop-canvas'),
+      onStatus: (msg) => {
+        $('en-pop-status').textContent = msg;
+      },
+      onScore: (info) => {
+        $('en-pop-score').textContent = info.score;
+        $('en-pop-combo').textContent = `x${info.combo}`;
+        $('en-pop-timer').textContent = info.timeLeft;
+        $('en-pop-stars').textContent = info.stars;
+        if (info.collectedMaterial) {
+          this.profileStore.awardTreasure(info.collectedMaterial, true);
+          this.refreshHeader();
+        }
+        if (info.solvedSound) {
+          this._recordEnglishResult(true);
+        }
+      },
+      onFinish: (res) => {
+        AudioEngine.fanfare();
+        launchConfetti(40);
+        const msg = `🏆 Time Up! ${res.score} pts (${res.popped} popped) • +${res.stars} ⭐`;
+        $('en-pop-status').textContent = `${msg} Tap Play Again!`;
+        $('en-pop-finish-text').textContent = msg;
+        $('en-pop-finish-banner').classList.remove('hidden');
+      }
+    });
+    return this.enPopGame;
+  }
+
+  openPop() {
+    AudioEngine.pop();
+    this.stopMathTimer();
+    this.closeArcadeSettings();
+    $('en-pop-finish-banner').classList.add('hidden');
+    const game = this._initPop();
+    $('en-pop-score').textContent = '0';
+    $('en-pop-combo').textContent = 'x1';
+    $('en-pop-timer').textContent = this.enPopSpeed === 'slow' ? '90' : this.enPopSpeed === 'medium' ? '75' : '60';
+    $('en-pop-stars').textContent = '0';
+    $('btn-en-pop-cam').textContent = game.showCamera ? '📷 Cam + Sky' : '🌈 Sky Only';
+    this._refreshPopVoices();
+    this.showView('enPop');
+    game.start(this.englishTier, this.enPopSpeed, this.enPopClue);
+  }
+
+  _refreshPopVoices() {
+    const sel = $('en-pop-voice-select');
+    if (!sel || typeof AudioEngine.getAvailableVoices !== 'function') return;
+    const voices = AudioEngine.getAvailableVoices();
+    const activeName = AudioEngine.getSelectedVoiceName();
+    sel.innerHTML = '';
+    if (voices.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Auto (Warm Female Voice)';
+      sel.appendChild(opt);
+      return;
+    }
+    voices.forEach((v) => {
+      const opt = document.createElement('option');
+      opt.value = v.name;
+      const cleanName = v.name.replace(/^Microsoft\s+/i, '').replace(/\s*\(United States\)/i, '');
+      opt.textContent = cleanName;
+      if (v.name === activeName) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  _bindPopEvents() {
+    if (typeof AudioEngine.onVoicesChanged === 'function') {
+      AudioEngine.onVoicesChanged(() => this._refreshPopVoices());
+    }
+    const voiceSel = $('en-pop-voice-select');
+    if (voiceSel) {
+      voiceSel.addEventListener('change', () => {
+        if (typeof AudioEngine.setVoiceByName === 'function') {
+          AudioEngine.setVoiceByName(voiceSel.value);
+        }
+        AudioEngine.pop();
+        if (this.enPopGame && this.enPopGame.running) {
+          this.enPopGame.repeatSound(false);
+        }
+      });
+    }
+    const voiceTestBtn = $('btn-en-pop-voice-test');
+    if (voiceTestBtn) {
+      voiceTestBtn.addEventListener('click', () => {
+        if (typeof AudioEngine.musicalChantNotes === 'function') {
+          AudioEngine.musicalChantNotes(false);
+        }
+        AudioEngine.speak('A, sound ah, ah! Alligator!', 'gentle');
+      });
+    }
+    document.querySelectorAll('[data-action="open-en-pop"]').forEach((el) => {
+      el.addEventListener('click', () => this.openPop());
+    });
+    $('btn-en-pop-back').addEventListener('click', () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      this.showView('english');
+    });
+    $('btn-en-pop-hear').addEventListener('click', () => {
+      if (this.enPopGame) this.enPopGame.repeatSound(false);
+    });
+    $('btn-en-pop-example').addEventListener('click', () => {
+      if (this.enPopGame) this.enPopGame.repeatSound(true);
+    });
+    const restart = () => {
+      AudioEngine.pop();
+      this.closeArcadeSettings();
+      $('en-pop-finish-banner').classList.add('hidden');
+      if (this.enPopGame) this.enPopGame.start(this.englishTier, this.enPopSpeed, this.enPopClue);
+    };
+    $('btn-en-pop-restart').addEventListener('click', restart);
+    $('btn-en-pop-play-again').addEventListener('click', restart);
+    $('btn-en-pop-cam').addEventListener('click', () => {
+      if (!this.enPopGame) return;
+      const on = this.enPopGame.toggleCameraView();
+      $('btn-en-pop-cam').textContent = on ? '📷 Cam + Sky' : '🌈 Sky Only';
+      AudioEngine.pop();
+    });
+    document.querySelectorAll('[data-en-pop-tier]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.syncTierUI(btn.dataset.enPopTier);
+        AudioEngine.pop();
+        if (this.enPopGame) this.enPopGame.setTier(this.englishTier);
+      });
+    });
+    document.querySelectorAll('[data-en-pop-speed]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.enPopSpeed = btn.dataset.enPopSpeed;
+        document.querySelectorAll('[data-en-pop-speed]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.enPopGame) this.enPopGame.setSpeed(this.enPopSpeed);
+      });
+    });
+    document.querySelectorAll('[data-en-pop-clue]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.enPopClue = btn.dataset.enPopClue;
+        document.querySelectorAll('[data-en-pop-clue]').forEach((b) => b.classList.toggle('active', b === btn));
+        AudioEngine.pop();
+        if (this.enPopGame) this.enPopGame.setClueMode(this.enPopClue);
+      });
+    });
   }
 
   // --- Option 1: Phonics Clap Blender AR ---

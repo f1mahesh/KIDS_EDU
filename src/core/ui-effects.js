@@ -80,6 +80,16 @@ const HELP_TOPICS = {
       </ul>
     `
   },
+  'en-pop': {
+    title: '🫧 Phonics Bubble Pop AR',
+    body: `
+      <ul class="help-list">
+        <li><strong>🎵 Listen to the Musical Chant:</strong> The game sings soft musical notes with each letter and pronounces its phonic sound twice (like <em>"B, sound buh, buh"</em>). Tap <strong>🔊 Hear Sound</strong> or <strong>🎵 Full Song</strong> anytime!</li>
+        <li><strong>🫧 Pop the Matching Letter:</strong> Wave your hand/finger in front of the camera (or tap a bubble) to pop the floating letter bubble that makes that sound!</li>
+        <li><strong>🔥 Combos &amp; Treasures:</strong> Chain correct pops for x2–x5 combo points, earn ⭐ Stars, and pop floating 💎 Treasure bubbles!</li>
+      </ul>
+    `
+  },
   'en-clap': {
     title: '👏 Phonics Clap Blender AR',
     body: `
@@ -129,11 +139,12 @@ const HELP_TOPICS = {
     `
   },
   'en-builder': {
-    title: '🧩 Word Builder Board',
+    title: '🧩 Word Builder Board (K–8)',
     body: `
       <ul class="help-list">
-        <li><strong>🎂 Pick Your Age Level:</strong> Start with <em>Ages 4–5 (CVC)</em> 3-letter words and level up to 4-letter blends, digraphs, Magic-E &amp; vowel teams!</li>
+        <li><strong>🎓 Grade Levels (K–8):</strong> Start with <em>Kindergarten</em> 3-letter words and level up all the way through <em>Grades 7–8</em> science, math &amp; literature words!</li>
         <li><strong>🔤 Drag Letters to Build:</strong> Drag any letter from the colorful Letter Board into the word boxes (or tap a letter to snap it into the next spot).</li>
+        <li><strong>💡 Phonics Hints:</strong> Tap <strong>💡 Hint</strong> to hear and read the phonics sound of the next box — then find the matching letter yourself!</li>
         <li><strong>🖼️ + 🔊 Picture or Sound:</strong> Switch between Picture &amp; Sound, Picture Only, or Sound Only mystery words!</li>
         <li><strong>🎉 Cheer &amp; Treasures:</strong> Complete words to earn cheering praise, ⭐ Stars, and bonus Stones, Coins, Jewels &amp; Diamonds!</li>
       </ul>

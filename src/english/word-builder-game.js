@@ -13,13 +13,46 @@
   } = app;
 
   const AGE_LABELS = {
-    k: '🐣 Ages 4–5 (CVC)',
-    g1: '🌱 Ages 6–7 (Blends)',
-    g2: '🚀 Ages 7–8 (Digraphs & FLSZ)',
-    g3: '✨ Ages 8–9 (VCe / R-Ctrl)',
-    g4_5: '👑 Ages 9–10 (Teams)',
-    all: '🎲 All Ages (4–10)'
+    k: '🐣 K (Ages 4–6)',
+    g1: '🌱 Grade 1 (Ages 6–7)',
+    g2: '🚀 Grade 2 (Ages 7–8)',
+    g3: '✨ Grade 3 (Ages 8–9)',
+    g4_5: '📘 Grades 4–5 (Ages 9–11)',
+    g6: '🔭 Grade 6 (Ages 11–12)',
+    g7_8: '👑 Grades 7–8 (Ages 12–14)',
+    all: '🎲 All (K–8)'
   };
+
+  const WB_DECK_STORAGE_KEY = 'playspark_wb_decks_v1';
+
+  const PHONICS_DISTRACTORS = {
+    a: ['e', 'o', 'u'],
+    c: ['k', 's'],
+    e: ['a', 'i', 'u'],
+    f: ['v', 'p'],
+    g: ['j', 'k'],
+    i: ['e', 'y', 'a'],
+    j: ['g', 'y'],
+    k: ['c', 'g'],
+    m: ['n'],
+    n: ['m'],
+    o: ['a', 'u'],
+    p: ['b', 'f'],
+    s: ['c', 'z'],
+    u: ['o', 'a', 'e'],
+    v: ['f', 'w'],
+    w: ['v', 'u'],
+    y: ['i', 'e'],
+    z: ['s']
+  };
+
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
 
   const CHEER_LINES = [
     (w) => `Woohoo!! "${w.toUpperCase()}" is AWESOME! 🌟`,
@@ -47,10 +80,81 @@
       this.slots = []; // Array of { letter, locked, tileId, state }
       this.boardTiles = []; // Array of { id, letter, used, colorIdx }
       this.completed = false;
+      this.cheerTimer = null;
       this.nextTimer = null;
       this.hintTileId = null;
+      this.deckState = this._loadDeckState();
 
       this._bindEvents();
+    }
+
+    _loadDeckState() {
+      try {
+        const raw = localStorage.getItem(WB_DECK_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            return {
+              decks: parsed.decks && typeof parsed.decks === 'object' ? parsed.decks : {},
+              recent: Array.isArray(parsed.recent) ? parsed.recent : []
+            };
+          }
+        }
+      } catch (_) {}
+      return { decks: {}, recent: [] };
+    }
+
+    _saveDeckState() {
+      try {
+        localStorage.setItem(WB_DECK_STORAGE_KEY, JSON.stringify(this.deckState));
+      } catch (_) {}
+    }
+
+    _pickNextDeckWord(tier, excludeWord = '') {
+      const pool = typeof EnglishPhonics.getBuilderWords === 'function'
+        ? EnglishPhonics.getBuilderWords(tier)
+        : EnglishPhonics.getWords(tier);
+      if (!pool || pool.length === 0) {
+        return EnglishPhonics.pickWord(tier, excludeWord);
+      }
+
+      const poolMap = new Map();
+      pool.forEach((entry) => poolMap.set(entry.word, entry));
+
+      let deck = Array.isArray(this.deckState.decks[tier])
+        ? this.deckState.decks[tier].filter((w) => poolMap.has(w))
+        : [];
+
+      if (deck.length === 0) {
+        deck = shuffleArray(pool.map((e) => e.word));
+        const avoidCount = Math.min(20, Math.floor(pool.length / 2));
+        const recentAvoid = new Set(this.deckState.recent.slice(-avoidCount));
+        if (excludeWord) recentAvoid.add(excludeWord.toLowerCase());
+
+        // Push any recently seen words toward the back of the freshly shuffled deck
+        const freshFront = [];
+        const cooledBack = [];
+        for (const w of deck) {
+          if (recentAvoid.has(w)) cooledBack.push(w);
+          else freshFront.push(w);
+        }
+        deck = freshFront.concat(cooledBack);
+      }
+
+      let chosenWord = deck.shift();
+      if (chosenWord === excludeWord && deck.length > 0) {
+        deck.push(chosenWord);
+        chosenWord = deck.shift();
+      }
+
+      this.deckState.decks[tier] = deck;
+      this.deckState.recent.push(chosenWord);
+      if (this.deckState.recent.length > 60) {
+        this.deckState.recent = this.deckState.recent.slice(-60);
+      }
+      this._saveDeckState();
+
+      return poolMap.get(chosenWord) || pool[0];
     }
 
     _bindEvents() {
@@ -94,6 +198,10 @@
     }
 
     stop() {
+      if (this.cheerTimer) {
+        clearTimeout(this.cheerTimer);
+        this.cheerTimer = null;
+      }
       if (this.nextTimer) {
         clearTimeout(this.nextTimer);
         this.nextTimer = null;
@@ -117,15 +225,33 @@
       $('wb-stage').classList.remove('burst');
 
       const prevWord = this.currentEntry ? this.currentEntry.word : '';
-      const entry = EnglishPhonics.pickWord(this.tier, prevWord);
+      const entry = this._pickNextDeckWord(this.tier, prevWord);
       this.currentEntry = entry;
 
       const letters = entry.word.split('');
       this.slots = letters.map(() => ({ letter: null, locked: false, tileId: null, state: '' }));
 
-      // Build age-appropriate letter board (exact letters + 2..4 friendly extras)
-      const extraCount = entry.tier === 'k' ? 2 : entry.tier === 'g1' || entry.tier === 'g2' ? 3 : 4;
+      // Build age-appropriate letter board (exact letters + phonics/common extras)
+      const extraCount = letters.length >= 8 ? 3 : entry.tier === 'k' ? 2 : entry.tier === 'g1' || entry.tier === 'g2' ? 3 : 4;
       const pool = [...letters];
+
+      // Seed 1-2 phonics-confusable distractors first so kids truly use phonics to choose!
+      const confusableCandidates = [];
+      letters.forEach((ch) => {
+        const list = PHONICS_DISTRACTORS[ch];
+        if (list) {
+          list.forEach((d) => {
+            if (!pool.includes(d) && !confusableCandidates.includes(d)) {
+              confusableCandidates.push(d);
+            }
+          });
+        }
+      });
+      shuffleArray(confusableCandidates);
+      while (pool.length < letters.length + Math.min(2, extraCount) && confusableCandidates.length > 0) {
+        pool.push(confusableCandidates.shift());
+      }
+
       let guard = 0;
       while (pool.length < letters.length + extraCount && guard < 40) {
         guard++;
@@ -134,7 +260,7 @@
           pool.push(ch);
         }
       }
-      pool.sort(() => Math.random() - 0.5);
+      shuffleArray(pool);
 
       this.boardTiles = pool.map((letter, idx) => ({
         id: idx,
@@ -177,40 +303,25 @@
       const idx = this.slots.findIndex((s) => !s.locked);
       if (idx === -1) return;
 
-      const neededLetter = this.currentEntry.word[idx];
-      const matchTile = this.boardTiles.find((t) => !t.used && t.letter === neededLetter);
-      if (matchTile) {
-        this.hintTileId = matchTile.id;
-      }
+      // Never highlight the exact answer tile or reveal the letter/word — give phonics only!
+      this.hintTileId = null;
       this.profileStore.recordHint('en');
 
-      const isSilentE =
-        this.currentEntry.tier === 'g3' &&
-        this.currentEntry.word.endsWith('e') &&
-        idx === this.currentEntry.word.length - 1;
-
-      if (isSilentE) {
-        const vceKey = `${this.currentEntry.word[idx - 2]}_e`;
-        this._setCheer(`💡 Box ${idx + 1} is silent Magic-E! Letter ${this.currentEntry.word[idx - 2].toUpperCase()} says its name!`, false);
-        AudioEngine.speak('Silent E makes the vowel say its name!', 'gentle', () => {
-          EnglishPhonics.speakPhoneme(vceKey, false);
-        });
+      if (typeof EnglishPhonics.getPhonicsHintForSlot === 'function') {
+        const hint = EnglishPhonics.getPhonicsHintForSlot(this.currentEntry, idx);
+        this._setCheer(hint.text, false);
+        if (typeof EnglishPhonics.speakSlotPhonicsHint === 'function') {
+          EnglishPhonics.speakSlotPhonicsHint(hint);
+        } else if (hint.phonemeKey) {
+          EnglishPhonics.speakPhoneme(hint.phonemeKey);
+        }
       } else {
-        const info = typeof EnglishPhonics.getUfliGrapheme === 'function'
-          ? EnglishPhonics.getUfliGrapheme(neededLetter)
-          : null;
+        const neededLetter = this.currentEntry.word[idx];
         const soundCue = EnglishPhonics.getLetterSound(neededLetter);
-        if (info) {
-          this._setCheer(`💡 Box ${idx + 1}: Letter ${neededLetter.toUpperCase()} sounds ${info.symbol} (like "${info.keyword}" ${info.emoji})`, false);
-        } else {
-          this._setCheer(`💡 Box ${idx + 1}: Letter ${neededLetter.toUpperCase()} sounds ${soundCue}!`, false);
-        }
-        if (typeof EnglishPhonics.speakLetterAndSound === 'function') {
-          EnglishPhonics.speakLetterAndSound(neededLetter);
-        } else {
-          EnglishPhonics.speakPhoneme(neededLetter);
-        }
+        this._setCheer(`💡 Box ${idx + 1} phonics: ${soundCue} — find the matching letter!`, false);
+        EnglishPhonics.speakPhoneme(neededLetter);
       }
+
       this._renderSlots(idx);
       this._renderBoard();
     }
@@ -292,6 +403,8 @@
     _renderSlots(hintSlotIdx = -1) {
       const container = $('wb-slots');
       container.innerHTML = '';
+      container.classList.toggle('long-word', this.slots.length >= 7 && this.slots.length < 9);
+      container.classList.toggle('xl-word', this.slots.length >= 9);
 
       this.slots.forEach((slot, idx) => {
         const box = document.createElement('button');
@@ -307,7 +420,7 @@
         box.className = classes.join(' ');
         box.style.animationDelay = this.completed ? `${idx * 0.08}s` : '0s';
 
-        box.textContent = slot.letter ? slot.letter : idx === hintSlotIdx ? this.currentEntry.word[idx] : '?';
+        box.textContent = slot.letter ? slot.letter : idx === hintSlotIdx ? '🔊' : '?';
         box.title = slot.letter && !slot.locked ? 'Tap to remove letter' : `Letter ${idx + 1}`;
 
         box.addEventListener('click', () => {
@@ -436,12 +549,8 @@
         if (this.hintTileId === tile.id) this.hintTileId = null;
 
         AudioEngine.correct();
-        const isSilentE =
-          this.currentEntry.tier === 'g3' &&
-          this.currentEntry.word.endsWith('e') &&
-          slotIdx === this.currentEntry.word.length - 1;
-        if (isSilentE) {
-          EnglishPhonics.speakPhoneme(`${this.currentEntry.word[slotIdx - 2]}_e`);
+        if (typeof EnglishPhonics.speakSlotPhoneme === 'function') {
+          EnglishPhonics.speakSlotPhoneme(this.currentEntry, slotIdx);
         } else {
           EnglishPhonics.speakPhoneme(tile.letter);
         }
@@ -536,18 +645,23 @@
       AudioEngine.fanfare();
       spawnFloatingPop($('wb-slots'), `${rewardMat.emoji} +${starBonus + rewardMat.stars}⭐!`);
 
-      // Pause briefly so the final placed tile's phonics sound finishes before speaking the completed word
-      setTimeout(() => {
-        if ($('view-en-builder').classList.contains('active') && this.currentEntry === entry) {
-          AudioEngine.speak(`Woohoo! You built ${entry.word}!`, 'cheer');
-        }
-      }, 420);
-
-      this.nextTimer = setTimeout(() => {
-        if ($('view-en-builder').classList.contains('active')) {
-          this.nextWord();
-        }
-      }, 2350);
+      // Pause briefly so the final placed tile's phonics sound finishes before speaking the completed word,
+      // then take a comfortable pause after the cheer before advancing to the next word.
+      const voiceActive = typeof AudioEngine.isVoiceOn === 'function' ? AudioEngine.isVoiceOn() : true;
+      const postCheerPauseMs = voiceActive ? 1200 : 2500;
+      this.cheerTimer = setTimeout(() => {
+        this.cheerTimer = null;
+        if (!$('view-en-builder').classList.contains('active') || this.currentEntry !== entry) return;
+        AudioEngine.speak(`Woohoo! You built ${entry.word}!`, 'cheer', () => {
+          if (!$('view-en-builder').classList.contains('active') || this.currentEntry !== entry) return;
+          this.nextTimer = setTimeout(() => {
+            this.nextTimer = null;
+            if ($('view-en-builder').classList.contains('active') && this.currentEntry === entry) {
+              this.nextWord();
+            }
+          }, postCheerPauseMs);
+        });
+      }, 450);
     }
   }
 

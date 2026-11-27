@@ -1,4 +1,4 @@
-const CACHE_NAME = 'playspark-v44';
+const CACHE_NAME = 'playspark-v51';
 const ASSETS = [
   './',
   './index.html',
@@ -16,6 +16,7 @@ const ASSETS = [
   './src/math/math-quest-controller.js',
   './src/math/times-tables-controller.js',
   './src/english/phonics-curriculum.js',
+  './src/english/phonics-pop-game.js',
   './src/english/phonics-clap-game.js',
   './src/english/phonics-blaster-game.js',
   './src/english/phonics-runner-game.js',
@@ -30,7 +31,13 @@ const ASSETS = [
   './src/games/rock-blaster-game.js',
   './src/games/number-runner-game.js',
   './src/games/car-racer-game.js',
-  './src/games/games-hub-controller.js'
+  './src/games/games-hub-controller.js',
+  './src/story/story-controller.js',
+  './mountain.jpeg',
+  './shiv%20ji.jpeg',
+  './parvati.jpeg',
+  './ganesha%20before%20elephant.jpeg',
+  './ganeshsa.jpeg'
 ];
 
 self.addEventListener('install', (event) => {

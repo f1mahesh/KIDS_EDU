@@ -3,7 +3,7 @@
 (function (app) {
   'use strict';
 
-  const { AudioEngine, BADGES, ProfileStore, getRankLabel, getTotalTreasures, TREASURE_ITEMS, $, closeHelpModal, launchConfetti, openHelpModal, spawnFloatingPop, EnglishHubController, GamesHubController, LearnController, Math3DScene, MathQuestController, TimesTablesController } = app;
+  const { AudioEngine, BADGES, ProfileStore, getRankLabel, getTotalTreasures, TREASURE_ITEMS, $, closeHelpModal, launchConfetti, openHelpModal, spawnFloatingPop, EnglishHubController, GamesHubController, LearnController, Math3DScene, MathQuestController, StoryController, TimesTablesController } = app;
 
 const TOPIC_META = [
   { key: 'add', label: '➕ Addition', color: '#10b981' },
@@ -20,12 +20,14 @@ const SECTION_FOR_VIEW = {
   summary: 'math',
   tables: 'math',
   english: 'english',
+  enPop: 'english',
   enClap: 'english',
   enBlaster: 'english',
   enRunner: 'english',
   enTrace: 'english',
   enBuilder: 'english',
   learn: 'learn',
+  story: 'story',
   games: 'games',
   magic: 'games',
   snow: 'games',
@@ -55,6 +57,7 @@ const views = {
   tables: $('view-tables'),
   trophies: $('view-trophies'),
   learn: $('view-learn'),
+  story: $('view-story'),
   magic: $('view-magic'),
   games: $('view-games'),
   snow: $('view-snow'),
@@ -62,6 +65,7 @@ const views = {
   rock: $('view-rock'),
   runner: $('view-runner'),
   english: $('view-english'),
+  enPop: $('view-en-pop'),
   enClap: $('view-en-clap'),
   enBlaster: $('view-en-blaster'),
   enRunner: $('view-en-runner'),
@@ -79,6 +83,7 @@ new Math3DScene($('summary-3d-canvas'), { mode: 'trophy', autoSpin: true });
 
 let gamesHub = null;
 let englishHub = null;
+let storyController = null;
 
 function closeArcadeSettings() {
   document.querySelectorAll('.arcade-settings-panel').forEach((panel) => panel.classList.add('hidden'));
@@ -88,6 +93,7 @@ function closeArcadeSettings() {
 function showView(name) {
   if (gamesHub) gamesHub.stopAll(name);
   if (englishHub) englishHub.stopAll(name);
+  if (storyController) storyController.stopIfInactive(name);
   Object.values(views).forEach((v) => {
     if (v) v.classList.remove('active');
   });
@@ -160,6 +166,10 @@ englishHub = new EnglishHubController({
   refreshHeader,
   stopMathTimer: () => mathQuest.stopTimer(),
   closeArcadeSettings
+});
+
+storyController = new StoryController({
+  showView
 });
 
 // Progress Report & Trophy Room
@@ -343,6 +353,12 @@ document.querySelectorAll('[data-action="open-learn"]').forEach((el) => {
 document.querySelectorAll('[data-action="open-learn-english"]').forEach((el) => {
   el.addEventListener('click', () => learnController.open('english', '4-6'));
 });
+document.querySelectorAll('[data-action="open-story"]').forEach((el) => {
+  el.addEventListener('click', () => {
+    mathQuest.stopTimer();
+    storyController.open();
+  });
+});
 document.querySelectorAll('[data-action="open-trophies"]').forEach((el) => {
   el.addEventListener('click', openTrophies);
 });
@@ -382,6 +398,7 @@ function bindArcadeSettings(btnId, panelId) {
   ['btn-sq-settings', 'sq-settings-panel'],
   ['btn-rock-settings', 'rock-settings-panel'],
   ['btn-runner-settings', 'runner-settings-panel'],
+  ['btn-en-pop-settings', 'en-pop-settings-panel'],
   ['btn-en-clap-settings', 'en-clap-settings-panel'],
   ['btn-en-blaster-settings', 'en-blaster-settings-panel'],
   ['btn-en-runner-settings', 'en-runner-settings-panel'],
@@ -411,6 +428,7 @@ const HELP_BINDINGS = [
   ['btn-help-rock', 'rock'],
   ['btn-help-runner', 'runner'],
   ['btn-help-english', 'english'],
+  ['btn-help-en-pop', 'en-pop'],
   ['btn-help-en-clap', 'en-clap'],
   ['btn-help-en-blaster', 'en-blaster'],
   ['btn-help-en-runner', 'en-runner'],
@@ -443,6 +461,10 @@ $('btn-sound').addEventListener('click', () => {
   AudioEngine.toggleMute();
   updateSoundBtn();
   updateVoiceBtn();
+  if (storyController) {
+    if (AudioEngine.isMuted()) storyController.narrator.stop();
+    storyController._syncMuteUI();
+  }
 });
 
 $('btn-voice').addEventListener('click', () => {
@@ -641,6 +663,20 @@ window.addEventListener('keydown', (e) => {
     if (/^[a-zA-Z]$/.test(e.key) || e.key === 'Backspace' || e.key === 'Enter') {
       activeBuilder.handleKey(e.key);
     }
+    return;
+  }
+
+  const activePop = englishHub.getActivePop();
+  if (activePop) {
+    if (/^[a-zA-Z]$/.test(e.key) || e.key === ' ') {
+      if (e.key === ' ') e.preventDefault();
+      activePop.handleKey(e.key);
+    }
+    return;
+  }
+
+  if (views.story && views.story.classList.contains('active')) {
+    storyController.handleKey(e.key);
   }
 });
 

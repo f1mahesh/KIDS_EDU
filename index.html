@@ -55,12 +55,13 @@
       </div>
     </header>
 
-    <!-- Top Category Navigation (Home · Math · English · Learn · Games) -->
+    <!-- Top Category Navigation (Home · Math · English · Learn · Story · Games · Fun Games · Trophies) -->
     <nav class="section-nav" aria-label="Main Categories">
       <button class="nav-pill active" data-nav-section="home" data-action="go-home">🏠 Home</button>
       <button class="nav-pill" data-nav-section="math" data-action="open-math">🔢 Math</button>
       <button class="nav-pill" data-nav-section="english" data-action="open-english">📖 English</button>
       <button class="nav-pill" data-nav-section="learn" data-action="open-learn">📚 Learn</button>
+      <button class="nav-pill" data-nav-section="story" data-action="open-story">🪷 Story</button>
       <button class="nav-pill" data-nav-section="games" data-action="open-games">🎮 Games</button>
       <button class="nav-pill" data-nav-section="fun" data-action="open-fun-games">🎉 Fun Games</button>
       <button class="nav-pill" data-nav-section="trophies" data-action="open-trophies">🏆 Trophies</button>
@@ -143,6 +144,15 @@
             <div class="mode-info">
               <h2>Fun Games <span class="new-tag">NEW</span></h2>
               <p>Turbo Hand Racer — Steer a race car with your hands!</p>
+            </div>
+            <span class="mode-arrow">▶</span>
+          </button>
+
+          <button class="mode-card mode-story" data-action="open-story">
+            <div class="mode-icon">🪷</div>
+            <div class="mode-info">
+              <h2>Story Time <span class="new-tag">NEW</span></h2>
+              <p>The Story of Little Ganesha — interactive illustrated tale!</p>
             </div>
             <span class="mode-arrow">▶</span>
           </button>
@@ -595,6 +605,15 @@
 
           <h3 class="arcade-subhead">📖 English Phonics AR Games (K–5)</h3>
           <div class="mode-grid">
+            <button class="mode-card mode-en-pop" data-action="open-en-pop">
+              <div class="mode-icon">🫧</div>
+              <div class="mode-info">
+                <h2>Phonics Bubble Pop AR <span class="new-tag">NEW AR</span></h2>
+                <p>Hear each phonic sound &amp; pop the matching floating letter bubbles!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
             <button class="mode-card mode-en-clap" data-action="open-en-clap">
               <div class="mode-icon">👏</div>
               <div class="mode-info">
@@ -955,6 +974,15 @@
           </div>
 
           <div class="mode-grid">
+            <button class="mode-card mode-en-pop" data-action="open-en-pop">
+              <div class="mode-icon">🫧</div>
+              <div class="mode-info">
+                <h2>Phonics Bubble Pop AR <span class="new-tag">NEW AR</span></h2>
+                <p>Hear each phonic sound &amp; pop the matching floating letter bubbles!</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
             <button class="mode-card mode-en-clap" data-action="open-en-clap">
               <div class="mode-icon">👏</div>
               <div class="mode-info">
@@ -1137,6 +1165,83 @@
         </div>
       </section>
 
+      <!-- VIEW: PHONICS BUBBLE POP AR -->
+      <section id="view-en-pop" class="view" aria-label="Phonics Bubble Pop AR">
+        <div class="arcade-cabinet en-pop-cabinet arcade-fullscreen">
+          <div class="snow-stage-wrap">
+            <canvas id="en-pop-canvas" width="640" height="400" aria-label="Phonics Bubble Pop AR Arcade"></canvas>
+          </div>
+
+          <div class="arcade-top-overlay">
+            <div class="arcade-marquee">
+              <button class="back-btn glass-back" id="btn-en-pop-back" aria-label="Back to English">← Back</button>
+              <div class="arcade-hud">
+                <div class="hud-chip"><span>PTS</span> <strong id="en-pop-score">0</strong></div>
+                <div class="hud-chip hud-combo"><span>COMBO</span> <strong id="en-pop-combo">x1</strong></div>
+                <div class="hud-chip hud-timer"><span>⏱️</span> <strong id="en-pop-timer">90</strong>s</div>
+                <div class="hud-chip"><span>⭐</span> <strong id="en-pop-stars">0</strong></div>
+              </div>
+              <button id="btn-en-pop-settings" class="icon-btn glass-pill arcade-settings-btn" aria-label="Game Settings" aria-expanded="false" title="Settings">⚙️</button>
+            </div>
+
+            <div id="en-pop-settings-panel" class="arcade-settings-panel hidden" role="dialog" aria-label="Phonics Bubble Pop Settings">
+              <div class="arcade-settings-head">
+                <span>⚙️ Bubble Pop Settings</span>
+                <div class="arcade-settings-head-actions">
+                  <button id="btn-help-en-pop" class="help-pill-btn glass-pill">❓ Help</button>
+                  <button type="button" class="icon-btn glass-pill arcade-settings-close" data-close-settings="en-pop-settings-panel" aria-label="Close Settings">✕</button>
+                </div>
+              </div>
+              <div class="snow-status-bar" id="en-pop-status">📷 Starting AR Bubble Pop Camera...</div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Grade Level</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill" data-en-tier-sync="k" data-en-pop-tier="k">🐣 K</button>
+                  <button class="magic-pill" data-en-tier-sync="g1" data-en-pop-tier="g1">🌱 G1</button>
+                  <button class="magic-pill" data-en-tier-sync="g2" data-en-pop-tier="g2">🚀 G2</button>
+                  <button class="magic-pill" data-en-tier-sync="g3" data-en-pop-tier="g3">✨ G3</button>
+                  <button class="magic-pill" data-en-tier-sync="g4_5" data-en-pop-tier="g4_5">👑 G4–5</button>
+                  <button class="magic-pill active" data-en-tier-sync="all" data-en-pop-tier="all">🎲 All</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">Listening Clue &amp; Speed</span>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-en-pop-clue="clue">🎵 Phonics Song</button>
+                  <button class="magic-pill" data-en-pop-clue="ear">🎧 Sound Only</button>
+                </div>
+                <div class="snow-op-bar">
+                  <button class="magic-pill active" data-en-pop-speed="slow">🐢 Slow</button>
+                  <button class="magic-pill" data-en-pop-speed="medium">🚀 Med</button>
+                  <button class="magic-pill" data-en-pop-speed="fast">⚡ Fast</button>
+                </div>
+              </div>
+              <div class="arcade-settings-group">
+                <span class="arcade-settings-label">🗣️ Soothing Voice</span>
+                <div class="voice-picker-row">
+                  <select id="en-pop-voice-select" class="voice-select" aria-label="Choose Voice"></select>
+                  <button id="btn-en-pop-voice-test" type="button" class="mini-btn glass-pill">🔊 Test</button>
+                </div>
+              </div>
+              <div class="arcade-settings-actions">
+                <button id="btn-en-pop-cam" class="mini-btn glass-pill">📷 Cam + Sky</button>
+                <button id="btn-en-pop-restart" class="mini-btn glass-pill">🔄 Restart</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="en-pop-finish-banner" class="arcade-finish-banner hidden">
+            <span id="en-pop-finish-text"></span>
+            <button id="btn-en-pop-play-again" class="mini-btn">🔄 Play Again</button>
+          </div>
+
+          <div class="runner-controls-bar arcade-bottom-overlay">
+            <button id="btn-en-pop-hear" class="runner-pad-btn runner-action-btn" aria-label="Hear Phonic Sound">🔊 Hear Sound</button>
+            <button id="btn-en-pop-example" class="runner-pad-btn glass-pill" aria-label="Sing Full Chant">🎵 Full Song</button>
+          </div>
+        </div>
+      </section>
+
       <!-- VIEW: OPTION 3 — PHONICS RUNNER AR -->
       <section id="view-en-runner" class="view" aria-label="Phonics Runner AR">
         <div class="arcade-cabinet en-runner-cabinet arcade-fullscreen">
@@ -1286,13 +1391,15 @@
           </div>
 
           <div class="wb-toolbar">
-            <div class="wb-age-group" role="tablist" aria-label="Choose Kids Age Level">
-              <button class="magic-pill active" data-wb-tier="k">🐣 Ages 4–5 (CVC)</button>
-              <button class="magic-pill" data-wb-tier="g1">🌱 Ages 6–7 (Blends)</button>
-              <button class="magic-pill" data-wb-tier="g2">🚀 Ages 7–8 (Digraphs &amp; FLSZ)</button>
-              <button class="magic-pill" data-wb-tier="g3">✨ Ages 8–9 (VCe / R-Ctrl)</button>
-              <button class="magic-pill" data-wb-tier="g4_5">👑 Ages 9–10 (Teams)</button>
-              <button class="magic-pill" data-wb-tier="all">🎲 All Ages</button>
+            <div class="wb-age-group" role="tablist" aria-label="Choose Grade Level">
+              <button class="magic-pill active" data-wb-tier="k">🐣 K (Ages 4–6)</button>
+              <button class="magic-pill" data-wb-tier="g1">🌱 Grade 1</button>
+              <button class="magic-pill" data-wb-tier="g2">🚀 Grade 2</button>
+              <button class="magic-pill" data-wb-tier="g3">✨ Grade 3</button>
+              <button class="magic-pill" data-wb-tier="g4_5">📘 Grades 4–5</button>
+              <button class="magic-pill" data-wb-tier="g6">🔭 Grade 6</button>
+              <button class="magic-pill" data-wb-tier="g7_8">👑 Grades 7–8</button>
+              <button class="magic-pill" data-wb-tier="all">🎲 All (K–8)</button>
             </div>
             <div class="wb-mode-group" role="tablist" aria-label="Choose Clue Type">
               <button class="magic-pill active" data-wb-clue="both">🖼️ + 🔊 Picture &amp; Sound</button>
@@ -1456,6 +1563,51 @@
           </div>
         </div>
       </section>
+
+      <!-- VIEW: STORY TIME (THE STORY OF LITTLE GANESHA) -->
+      <section id="view-story" class="view" aria-labelledby="story-section-title">
+        <div class="story-book-shell">
+          <div class="story-book-header">
+            <div class="story-book-left">
+              <button class="back-btn story-back-btn" data-action="go-home">← Back</button>
+              <span class="story-book-title" id="story-section-title">🪷 The Story of Little Ganesha</span>
+            </div>
+            <div class="story-book-right">
+              <span id="story-page-badge" class="story-page-badge">Scene 1 of 6</span>
+              <button id="btn-story-speak" class="story-speak-btn" type="button" title="Listen to Female Storyteller">🗣️ Tell Story</button>
+              <button id="btn-story-mute" class="story-mute-btn" type="button" aria-pressed="false" title="Toggle Story Sound">
+                <span id="story-mute-icon">🔊</span>
+                <span id="story-mute-label">Sound On</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="story-stage-wrap">
+            <div class="story-stage-inner">
+              <canvas id="story-canvas" width="960" height="540" aria-label="Interactive animated storybook illustration"></canvas>
+              <button id="btn-story-start" class="story-start-btn" type="button">✨ Start Story</button>
+            </div>
+          </div>
+
+          <div class="story-panel">
+            <div class="story-meta-row">
+              <h2 id="story-scene-heading" class="story-scene-heading">✨ The Story of Little Ganesha</h2>
+              <span id="story-interact-hint" class="story-interact-hint">💡 Tap Baby Ganesha to wave, or tap the bells &amp; lotus flowers!</span>
+            </div>
+            <p id="story-text" class="story-text"></p>
+            <div class="story-nav-bar" role="navigation" aria-label="Storybook Pages">
+              <div class="story-nav-group">
+                <button id="btn-story-prev" class="story-nav-btn story-btn-prev" type="button">⬅ Previous</button>
+                <button id="btn-story-next" class="story-nav-btn story-btn-next" type="button">Next ➡</button>
+              </div>
+              <div id="story-dot-strip" class="story-dot-strip" aria-label="Scene selector"></div>
+              <div class="story-nav-group">
+                <button id="btn-story-replay" class="story-nav-btn story-btn-replay" type="button">🔄 Replay</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -1515,6 +1667,7 @@
   <script defer src="./src/math/math-quest-controller.js"></script>
   <script defer src="./src/math/times-tables-controller.js"></script>
   <script defer src="./src/english/phonics-curriculum.js"></script>
+  <script defer src="./src/english/phonics-pop-game.js"></script>
   <script defer src="./src/english/phonics-clap-game.js"></script>
   <script defer src="./src/english/phonics-blaster-game.js"></script>
   <script defer src="./src/english/phonics-runner-game.js"></script>
@@ -1530,6 +1683,7 @@
   <script defer src="./src/games/number-runner-game.js"></script>
   <script defer src="./src/games/car-racer-game.js"></script>
   <script defer src="./src/games/games-hub-controller.js"></script>
+  <script defer src="./src/story/story-controller.js"></script>
   <script defer src="./src/main.js"></script>
 </body>
 </html>
