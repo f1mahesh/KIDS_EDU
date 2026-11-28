@@ -6,9 +6,10 @@
   const { AudioEngine, $, launchConfetti, MagicMixerGame, NumberRunnerGame, RockBlasterGame, SnowClapGame, SquirrelBridgeGame, CarRacerGame, PicturePuzzleGame } = app;
 
 class GamesHubController {
-  constructor({ profileStore, showView, refreshHeader, stopMathTimer, closeArcadeSettings }) {
+  constructor({ profileStore, showView, goBack, refreshHeader, stopMathTimer, closeArcadeSettings }) {
     this.profileStore = profileStore;
     this.showView = showView;
+    this.goBack = goBack || ((fallback) => showView(fallback));
     this.refreshHeader = refreshHeader;
     this.stopMathTimer = stopMathTimer;
     this.closeArcadeSettings = closeArcadeSettings;
@@ -153,11 +154,13 @@ class GamesHubController {
   }
 
   _bindSnowEvents() {
-    document.querySelector('[data-action="open-snow"]').addEventListener('click', () => this.openSnow());
+    document.querySelectorAll('[data-action="open-snow"]').forEach((el) => {
+      el.addEventListener('click', () => this.openSnow());
+    });
     $('btn-snow-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('games');
+      this.goBack('math');
     });
     $('btn-snow-clap').addEventListener('click', () => {
       if (this.snowGame) this.snowGame.triggerClap();
@@ -241,11 +244,13 @@ class GamesHubController {
   }
 
   _bindSquirrelEvents() {
-    document.querySelector('[data-action="open-squirrel"]').addEventListener('click', () => this.openSquirrel());
+    document.querySelectorAll('[data-action="open-squirrel"]').forEach((el) => {
+      el.addEventListener('click', () => this.openSquirrel());
+    });
     $('btn-squirrel-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('games');
+      this.goBack('math');
     });
     $('btn-sq-connect').addEventListener('click', () => {
       if (this.squirrelGame) this.squirrelGame.connectNow();
@@ -345,11 +350,13 @@ class GamesHubController {
   }
 
   _bindRockEvents() {
-    document.querySelector('[data-action="open-rock"]').addEventListener('click', () => this.openRock());
+    document.querySelectorAll('[data-action="open-rock"]').forEach((el) => {
+      el.addEventListener('click', () => this.openRock());
+    });
     $('btn-rock-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('games');
+      this.goBack('math');
     });
     const restart = () => {
       AudioEngine.pop();
@@ -441,11 +448,13 @@ class GamesHubController {
   }
 
   _bindRunnerEvents() {
-    document.querySelector('[data-action="open-runner"]').addEventListener('click', () => this.openRunner());
+    document.querySelectorAll('[data-action="open-runner"]').forEach((el) => {
+      el.addEventListener('click', () => this.openRunner());
+    });
     $('btn-runner-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('games');
+      this.goBack('math');
     });
     const restart = () => {
       AudioEngine.pop();
@@ -560,7 +569,7 @@ class GamesHubController {
     $('btn-racer-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('funGames');
+      this.goBack('funGames');
     });
     const restart = () => {
       AudioEngine.pop();
@@ -626,7 +635,7 @@ class GamesHubController {
     AudioEngine.pop();
     this.stopMathTimer();
     this.closeArcadeSettings();
-    this.puzzleReturnView = fromView === 'games' ? 'games' : 'funGames';
+    this.puzzleReturnView = fromView || 'funGames';
     this.showView('puzzle');
     this.picturePuzzle.open();
   }
@@ -638,7 +647,7 @@ class GamesHubController {
     $('btn-puzzle-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView(this.puzzleReturnView || 'funGames');
+      this.goBack(this.puzzleReturnView || 'funGames');
     });
   }
 }

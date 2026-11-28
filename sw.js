@@ -1,14 +1,16 @@
-const CACHE_NAME = 'playspark-v54';
+const CACHE_NAME = 'playspark-v56';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
+  './src/games/picture-puzzle.css',
   './manifest.webmanifest',
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './src/main.js',
   './src/core/audio-engine.js',
+  './src/core/activity-catalog.js',
   './src/core/profile-store.js',
   './src/core/treasure-registry.js',
   './src/core/ui-effects.js',

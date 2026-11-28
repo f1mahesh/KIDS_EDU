@@ -6,9 +6,10 @@
   const { AudioEngine, $, launchConfetti, PhonicsBlasterGame, PhonicsClapGame, PhonicsPopGame, PhonicsRunnerGame, PhonicsTraceGame, WordBuilderGame } = app;
 
 class EnglishHubController {
-  constructor({ profileStore, showView, refreshHeader, stopMathTimer, closeArcadeSettings }) {
+  constructor({ profileStore, showView, goBack, refreshHeader, stopMathTimer, closeArcadeSettings }) {
     this.profileStore = profileStore;
     this.showView = showView;
+    this.goBack = goBack || ((fallback) => showView(fallback));
     this.refreshHeader = refreshHeader;
     this.stopMathTimer = stopMathTimer;
     this.closeArcadeSettings = closeArcadeSettings;
@@ -216,7 +217,7 @@ class EnglishHubController {
     $('btn-en-pop-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('english');
+      this.goBack('english');
     });
     $('btn-en-pop-hear').addEventListener('click', () => {
       if (this.enPopGame) this.enPopGame.repeatSound(false);
@@ -323,7 +324,7 @@ class EnglishHubController {
     $('btn-en-clap-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('english');
+      this.goBack('english');
     });
     $('btn-en-clap-trigger').addEventListener('click', () => {
       if (this.enClapGame) this.enClapGame.triggerClap();
@@ -415,7 +416,7 @@ class EnglishHubController {
     $('btn-en-blaster-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('english');
+      this.goBack('english');
     });
     const restart = () => {
       AudioEngine.pop();
@@ -506,7 +507,7 @@ class EnglishHubController {
     $('btn-en-runner-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('english');
+      this.goBack('english');
     });
     const restart = () => {
       AudioEngine.pop();
@@ -612,7 +613,7 @@ class EnglishHubController {
     $('btn-en-trace-back').addEventListener('click', () => {
       AudioEngine.pop();
       this.closeArcadeSettings();
-      this.showView('english');
+      this.goBack('english');
     });
     $('btn-en-trace-clear').addEventListener('click', () => {
       AudioEngine.pop();
@@ -679,7 +680,7 @@ class EnglishHubController {
     });
     $('btn-wb-back').addEventListener('click', () => {
       AudioEngine.pop();
-      this.showView('english');
+      this.goBack('english');
     });
   }
 }

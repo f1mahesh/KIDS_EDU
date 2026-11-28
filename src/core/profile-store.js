@@ -70,16 +70,20 @@ const BADGES = [
   }
 ];
 
-function createEmptyProfile(name = '', avatar = '🦁') {
+function createEmptyProfile(name = '', avatar = '🦁', ageBand = '4-6') {
   return {
     name,
     avatar,
+    ageBand,
     stars: 0,
     hearts: 0,
     solved: 0,
     bestStreak: 0,
     arcadeBest: 0,
     rockBest: 0,
+    favorites: [],
+    recent: [],
+    puzzleCompleted: [],
     treasures: createEmptyTreasures(),
     stats: {
       add: { attempts: 0, correct: 0, hints: 0 },
@@ -91,10 +95,14 @@ function createEmptyProfile(name = '', avatar = '🦁') {
 }
 
 function ensureProfileShape(p) {
-  const base = createEmptyProfile(p.name || '', p.avatar || '🦁');
+  const base = createEmptyProfile(p.name || '', p.avatar || '🦁', p.ageBand || '4-6');
   return {
     ...base,
     ...p,
+    ageBand: p.ageBand || '4-6',
+    favorites: Array.isArray(p.favorites) ? p.favorites : [],
+    recent: Array.isArray(p.recent) ? p.recent : [],
+    puzzleCompleted: Array.isArray(p.puzzleCompleted) ? p.puzzleCompleted : [],
     treasures: { ...base.treasures, ...(p.treasures || {}) },
     stats: {
       add: { ...base.stats.add, ...(p.stats && p.stats.add) },
@@ -151,25 +159,61 @@ class ProfileStore {
     return this.profile;
   }
 
-  saveNameAndAvatar(rawName, avatar) {
+  saveNameAndAvatar(rawName, avatar, ageBand = null) {
     const cleanName = rawName.trim() || 'Explorer';
     const slug = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'default';
+    const nextAge = ageBand || this.profile.ageBand || '4-6';
     if (!this.store.profiles[slug]) {
       if (!this.profile.name && this.store.activeId === 'default') {
         delete this.store.profiles.default;
       }
       this.store.activeId = slug;
       this.profile = this.profile.name
-        ? createEmptyProfile(cleanName, avatar)
-        : { ...this.profile, name: cleanName, avatar };
+        ? createEmptyProfile(cleanName, avatar, nextAge)
+        : { ...this.profile, name: cleanName, avatar, ageBand: nextAge };
     } else {
       this.store.activeId = slug;
       this.profile = ensureProfileShape(this.store.profiles[slug]);
       this.profile.name = cleanName;
       this.profile.avatar = avatar;
+      if (ageBand) this.profile.ageBand = ageBand;
     }
     this.save(this.profile);
     return this.profile;
+  }
+
+  setAgeBand(ageBand) {
+    this.profile.ageBand = ageBand || '4-6';
+    this.save(this.profile);
+    return this.profile.ageBand;
+  }
+
+  isFavorite(activityId) {
+    return Array.isArray(this.profile.favorites) && this.profile.favorites.includes(activityId);
+  }
+
+  toggleFavorite(activityId) {
+    if (!activityId) return false;
+    const favs = Array.isArray(this.profile.favorites) ? [...this.profile.favorites] : [];
+    const idx = favs.indexOf(activityId);
+    let added = false;
+    if (idx >= 0) {
+      favs.splice(idx, 1);
+    } else {
+      favs.unshift(activityId);
+      added = true;
+    }
+    this.profile.favorites = favs;
+    this.save(this.profile);
+    return added;
+  }
+
+  recordRecent(activityId) {
+    if (!activityId) return;
+    const list = Array.isArray(this.profile.recent) ? this.profile.recent.filter((r) => r.id !== activityId) : [];
+    list.unshift({ id: activityId, ts: Date.now() });
+    this.profile.recent = list.slice(0, 4);
+    this.save(this.profile);
   }
 
   resetCurrent() {

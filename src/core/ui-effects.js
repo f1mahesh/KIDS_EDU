@@ -133,9 +133,9 @@ const HELP_TOPICS = {
     title: '🖼️ How Picture Puzzle Works',
     body: `
       <ul class="help-list">
-        <li><strong>🎨 Pick or Upload a Picture:</strong> Use the top Picture dropdown or tap <strong>📷 Photo</strong> to upload your own picture!</li>
-        <li><strong>🎯 Difficulty Level:</strong> Pick <strong>🐣 2×2</strong>, <strong>🌱 3×3</strong>, <strong>🚀 4×4</strong>, or <strong>👑 5×5</strong> from the Level dropdown or the slide bar inside <strong>⚙️ Options</strong>!</li>
-        <li><strong>🧩 Real Jigsaw, Swap, or Slide:</strong> Tap <strong>💥 Break</strong> to scatter pieces! Drag or tap jigsaw pieces into place, or switch styles inside <strong>⚙️ Options</strong>.</li>
+        <li><strong>1️⃣ Pick a Picture:</strong> Choose an unlocked picture (or tap <strong>📷 My Photo</strong> to upload your own)!</li>
+        <li><strong>2️⃣ Pick Pieces &amp; Style:</strong> Choose <strong>🐣 4</strong>, <strong>🌱 9</strong>, <strong>🚀 16</strong>, or <strong>👑 25</strong> pieces and pick Jigsaw, Swap, or Slide, then tap <strong>▶ Next: Play Puzzle!</strong></li>
+        <li><strong>🔓 Unlock More Pictures:</strong> Finish each puzzle to mark it <strong>✅ Done</strong> and unlock the next picture!</li>
         <li><strong>👁️ Peek &amp; 💡 Hint:</strong> Tap <strong>👁️ Peek</strong> to see the whole picture or <strong>💡 Hint</strong> to highlight your next piece!</li>
       </ul>
     `

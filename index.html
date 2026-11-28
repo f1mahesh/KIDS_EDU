@@ -15,12 +15,13 @@
   <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./src/games/picture-puzzle.css" />
 </head>
 <body>
   <div id="confetti-layer" aria-hidden="true"></div>
 
   <div class="app-shell">
-    <!-- Top Navigation / Status Bar -->
+    <!-- Top Navigation / Status Bar (Clean & Kid-Focused) -->
     <header class="topbar">
       <button id="btn-home" class="brand-btn" aria-label="Go to Home">
         <span class="brand-cube" aria-hidden="true">✨</span>
@@ -28,9 +29,10 @@
       </button>
 
       <div class="topbar-stats">
-        <button id="btn-profile" class="profile-pill" title="Change Kid Profile">
+        <button id="btn-profile" class="profile-pill" title="Switch Kid Profile or Age">
           <span id="profile-avatar">🦁</span>
           <span id="profile-name">Kid</span>
+          <span id="profile-age-badge" class="profile-age-badge">4–6</span>
         </button>
         <div class="stat-pill" title="Total Stars">
           <span aria-hidden="true">⭐</span>
@@ -40,14 +42,15 @@
           <span aria-hidden="true">🔥</span>
           <span id="stat-streak">0</span>
         </div>
+        <button id="btn-top-trophies" class="stat-pill treasure-top-pill" data-action="open-trophies" title="Trophy Room &amp; Treasure Chest" aria-label="Trophy Room and Treasure Chest">
+          <span aria-hidden="true">🏆</span>
+          <span id="top-treasure-count">0</span>
+        </button>
         <button id="btn-sound" class="icon-btn" aria-label="Toggle Sound" title="Sound On/Off">
           🔊
         </button>
         <button id="btn-voice" class="icon-btn" aria-label="Toggle Voice Read-Aloud" title="Voice Read-Aloud On/Off">
           🗣️
-        </button>
-        <button id="btn-top-learn" class="icon-btn" aria-label="Learning Guides" title="Learning Guides">
-          📚
         </button>
         <button id="btn-install" class="install-btn hidden" aria-label="Install App">
           📲 Install
@@ -55,36 +58,50 @@
       </div>
     </header>
 
-    <!-- Top Category Navigation (Home · Math · English · Learn · Story · Games · Fun Games · Trophies) -->
-    <nav class="section-nav" aria-label="Main Categories">
-      <button class="nav-pill active" data-nav-section="home" data-action="go-home">🏠 Home</button>
-      <button class="nav-pill" data-nav-section="math" data-action="open-math">🔢 Math</button>
-      <button class="nav-pill" data-nav-section="english" data-action="open-english">📖 English</button>
-      <button class="nav-pill" data-nav-section="learn" data-action="open-learn">📚 Learn</button>
-      <button class="nav-pill" data-nav-section="story" data-action="open-story">🪷 Story</button>
-      <button class="nav-pill" data-nav-section="games" data-action="open-games">🎮 Games</button>
-      <button class="nav-pill" data-nav-section="fun" data-action="open-fun-games">🎉 Fun Games</button>
-      <button class="nav-pill" data-nav-section="trophies" data-action="open-trophies">🏆 Trophies</button>
+    <!-- Minimal 4-World Navigation Dock (Auto-hidden during active games) -->
+    <nav class="world-dock" id="world-dock" aria-label="Worlds">
+      <button class="world-tab active" data-nav-section="home" data-action="go-home">
+        <span class="world-tab-icon" aria-hidden="true">🏠</span>
+        <span class="world-tab-label">Home</span>
+      </button>
+      <button class="world-tab" data-nav-section="english" data-action="open-english">
+        <span class="world-tab-icon" aria-hidden="true">📖</span>
+        <span class="world-tab-label">ABC</span>
+      </button>
+      <button class="world-tab" data-nav-section="math" data-action="open-math">
+        <span class="world-tab-icon" aria-hidden="true">🔢</span>
+        <span class="world-tab-label">123</span>
+      </button>
+      <button class="world-tab" data-nav-section="fun" data-action="open-fun-games">
+        <span class="world-tab-icon" aria-hidden="true">🎨</span>
+        <span class="world-tab-label">Play</span>
+      </button>
     </nav>
 
     <!-- Main Content Area -->
     <main class="main-stage">
-      <!-- VIEW: HOME -->
+      <!-- VIEW: HOME (ZERO-JUGGLE KID LAUNCHPAD) -->
       <section id="view-home" class="view active" aria-labelledby="home-heading">
-        <div class="hero-card">
+        <div class="hero-card hero-compact">
           <div class="hero-text">
-            <span class="rank-chip" id="home-rank">🌱 Number Sprout</span>
+            <div class="hero-meta-row">
+              <span class="rank-chip" id="home-rank">🌱 Number Sprout</span>
+              <div class="age-pill-switcher" id="home-age-switcher" role="group" aria-label="Choose Age Stage">
+                <button type="button" class="age-mini-pill active" data-age-band="4-6">🐣 4–6</button>
+                <button type="button" class="age-mini-pill" data-age-band="6-8">🚀 6–8</button>
+                <button type="button" class="age-mini-pill" data-age-band="8-10">👑 8–10+</button>
+              </div>
+            </div>
             <h1 id="home-heading">Let's Play &amp; Learn Together!</h1>
-            <p>Explore Math 3D blocks, K–5 English Phonics, interactive Learning Guides, and AR Camera Games!</p>
+            <p class="hero-sub">Pick a world below, tap a favorite, or roll a surprise game!</p>
             <div class="hero-cta-row">
-              <button id="btn-quick-play" class="cta-pulse-btn">🚀 Quick Play Math!</button>
-              <button class="cta-magic-btn" data-action="open-english">📖 English Phonics</button>
-              <button class="cta-magic-btn" data-action="open-games">🎮 Game Arcade</button>
+              <button id="btn-surprise-me" class="cta-pulse-btn" type="button">🎲 Surprise Me!</button>
+              <button id="btn-quick-play" class="cta-magic-btn" type="button">🚀 Quick Math</button>
             </div>
           </div>
           <div class="hero-3d-wrap">
             <canvas id="hero-3d-canvas" width="260" height="200" aria-label="Interactive 3D Math Cubes"></canvas>
-            <span class="drag-hint">👆 Drag to spin 3D!</span>
+            <span class="drag-hint">👆 Spin 3D Blocks!</span>
           </div>
         </div>
 
@@ -97,74 +114,77 @@
           <div class="pet-speech-wrap">
             <div class="pet-speech" id="pet-speech">Tap me! Earn 5 ⭐ to feed me a yummy treat!</div>
           </div>
-          <button id="btn-home-treasure" class="treasure-pill-btn" title="Open Treasure Chest" aria-label="Open Treasure Chest">💎 <span id="home-treasure-count">0</span></button>
+          <button id="btn-home-treasure" class="treasure-pill-btn" title="Open Trophy Room" aria-label="Open Trophy Room">💎 <span id="home-treasure-count">0</span></button>
           <button id="btn-feed-buddy" class="feed-btn">🧁 Treat (5⭐)</button>
         </div>
 
-        <h2 class="section-heading">✨ Pick a Category</h2>
-        <div class="mode-grid category-portal-grid">
-          <button class="mode-card mode-math" data-action="open-math">
-            <div class="mode-icon">🔢</div>
-            <div class="mode-info">
-              <h2>Math World</h2>
-              <p>Addition, Subtraction, Multiplication &amp; 3D Times Tables</p>
+        <!-- Jump Back In + My Favorites Strip (Zero-Juggle 1-Tap Launch) -->
+        <div id="home-personal-shelf" class="personal-shelf">
+          <div id="home-continue-slot" class="continue-slot"></div>
+          <div id="home-favorites-wrap" class="favorites-wrap hidden">
+            <div class="shelf-head">
+              <h3>❤️ My Favorites</h3>
+              <span class="shelf-hint">Tap ❤️ on any game to pin it here</span>
             </div>
-            <span class="mode-arrow">▶</span>
+            <div id="home-favorites-row" class="favorites-row"></div>
+          </div>
+        </div>
+
+        <h2 class="section-heading">✨ Pick a World</h2>
+        <div class="world-portal-grid">
+          <button class="world-portal-card mode-english" data-action="open-english">
+            <div class="world-portal-emoji">📖</div>
+            <div class="world-portal-body">
+              <h2>ABC &amp; Reading</h2>
+              <p>Trace letters, pop phonics &amp; build words</p>
+              <span class="world-portal-count">6 Games + Guides</span>
+            </div>
+            <span class="world-portal-go">▶</span>
           </button>
 
-          <button class="mode-card mode-english" data-action="open-english">
-            <div class="mode-icon">📖</div>
-            <div class="mode-info">
-              <h2>English Phonics <span class="new-tag">K–5</span></h2>
-              <p>3 &amp; 4-letter words: Clap Blender, Letter Blaster, Runner &amp; Air-Trace</p>
+          <button class="world-portal-card mode-math" data-action="open-math">
+            <div class="world-portal-emoji">🔢</div>
+            <div class="world-portal-body">
+              <h2>123 &amp; Math</h2>
+              <p>3D cubes, times tables &amp; action AR</p>
+              <span class="world-portal-count">10 Games + Guides</span>
             </div>
-            <span class="mode-arrow">▶</span>
+            <span class="world-portal-go">▶</span>
           </button>
 
-          <button class="mode-card mode-learn" data-action="open-learn">
-            <div class="mode-icon">📚</div>
-            <div class="mode-info">
-              <h2>Learn &amp; Guides</h2>
-              <p>Step-by-step Math tricks &amp; English Phonics rules (K–5)</p>
+          <button class="world-portal-card mode-fun" data-action="open-fun-games">
+            <div class="world-portal-emoji">🎨</div>
+            <div class="world-portal-body">
+              <h2>Play &amp; Stories</h2>
+              <p>Jigsaw puzzles, racer &amp; Ganesha tale</p>
+              <span class="world-portal-count">3 Adventures</span>
             </div>
-            <span class="mode-arrow">▶</span>
+            <span class="world-portal-go">▶</span>
           </button>
 
-          <button class="mode-card mode-games" data-action="open-games">
-            <div class="mode-icon">🎮</div>
-            <div class="mode-info">
-              <h2>Game Arcade</h2>
-              <p>Camera AR games, Magic Mixer Lab &amp; Speed Blitz</p>
+          <button class="world-portal-card mode-trophies" data-action="open-trophies">
+            <div class="world-portal-emoji">🏆</div>
+            <div class="world-portal-body">
+              <h2>Trophies &amp; Buddy</h2>
+              <p>Badges, treasure chest &amp; grown-ups</p>
+              <span class="world-portal-count">Rewards &amp; Report</span>
             </div>
-            <span class="mode-arrow">▶</span>
+            <span class="world-portal-go">▶</span>
           </button>
+        </div>
 
-          <button class="mode-card mode-fun" data-action="open-fun-games">
-            <div class="mode-icon">🎉</div>
-            <div class="mode-info">
-              <h2>Fun Games <span class="new-tag">NEW</span></h2>
-              <p>Picture Puzzle (Upload Photos!), Turbo Hand Racer &amp; AR Fun!</p>
+        <!-- Quick Play-Style Finder (Find Quiet Touch vs Camera AR in 1 Tap) -->
+        <div class="discover-section">
+          <div class="discover-header">
+            <h2 class="section-heading" style="margin:0">🎯 Find by How You Play</h2>
+            <div class="play-style-pills" id="home-filter-pills" role="tablist" aria-label="Filter games by style">
+              <button type="button" class="filter-pill active" data-home-filter="recommended">🌟 For Me</button>
+              <button type="button" class="filter-pill" data-home-filter="touch">✋ Quiet Touch</button>
+              <button type="button" class="filter-pill" data-home-filter="ar">📷 Camera AR</button>
+              <button type="button" class="filter-pill" data-home-filter="all">✨ All</button>
             </div>
-            <span class="mode-arrow">▶</span>
-          </button>
-
-          <button class="mode-card mode-story" data-action="open-story">
-            <div class="mode-icon">🪷</div>
-            <div class="mode-info">
-              <h2>Story Time <span class="new-tag">NEW</span></h2>
-              <p>The Story of Little Ganesha — interactive illustrated tale!</p>
-            </div>
-            <span class="mode-arrow">▶</span>
-          </button>
-
-          <button class="mode-card mode-trophies" data-action="open-trophies">
-            <div class="mode-icon">🏆</div>
-            <div class="mode-info">
-              <h2>Progress &amp; Treasure Chest</h2>
-              <p>Score report, Stones, Coins, Jewels, Diamonds &amp; Badges</p>
-            </div>
-            <span class="mode-arrow">▶</span>
-          </button>
+          </div>
+          <div id="home-discover-grid" class="discover-grid"></div>
         </div>
       </section>
 
@@ -172,54 +192,103 @@
       <section id="view-math" class="view" aria-labelledby="math-title">
         <div class="panel-card math-hub-card">
           <div class="tables-top">
-            <button class="back-btn" data-action="go-home">← Back</button>
-            <h2 id="math-title">🔢 Math World</h2>
-            <button class="help-pill-btn" data-action="open-learn">📚 Math Guides</button>
+            <button class="back-btn" data-action="go-home">← Home</button>
+            <h2 id="math-title">🔢 123 &amp; Math World</h2>
+            <button class="help-pill-btn" data-action="open-learn">📚 Math Lessons</button>
           </div>
-          <p class="muted" style="margin-top:0">Practice with interactive 3D cube blocks, step-by-step hints, and bonus treasure drops!</p>
+          <p class="hub-subtitle">Spin 3D blocks, practice times tables, or jump into active AR math games!</p>
 
+          <h3 class="arcade-subhead">🧊 Learn &amp; Build (Touch &amp; 3D)</h3>
           <div class="mode-grid">
-            <button class="mode-card mode-add" data-action="start-setup" data-op="add">
+            <button class="mode-card mode-add" data-action="start-setup" data-op="add" data-activity-id="math-add">
               <div class="mode-icon">➕</div>
               <div class="mode-info">
-                <h2>Addition</h2>
-                <p>Combine 3D blocks &amp; add numbers</p>
+                <h2>Addition 3D</h2>
+                <p>Join glowing 3D cube blocks</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-sub" data-action="start-setup" data-op="sub">
+            <button class="mode-card mode-sub" data-action="start-setup" data-op="sub" data-activity-id="math-sub">
               <div class="mode-icon">➖</div>
               <div class="mode-info">
-                <h2>Subtraction</h2>
-                <p>Pop away cubes &amp; find what's left</p>
+                <h2>Subtraction 3D</h2>
+                <p>Pop cubes &amp; count what is left</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-mul" data-action="start-setup" data-op="mul">
+            <button class="mode-card mode-mul" data-action="start-setup" data-op="mul" data-activity-id="math-mul">
               <div class="mode-icon">✖️</div>
               <div class="mode-info">
-                <h2>Multiplication</h2>
+                <h2>Multiplication 3D</h2>
                 <p>Build 3D cube grids &amp; multiply</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-tables" data-action="open-tables">
+            <button class="mode-card mode-tables" data-action="open-tables" data-activity-id="math-tables">
               <div class="mode-icon">🔢</div>
               <div class="mode-info">
-                <h2>Times Tables</h2>
-                <p>3D flip flashcards &amp; table quiz (1–12)</p>
+                <h2>Times Tables 1–12</h2>
+                <p>Flip 3D flashcards &amp; table quiz</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-arcade" data-action="start-arcade">
+            <button class="mode-card mode-magic" data-action="open-magic" data-activity-id="math-magic">
+              <div class="mode-icon">🪄</div>
+              <div class="mode-info">
+                <h2>Magic Mixer Lab</h2>
+                <p>Mix bubbles, planets &amp; fruits</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-arcade" data-action="start-arcade" data-activity-id="math-blitz">
               <div class="mode-icon">⚡</div>
               <div class="mode-info">
                 <h2>60s Speed Blitz</h2>
-                <p>Race the clock for high scores!</p>
+                <p>Beat the 60-second math clock</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+          </div>
+
+          <h3 class="arcade-subhead">📷 Active Math AR (Camera or Touch)</h3>
+          <div class="mode-grid">
+            <button class="mode-card mode-runner" data-action="open-runner" data-activity-id="math-runner">
+              <div class="mode-icon">🏃</div>
+              <div class="mode-info">
+                <h2>Number Runner AR</h2>
+                <p>Jump, duck &amp; pick answers</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-snow" data-action="open-snow" data-activity-id="math-snow">
+              <div class="mode-icon">❄️</div>
+              <div class="mode-info">
+                <h2>Snow Clap AR</h2>
+                <p>Catch snow numbers &amp; clap</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-rock" data-action="open-rock" data-activity-id="math-rock">
+              <div class="mode-icon">🥊</div>
+              <div class="mode-info">
+                <h2>Rock Blaster AR</h2>
+                <p>Punch targets &amp; collect gems</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-squirrel" data-action="open-squirrel" data-activity-id="math-squirrel">
+              <div class="mode-icon">🐿️</div>
+              <div class="mode-info">
+                <h2>Squirrel Bridge AR</h2>
+                <p>Stretch both arms to build bridges</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
@@ -231,7 +300,7 @@
       <section id="view-setup" class="view" aria-labelledby="setup-title">
         <div class="panel-card setup-card">
           <div class="step-topbar">
-            <button class="back-btn" data-action="go-home">← Back</button>
+            <button class="back-btn" data-action="go-back" data-fallback="math">← Back</button>
             <button id="btn-help-setup" class="help-pill-btn" aria-label="Help with levels">❓ Help</button>
           </div>
           <h2 id="setup-title">Choose Your Level</h2>
@@ -383,7 +452,7 @@
       <section id="view-tables" class="view" aria-labelledby="tables-title">
         <div class="panel-card tables-card">
           <div class="tables-top">
-            <button class="back-btn" data-action="go-home">← Back</button>
+            <button class="back-btn" data-action="go-back" data-fallback="math">← Back</button>
             <h2 id="tables-title">Times Tables Playground</h2>
             <div class="tables-actions">
               <button id="btn-help-tables" class="help-pill-btn">❓ Tricks</button>
@@ -404,15 +473,14 @@
         </div>
       </section>
 
-      <!-- VIEW: PROGRESS REPORT & TROPHY ROOM -->
+      <!-- VIEW: TROPHY ROOM & KID-SAFE GROWN-UPS CORNER -->
       <section id="view-trophies" class="view" aria-labelledby="trophies-title">
         <div class="panel-card trophies-card">
           <div class="tables-top">
-            <button class="back-btn" data-action="go-home">← Back</button>
-            <h2 id="trophies-title">📊 Progress Report &amp; Trophies</h2>
+            <button class="back-btn" data-action="go-back" data-fallback="home">← Home</button>
+            <h2 id="trophies-title">🏆 My Trophies &amp; Buddy</h2>
             <div class="tables-actions">
-              <button id="btn-copy-report" class="mini-btn">📋 Copy Report</button>
-              <button id="btn-reset-progress" class="mini-btn danger-btn">Reset</button>
+              <button id="btn-switch-kid" class="secondary-btn small-btn">✏️ Switch Kid</button>
             </div>
           </div>
 
@@ -424,7 +492,12 @@
                 <span class="muted" id="report-kid-rank">🌱 Number Sprout</span>
               </div>
             </div>
-            <button id="btn-switch-kid" class="secondary-btn small-btn">✏️ Change Name</button>
+            <div class="rank-progress-wrap">
+              <span class="rank-next-label" id="report-next-rank">Next rank: 25 ⭐</span>
+              <div class="rank-progress-bar">
+                <div class="rank-progress-fill" id="report-rank-fill" style="width: 0%"></div>
+              </div>
+            </div>
           </div>
 
           <div class="profile-summary">
@@ -446,25 +519,54 @@
             </div>
           </div>
 
-          <div class="insights-grid">
-            <div class="insight-card insight-good">
-              <h3>🌟 Doing Well</h3>
-              <ul id="report-strengths"></ul>
-            </div>
-            <div class="insight-card insight-focus">
-              <h3>🎯 Where to Focus</h3>
-              <ul id="report-focus"></ul>
-            </div>
-          </div>
-
-          <h3 class="badges-heading">🏴‍☠️ Treasure Chest (Bonus Materials)</h3>
+          <h3 class="badges-heading">🏴‍☠️ Treasure Chest</h3>
           <div class="treasure-chest-grid" id="treasure-chest-grid"></div>
 
-          <h3 class="badges-heading">📈 Topic Score Breakdown</h3>
-          <div class="topic-bars" id="topic-bars"></div>
-
-          <h3 class="badges-heading">🏆 Badges</h3>
+          <h3 class="badges-heading">🏆 Sticker Badges</h3>
           <div class="badges-grid" id="badges-grid"></div>
+
+          <!-- Kid-Safe Grown-Ups Gate (Like ABC Kids Parents Corner) -->
+          <div class="grownups-section" id="grownups-section">
+            <div class="grownups-gate" id="grownups-gate">
+              <div class="grownups-gate-info">
+                <span class="grownups-lock-icon" aria-hidden="true">🔒</span>
+                <div>
+                  <h3>👨‍👩‍👧 Grown-Ups Corner</h3>
+                  <p class="muted" style="margin:0">Progress insights, copy report &amp; reset options</p>
+                </div>
+              </div>
+              <div class="grownups-gate-actions">
+                <span class="grownups-math-q" id="grownups-math-q">3 × 4 = ?</span>
+                <input id="grownups-math-input" class="grownups-math-input" type="number" inputmode="numeric" placeholder="?" aria-label="Grown-up verification answer" />
+                <button id="btn-grownups-unlock" type="button" class="primary-btn small-btn">🔓 Unlock</button>
+              </div>
+            </div>
+
+            <div class="grownups-panel hidden" id="grownups-panel">
+              <div class="grownups-panel-head">
+                <h3>📊 Grown-Up Progress Report</h3>
+                <div class="tables-actions">
+                  <button id="btn-copy-report" class="mini-btn">📋 Copy Report</button>
+                  <button id="btn-reset-progress" class="mini-btn danger-btn">🗑️ Reset</button>
+                  <button id="btn-grownups-lock" type="button" class="mini-btn">🔒 Lock</button>
+                </div>
+              </div>
+
+              <div class="insights-grid">
+                <div class="insight-card insight-good">
+                  <h3>🌟 Doing Well</h3>
+                  <ul id="report-strengths"></ul>
+                </div>
+                <div class="insight-card insight-focus">
+                  <h3>🎯 Where to Focus</h3>
+                  <ul id="report-focus"></ul>
+                </div>
+              </div>
+
+              <h3 class="badges-heading">📈 Topic Score Breakdown</h3>
+              <div class="topic-bars" id="topic-bars"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -472,14 +574,14 @@
       <section id="view-learn" class="view" aria-labelledby="learn-title">
         <div class="panel-card learn-card">
           <div class="tables-top">
-            <button class="back-btn" data-action="go-home">← Back</button>
-            <h2 id="learn-title">📚 Learning Guides</h2>
-            <span class="muted age-subtitle">Math &amp; English Lessons</span>
+            <button class="back-btn" data-action="go-back" data-fallback="home">← Back</button>
+            <h2 id="learn-title">📚 Mini Lessons &amp; Tricks</h2>
+            <span class="muted age-subtitle">Step-by-step Guides</span>
           </div>
 
           <div class="learn-subject-tabs" role="tablist" aria-label="Select learning subject">
             <button class="magic-pill active" data-learn-subject="math">🔢 Math Guides</button>
-            <button class="magic-pill" data-learn-subject="english">📖 English Phonics Guides</button>
+            <button class="magic-pill" data-learn-subject="english">📖 Phonics Guides</button>
           </div>
 
           <div class="age-tabs" id="age-tabs" role="tablist" aria-label="Select age group">
@@ -496,7 +598,7 @@
       <section id="view-magic" class="view" aria-labelledby="magic-title">
         <div class="panel-card magic-card">
           <div class="tables-top">
-            <button class="back-btn" data-action="go-home">← Back</button>
+            <button class="back-btn" data-action="go-back" data-fallback="math">← Back</button>
             <h2 id="magic-title">🪄 Magic Mixer Lab</h2>
             <button id="btn-help-magic" class="help-pill-btn">❓ Help</button>
           </div>
@@ -554,146 +656,49 @@
         </div>
       </section>
 
-      <!-- VIEW: DEDICATED GAME ARCADE -->
+      <!-- VIEW: ALL CAMERA AR ARCADE (LEGACY / DIRECT LINK COMPATIBLE) -->
       <section id="view-games" class="view" aria-labelledby="games-title">
         <div class="panel-card games-hub-card">
           <div class="tables-top">
-            <button class="back-btn" data-action="go-home">← Back</button>
-            <h2 id="games-title">🎮 Kid's Game Arcade</h2>
-            <span class="arcade-badge">INSERT FUN!</span>
+            <button class="back-btn" data-action="go-home">← Home</button>
+            <h2 id="games-title">📷 Camera AR Games</h2>
+            <button class="help-pill-btn" data-action="open-math">🔢 123 &amp; Math</button>
           </div>
-          <p class="muted" style="margin-top:0">All Math &amp; English games organized by category — earn stars &amp; collect bonus treasures!</p>
+          <p class="hub-subtitle">Move, jump, punch &amp; clap in front of the camera — or play by touch anytime!</p>
 
-          <h3 class="arcade-subhead">📷 Math &amp; Action AR Games</h3>
           <div class="mode-grid">
-            <button class="mode-card mode-runner" data-action="open-runner">
+            <button class="mode-card mode-runner" data-action="open-runner" data-activity-id="math-runner">
               <div class="mode-icon">🏃</div>
               <div class="mode-info">
-                <h2>Number Runner AR <span class="new-tag">NEW</span></h2>
-                <p>Move Left/Right, Jump logs &amp; Duck flyers to hit the right answer!</p>
+                <h2>Number Runner AR</h2>
+                <p>Jump, duck &amp; pick answers</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-rock" data-action="open-rock">
+            <button class="mode-card mode-rock" data-action="open-rock" data-activity-id="math-rock">
               <div class="mode-icon">🥊</div>
               <div class="mode-info">
-                <h2>Rock Blaster AR <span class="new-tag">NEW</span></h2>
-                <p>Punch &amp; kick hard to blast rocks, planets &amp; treasure hauls!</p>
+                <h2>Rock Blaster AR</h2>
+                <p>Punch targets &amp; collect gems</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-squirrel" data-action="open-squirrel">
+            <button class="mode-card mode-squirrel" data-action="open-squirrel" data-activity-id="math-squirrel">
               <div class="mode-icon">🐿️</div>
               <div class="mode-info">
-                <h2>Squirrel Bridge <span class="new-tag">NEW</span></h2>
-                <p>Stretch both hands to build a park/jungle bridge so Squirrel crosses!</p>
+                <h2>Squirrel Bridge AR</h2>
+                <p>Stretch both arms to build bridges</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-snow" data-action="open-snow">
+            <button class="mode-card mode-snow" data-action="open-snow" data-activity-id="math-snow">
               <div class="mode-icon">❄️</div>
               <div class="mode-info">
-                <h2>Snow Clap Camera <span class="new-tag">NEW</span></h2>
-                <p>Catch falling snow numbers in each hand &amp; clap for a giant snowball!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-          </div>
-
-          <h3 class="arcade-subhead">📖 English Phonics AR Games (K–5)</h3>
-          <div class="mode-grid">
-            <button class="mode-card mode-en-pop" data-action="open-en-pop">
-              <div class="mode-icon">🫧</div>
-              <div class="mode-info">
-                <h2>Phonics Bubble Pop AR <span class="new-tag">NEW AR</span></h2>
-                <p>Hear each phonic sound &amp; pop the matching floating letter bubbles!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-clap" data-action="open-en-clap">
-              <div class="mode-icon">👏</div>
-              <div class="mode-info">
-                <h2>Phonics Clap Blender</h2>
-                <p>Catch onset &amp; rime in each hand, clap to blend &amp; pick the picture!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-blaster" data-action="open-en-blaster">
-              <div class="mode-icon">🥊</div>
-              <div class="mode-info">
-                <h2>Letter Blaster AR</h2>
-                <p>Punch &amp; kick falling letters in order to spell 3 &amp; 4-letter words!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-runner" data-action="open-en-runner">
-              <div class="mode-icon">🏃</div>
-              <div class="mode-info">
-                <h2>Phonics Runner AR</h2>
-                <p>Steer Left/Right, Jump &amp; Duck into the matching word gate!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-trace" data-action="open-en-trace">
-              <div class="mode-icon">✍️</div>
-              <div class="mode-info">
-                <h2>Air-Trace &amp; Glow Pad</h2>
-                <p>Trace &amp; write letters with phoneme sounds + Dictation mode!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-builder" data-action="open-en-builder">
-              <div class="mode-icon">🧩</div>
-              <div class="mode-info">
-                <h2>Word Builder Board <span class="new-tag">NEW</span></h2>
-                <p>Drag letters from the letter board using sound or picture clues!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-          </div>
-
-          <h3 class="arcade-subhead">🧪 Interactive Lab, Puzzles &amp; Speed Challenges</h3>
-          <div class="mode-grid">
-            <button class="mode-card mode-puzzle" data-action="open-puzzle" data-puzzle-from="games">
-              <div class="mode-icon">🖼️</div>
-              <div class="mode-info">
-                <h2>Picture Puzzle <span class="new-tag">NEW</span></h2>
-                <p>Solve picture puzzles with built-in art or upload your own photo!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-magic" data-action="open-magic">
-              <div class="mode-icon">🪄</div>
-              <div class="mode-info">
-                <h2>Magic Mixer Lab</h2>
-                <p>Drag bubbles, planets &amp; fruits for magic math bursts!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-arcade" data-action="start-arcade">
-              <div class="mode-icon">⚡</div>
-              <div class="mode-info">
-                <h2>60s Speed Blitz</h2>
-                <p>Race the arcade clock for high scores!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-tables" data-action="open-tables">
-              <div class="mode-icon">🔢</div>
-              <div class="mode-info">
-                <h2>Times Table Flip</h2>
-                <p>3D flip cards &amp; table challenge (1–12)</p>
+                <h2>Snow Clap AR</h2>
+                <p>Catch snow numbers &amp; clap</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
@@ -960,86 +965,86 @@
         </div>
       </section>
 
-      <!-- VIEW: ENGLISH PHONICS HUB (K–5 READING & WRITING) -->
+      <!-- VIEW: ENGLISH PHONICS HUB (ABC & READING) -->
       <section id="view-english" class="view" aria-labelledby="english-title">
         <div class="panel-card english-hub-card">
           <div class="tables-top">
-            <button class="back-btn" data-action="go-home">← Back</button>
-            <h2 id="english-title">📖 English Phonics Arcade (K–5)</h2>
+            <button class="back-btn" data-action="go-home">← Home</button>
+            <h2 id="english-title">📖 ABC &amp; Reading World</h2>
             <div class="tables-actions">
-              <button class="help-pill-btn" data-action="open-learn-english">📚 Phonics Guides</button>
+              <button class="help-pill-btn" data-action="open-learn-english">📚 Phonics Lessons</button>
               <button id="btn-help-english" class="help-pill-btn">❓ Help</button>
             </div>
           </div>
-          <p class="muted" style="margin-top:0">UFLI Foundations–aligned phonics: clean clipped stops (no extra "uh"), continuous blending, digraphs, VCe &amp; vowel teams!</p>
+          <p class="hub-subtitle">Pick your grade level, trace letters, pop phonics sounds, and build words!</p>
 
           <div class="en-tier-bar" id="en-tier-selector" role="tablist" aria-label="Choose Grade Level">
-            <button class="magic-pill" data-en-tier="k">🐣 K (CVC)</button>
-            <button class="magic-pill" data-en-tier="g1">🌱 G1 (Blends)</button>
-            <button class="magic-pill" data-en-tier="g2">🚀 G2 (Digraphs &amp; FLSZ)</button>
-            <button class="magic-pill" data-en-tier="g3">✨ G3 (VCe / R-Ctrl)</button>
-            <button class="magic-pill" data-en-tier="g4_5">👑 G4–5 (Teams)</button>
-            <button class="magic-pill active" data-en-tier="all">🎲 All K–5</button>
+            <button class="magic-pill" data-en-tier="k">🐣 K</button>
+            <button class="magic-pill" data-en-tier="g1">🌱 G1</button>
+            <button class="magic-pill" data-en-tier="g2">🚀 G2</button>
+            <button class="magic-pill" data-en-tier="g3">✨ G3</button>
+            <button class="magic-pill" data-en-tier="g4_5">👑 G4–5</button>
+            <button class="magic-pill active" data-en-tier="all">🎲 All Levels</button>
           </div>
 
+          <h3 class="arcade-subhead">✍️ Trace &amp; Build Words (Touch)</h3>
           <div class="mode-grid">
-            <button class="mode-card mode-en-pop" data-action="open-en-pop">
-              <div class="mode-icon">🫧</div>
-              <div class="mode-info">
-                <h2>Phonics Bubble Pop AR <span class="new-tag">NEW AR</span></h2>
-                <p>Hear each phonic sound &amp; pop the matching floating letter bubbles!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-clap" data-action="open-en-clap">
-              <div class="mode-icon">👏</div>
-              <div class="mode-info">
-                <h2>Phonics Clap Blender <span class="new-tag">OPT 1</span></h2>
-                <p>Catch onset &amp; rime in each hand, clap to blend &amp; pick the picture!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-blaster" data-action="open-en-blaster">
-              <div class="mode-icon">🥊</div>
-              <div class="mode-info">
-                <h2>Letter Blaster AR <span class="new-tag">OPT 2</span></h2>
-                <p>Punch &amp; kick falling letters in order to spell 3 &amp; 4-letter words!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-runner" data-action="open-en-runner">
-              <div class="mode-icon">🏃</div>
-              <div class="mode-info">
-                <h2>Phonics Runner AR <span class="new-tag">OPT 3</span></h2>
-                <p>Steer Left/Right, Jump &amp; Duck into the matching word gate!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-en-trace" data-action="open-en-trace">
+            <button class="mode-card mode-en-trace" data-action="open-en-trace" data-activity-id="en-trace">
               <div class="mode-icon">✍️</div>
               <div class="mode-info">
-                <h2>Air-Trace &amp; Glow Pad <span class="new-tag">OPT 4</span></h2>
-                <p>Trace &amp; write letters with phoneme sounds + Dictation mode!</p>
+                <h2>Air-Trace &amp; Letters</h2>
+                <p>Trace letters &amp; spell words</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-en-builder" data-action="open-en-builder">
+            <button class="mode-card mode-en-builder" data-action="open-en-builder" data-activity-id="en-builder">
               <div class="mode-icon">🧩</div>
               <div class="mode-info">
-                <h2>Word Builder Board <span class="new-tag">NEW</span></h2>
-                <p>Drag letters from the letter board using picture or sound clues!</p>
+                <h2>Word Builder Board</h2>
+                <p>Drag letter tiles to build words</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
           </div>
 
-          <div class="en-parked-strip">
-            <span>🅿️ <strong>Parked for Next Phase:</strong> 🌉 Sound-Bridge Stretch (Opt 5) • 🧪 Word Cauldron Mixer (Opt 6)</span>
+          <h3 class="arcade-subhead">🫧 Sounds &amp; Action Phonics (Sound + AR)</h3>
+          <div class="mode-grid">
+            <button class="mode-card mode-en-pop" data-action="open-en-pop" data-activity-id="en-pop">
+              <div class="mode-icon">🫧</div>
+              <div class="mode-info">
+                <h2>Phonics Bubble Pop</h2>
+                <p>Hear a sound &amp; pop the letter</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-clap" data-action="open-en-clap" data-activity-id="en-clap">
+              <div class="mode-icon">👏</div>
+              <div class="mode-info">
+                <h2>Clap Blender</h2>
+                <p>Clap sounds together into words</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-blaster" data-action="open-en-blaster" data-activity-id="en-blaster">
+              <div class="mode-icon">🥊</div>
+              <div class="mode-info">
+                <h2>Letter Blaster</h2>
+                <p>Smash letters in spelling order</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
+
+            <button class="mode-card mode-en-runner" data-action="open-en-runner" data-activity-id="en-runner">
+              <div class="mode-icon">🏃</div>
+              <div class="mode-info">
+                <h2>Phonics Runner</h2>
+                <p>Run into the matching word gate</p>
+              </div>
+              <span class="mode-arrow">▶</span>
+            </button>
           </div>
         </div>
       </section>
@@ -1461,49 +1466,40 @@
         </div>
       </section>
 
-      <!-- VIEW: FUN GAMES HUB -->
+      <!-- VIEW: PLAY & STORIES HUB -->
       <section id="view-fun-games" class="view" aria-labelledby="fun-games-title">
         <div class="panel-card fun-games-card">
           <div class="tables-top">
-            <button class="back-btn" data-action="go-home">← Back</button>
-            <h2 id="fun-games-title">🎉 Fun Games Zone</h2>
-            <span class="arcade-badge">HAND AR!</span>
+            <button class="back-btn" data-action="go-home">← Home</button>
+            <h2 id="fun-games-title">🎨 Play &amp; Stories</h2>
+            <span class="arcade-badge">CREATIVE FUN</span>
           </div>
-          <p class="muted" style="margin-top:0">Pure play &amp; motion fun for kids! Collect Diamonds, Gold, Jewels, Bronze Coins &amp; Stones while playing!</p>
+          <p class="hub-subtitle">Build picture puzzles, race with your hands, or enjoy an interactive bedtime story!</p>
 
           <div class="mode-grid">
-            <button class="mode-card mode-puzzle" data-action="open-puzzle" data-puzzle-from="funGames">
+            <button class="mode-card mode-puzzle" data-action="open-puzzle" data-puzzle-from="funGames" data-activity-id="fun-puzzle">
               <div class="mode-icon">🖼️</div>
               <div class="mode-info">
-                <h2>Picture Puzzle <span class="new-tag">UPLOAD PHOTO</span></h2>
-                <p>Solve fun picture puzzles with difficulty levels — or upload your own picture!</p>
+                <h2>Picture Puzzle</h2>
+                <p>Jigsaw puzzles or upload your own photo</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-racer" data-action="open-fun-racer">
+            <button class="mode-card mode-racer" data-action="open-fun-racer" data-activity-id="fun-racer">
               <div class="mode-icon">🏎️</div>
               <div class="mode-info">
-                <h2>Turbo Hand Racer <span class="new-tag">HAND STEER</span></h2>
-                <p>Hold both hands like a steering wheel to drive, dodge cones &amp; grab treasures!</p>
+                <h2>Turbo Hand Racer</h2>
+                <p>Steer with hands &amp; grab gems</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
 
-            <button class="mode-card mode-rock" data-action="open-rock">
-              <div class="mode-icon">🥊</div>
+            <button class="mode-card mode-story" data-action="open-story" data-activity-id="fun-story">
+              <div class="mode-icon">🪷</div>
               <div class="mode-info">
-                <h2>Rock Blaster AR</h2>
-                <p>Punch &amp; kick targets, planets &amp; treasure hauls in mid-air!</p>
-              </div>
-              <span class="mode-arrow">▶</span>
-            </button>
-
-            <button class="mode-card mode-squirrel" data-action="open-squirrel">
-              <div class="mode-icon">🐿️</div>
-              <div class="mode-info">
-                <h2>Squirrel Bridge AR</h2>
-                <p>Stretch both arms wide so Sammy the Squirrel walks across!</p>
+                <h2>Little Ganesha Story</h2>
+                <p>Interactive illustrated storybook</p>
               </div>
               <span class="mode-arrow">▶</span>
             </button>
@@ -1582,127 +1578,113 @@
         </div>
       </section>
 
-      <!-- VIEW: PICTURE PUZZLE GAME -->
+      <!-- VIEW: PICTURE PUZZLE GAME (2-SCREEN KID-FIRST FLOW) -->
       <section id="view-puzzle" class="view" aria-labelledby="puzzle-title">
         <div class="panel-card puzzle-card">
-          <div class="puzzle-topbar">
-            <button class="back-btn" id="btn-puzzle-back">← Back</button>
-            <h2 id="puzzle-title" class="puzzle-title">🖼️ Picture Puzzle</h2>
-            <div class="puzzle-top-actions">
-              <button id="btn-puzzle-upload" type="button" class="primary-btn small-btn">📷 Photo</button>
-              <button id="btn-puzzle-options" type="button" class="secondary-btn small-btn" aria-expanded="false" aria-controls="puzzle-options-drawer">⚙️ Options</button>
-              <button id="btn-help-puzzle" type="button" class="icon-btn" aria-label="Puzzle Help" title="Help">❓</button>
-            </div>
-            <input id="puzzle-upload-input" type="file" accept="image/*" class="hidden" aria-label="Upload your own puzzle picture" />
-          </div>
+          <input id="puzzle-upload-input" type="file" accept="image/*" class="hidden" aria-label="Upload your own puzzle picture" />
 
-          <!-- Streamlined Quick Selectors (Picture + Difficulty Dropdowns) -->
-          <div class="puzzle-quick-bar">
-            <label class="puzzle-select-wrap">
-              <span class="puzzle-select-icon" aria-hidden="true">🎨</span>
-              <select id="puzzle-pic-select" class="puzzle-select" aria-label="Choose picture"></select>
-            </label>
-            <label class="puzzle-select-wrap">
-              <span class="puzzle-select-icon" aria-hidden="true">🎯</span>
-              <select id="puzzle-diff-select" class="puzzle-select" aria-label="Choose difficulty level">
-                <option value="easy">🐣 Starter (2×2)</option>
-                <option value="medium">🌱 Explorer (3×3)</option>
-                <option value="hard">🚀 Challenger (4×4)</option>
-                <option value="master">👑 Master (5×5)</option>
-              </select>
-            </label>
-          </div>
-
-          <!-- Collapsible Options Drawer (Slider, Style, Numbers, Picture Strip) -->
-          <div id="puzzle-options-drawer" class="puzzle-options-drawer hidden" role="region" aria-label="More Puzzle Options">
-            <div class="puzzle-drawer-head">
-              <span>⚙️ Puzzle Options</span>
-              <button type="button" id="btn-puzzle-options-close" class="mini-btn">Done ✓</button>
-            </div>
-
-            <div class="puzzle-drawer-row">
-              <div class="puzzle-slider-head">
-                <span>🎯 Difficulty Slide</span>
-                <strong id="puzzle-diff-slider-label">🐣 Starter (2×2)</strong>
-              </div>
-              <input id="puzzle-diff-slider" class="puzzle-range-slider" type="range" min="0" max="3" step="1" value="0" aria-label="Difficulty level slider" />
-              <div class="puzzle-slider-ticks">
-                <span>2×2</span>
-                <span>3×3</span>
-                <span>4×4</span>
-                <span>5×5</span>
+          <!-- SCREEN 1: PICK A PICTURE & HOW TO PLAY -->
+          <div id="puzzle-screen-setup" class="puzzle-setup-screen">
+            <div class="puzzle-topbar">
+              <button class="back-btn" id="btn-puzzle-back">← Back</button>
+              <h2 id="puzzle-title" class="puzzle-title">🖼️ Picture Puzzle</h2>
+              <div class="puzzle-top-actions">
+                <button id="btn-help-puzzle" type="button" class="icon-btn" aria-label="Puzzle Help" title="Help">❓</button>
               </div>
             </div>
 
-            <div class="puzzle-drawer-row">
-              <span class="puzzle-section-lbl">🧩 Puzzle Style</span>
-              <div class="puzzle-tool-group" role="group" aria-label="Choose Puzzle Style">
-                <button type="button" class="magic-pill active" data-puzzle-mode="jigsaw">🧩 Real Jigsaw</button>
-                <button type="button" class="magic-pill" data-puzzle-mode="swap">🔄 Swap</button>
-                <button type="button" class="magic-pill" data-puzzle-mode="slide">🔀 Slide</button>
+            <div class="puzzle-step-block">
+              <h3 class="puzzle-step-heading">
+                <span>1️⃣ Pick a Topic &amp; Picture</span>
+                <span class="puzzle-unlock-counter" id="puzzle-unlock-counter">1 / 3 Unlocked</span>
+              </h3>
+              <div class="puzzle-cat-tabs" id="puzzle-cat-tabs" role="tablist" aria-label="Puzzle Categories"></div>
+              <div class="puzzle-gallery-grid" id="puzzle-gallery-grid" role="list" aria-label="Choose puzzle picture"></div>
+            </div>
+
+            <div class="puzzle-step-block">
+              <h3 class="puzzle-step-heading"><span>2️⃣ How Do You Want to Play?</span></h3>
+              <div class="puzzle-how-grid">
+                <div class="puzzle-how-box">
+                  <span class="puzzle-how-label">Pieces</span>
+                  <div class="puzzle-pill-row" role="group" aria-label="Choose Number of Pieces">
+                    <button type="button" class="puzzle-choice-pill active" data-puzzle-diff="easy">🐣 4<small>2×2 Easy</small></button>
+                    <button type="button" class="puzzle-choice-pill" data-puzzle-diff="medium">🌱 9<small>3×3 Med</small></button>
+                    <button type="button" class="puzzle-choice-pill" data-puzzle-diff="hard">🚀 16<small>4×4 Big</small></button>
+                    <button type="button" class="puzzle-choice-pill" data-puzzle-diff="master">👑 25<small>5×5 Pro</small></button>
+                  </div>
+                </div>
+                <div class="puzzle-how-box">
+                  <span class="puzzle-how-label">Style</span>
+                  <div class="puzzle-pill-row" role="group" aria-label="Choose Puzzle Style">
+                    <button type="button" class="puzzle-choice-pill active" data-puzzle-mode="jigsaw">🧩 Jigsaw<small>Snap pieces</small></button>
+                    <button type="button" class="puzzle-choice-pill" data-puzzle-mode="swap">🔄 Swap<small>Trade spots</small></button>
+                    <button type="button" class="puzzle-choice-pill" data-puzzle-mode="slide">🔀 Slide<small>Move tiles</small></button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="puzzle-drawer-row">
-              <span class="puzzle-section-lbl">🖼️ Pictures</span>
-              <div class="puzzle-pic-strip" id="puzzle-pic-strip" role="list" aria-label="Choose puzzle picture"></div>
-            </div>
-
-            <div class="puzzle-drawer-row puzzle-drawer-footer">
-              <button type="button" id="btn-puzzle-numbers" class="mini-btn">🔢 Numbers: Off</button>
-              <span class="puzzle-best-pill">🏆 Best: <strong id="puzzle-best">—</strong></span>
+            <div class="puzzle-setup-footer">
+              <div id="puzzle-lock-toast" class="puzzle-lock-toast" aria-live="polite"></div>
+              <button type="button" id="btn-puzzle-start" class="puzzle-start-cta">▶ Next: Play Puzzle!</button>
             </div>
           </div>
 
-          <!-- Compact HUD + Quick Action Bar -->
-          <div class="puzzle-action-bar">
-            <div class="puzzle-mini-stats">
+          <!-- SCREEN 2: DISTRACTION-FREE PUZZLE STAGE -->
+          <div id="puzzle-screen-play" class="puzzle-play-screen hidden">
+            <div class="puzzle-play-bar">
+              <button type="button" class="back-btn" id="btn-puzzle-to-setup">← Pictures</button>
+              <button type="button" class="puzzle-mobile-goal-btn" id="puzzle-mobile-goal-btn" title="Tap to peek at goal picture" aria-label="Tap to peek at goal picture">
+                <img id="puzzle-mobile-goal-img" src="" alt="" />
+                <span id="puzzle-play-title">🚀 Space Rocket</span>
+              </button>
               <span class="puzzle-chip">✅ <strong id="puzzle-placed">0/4</strong></span>
-              <span class="puzzle-chip">🔄 <strong id="puzzle-moves">0</strong></span>
-              <span class="puzzle-chip">⏱️ <strong id="puzzle-timer">0:00</strong></span>
-            </div>
-            <div class="puzzle-quick-actions">
-              <button type="button" id="btn-puzzle-shuffle" class="mini-btn puzzle-break-btn" title="Break or shuffle puzzle">💥 Break</button>
-              <button type="button" id="btn-puzzle-peek" class="mini-btn" title="Peek at full picture">👁️ Peek</button>
-              <button type="button" id="btn-puzzle-hint" class="mini-btn" title="Get a hint">💡 Hint</button>
-            </div>
-          </div>
-
-          <div class="puzzle-status-strip" id="puzzle-status" aria-live="polite">
-            Drag or tap a jigsaw piece into its matching spot!
-          </div>
-
-          <!-- Main Puzzle Stage: Board + Desktop Preview -->
-          <div class="puzzle-workspace">
-            <div class="puzzle-board-wrap" id="puzzle-board-wrap">
-              <div class="puzzle-board-stage">
-                <img id="puzzle-board-ghost" class="puzzle-board-ghost" alt="" aria-hidden="true" />
-                <div class="puzzle-board" id="puzzle-board" role="grid" aria-label="Picture puzzle board"></div>
-              </div>
-              <div class="puzzle-peek-overlay hidden" id="puzzle-peek-overlay">
-                <img id="puzzle-peek-img" alt="Full picture peek" />
+              <div class="puzzle-quick-actions">
+                <button type="button" id="btn-puzzle-peek" class="mini-btn" title="Peek at full picture">👁️ Peek</button>
+                <button type="button" id="btn-puzzle-hint" class="mini-btn" title="Get a hint">💡 Hint</button>
+                <button type="button" id="btn-puzzle-shuffle" class="mini-btn puzzle-break-btn" title="Mix pieces again">🔄</button>
               </div>
             </div>
 
-            <aside class="puzzle-side">
-              <div class="puzzle-preview-card">
-                <span class="puzzle-preview-title">🎯 Goal Picture</span>
-                <img id="puzzle-preview-img" class="puzzle-preview-img" alt="Target puzzle picture preview" />
+            <div class="puzzle-status-strip" id="puzzle-status" aria-live="polite">
+              Drag or tap a jigsaw piece into its matching spot!
+            </div>
+
+            <!-- Main Puzzle Stage: Board + Desktop Preview -->
+            <div class="puzzle-workspace">
+              <div class="puzzle-board-wrap" id="puzzle-board-wrap">
+                <div class="puzzle-board-stage">
+                  <img id="puzzle-board-ghost" class="puzzle-board-ghost" alt="" aria-hidden="true" />
+                  <div class="puzzle-board" id="puzzle-board" role="grid" aria-label="Picture puzzle board"></div>
+                </div>
+                <div class="puzzle-peek-overlay hidden" id="puzzle-peek-overlay">
+                  <img id="puzzle-peek-img" alt="Full picture peek" />
+                </div>
               </div>
-            </aside>
-          </div>
 
-          <!-- Real Jigsaw Piece Tray -->
-          <div class="puzzle-tray-wrap" id="puzzle-tray-wrap">
-            <div class="puzzle-tray" id="puzzle-tray" aria-label="Jigsaw pieces tray"></div>
-          </div>
+              <aside class="puzzle-side">
+                <div class="puzzle-preview-card">
+                  <span class="puzzle-preview-title">🎯 Goal Picture</span>
+                  <img id="puzzle-preview-img" class="puzzle-preview-img" alt="Target puzzle picture preview" />
+                </div>
+              </aside>
+            </div>
 
-          <div id="puzzle-win-banner" class="puzzle-win-banner hidden" aria-live="polite">
-            <span id="puzzle-win-text">🎉 Puzzle Complete!</span>
-            <div class="puzzle-win-actions">
-              <button type="button" id="btn-puzzle-again" class="primary-btn small-btn">🔄 Play Again</button>
-              <button type="button" id="btn-puzzle-next-pic" class="secondary-btn small-btn">🖼️ Next Picture</button>
-              <button type="button" id="btn-puzzle-harder" class="mini-btn">⚡ Harder Level</button>
+            <!-- Real Jigsaw Piece Tray -->
+            <div class="puzzle-tray-wrap" id="puzzle-tray-wrap">
+              <div class="puzzle-tray" id="puzzle-tray" aria-label="Jigsaw pieces tray"></div>
+            </div>
+
+            <div id="puzzle-win-banner" class="puzzle-win-banner hidden" aria-live="polite">
+              <span id="puzzle-win-text">🎉 Puzzle Complete!</span>
+              <span id="puzzle-unlock-pill" class="puzzle-unlock-pill hidden">🔓 Unlocked: Dino Meadow!</span>
+              <div id="puzzle-fact-box" class="puzzle-fact-box hidden"></div>
+              <div class="puzzle-win-actions">
+                <button type="button" id="btn-puzzle-next-pic" class="primary-btn small-btn">➡ Next Picture!</button>
+                <button type="button" id="btn-puzzle-again" class="secondary-btn small-btn">🔄 Play Again</button>
+                <button type="button" id="btn-puzzle-all-pics" class="mini-btn">🖼️ All Pictures</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1713,7 +1695,7 @@
         <div class="story-book-shell">
           <div class="story-book-header">
             <div class="story-book-left">
-              <button class="back-btn story-back-btn" data-action="go-home">← Back</button>
+              <button class="back-btn story-back-btn" data-action="go-back" data-fallback="funGames">← Back</button>
               <span class="story-book-title" id="story-section-title">🪷 The Story of Little Ganesha</span>
             </div>
             <div class="story-book-right">
@@ -1782,6 +1764,13 @@
         <label class="input-label" for="kid-name-input">Kid's Name</label>
         <input id="kid-name-input" class="kid-input" type="text" maxlength="20" placeholder="Enter name (e.g. Maya)" autocomplete="given-name" />
 
+        <div class="avatar-picker-label">Age Stage (Tailors Games For You)</div>
+        <div class="age-modal-picker" id="age-modal-picker">
+          <button type="button" class="age-modal-opt active" data-modal-age="4-6">🐣 Ages 4–6<small>Starter</small></button>
+          <button type="button" class="age-modal-opt" data-modal-age="6-8">🚀 Ages 6–8<small>Explorer</small></button>
+          <button type="button" class="age-modal-opt" data-modal-age="8-10">👑 Ages 8–10+<small>Master</small></button>
+        </div>
+
         <div class="avatar-picker-label">Pick Your Buddy</div>
         <div class="avatar-picker" id="avatar-picker">
           <button type="button" class="avatar-opt active" data-avatar="🦁">🦁</button>
@@ -1805,6 +1794,7 @@
 
   <script defer src="./src/core/audio-engine.js"></script>
   <script defer src="./src/core/treasure-registry.js"></script>
+  <script defer src="./src/core/activity-catalog.js"></script>
   <script defer src="./src/core/profile-store.js"></script>
   <script defer src="./src/core/ui-effects.js"></script>
   <script defer src="./src/math/math-3d-scene.js"></script>

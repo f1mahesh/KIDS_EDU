@@ -471,13 +471,600 @@
     });
   }
 
+  function drawSaturnRings(ctx, s) {
+    const bg = ctx.createRadialGradient(s * 0.5, s * 0.45, 30, s * 0.5, s * 0.5, s * 0.72);
+    bg.addColorStop(0, '#312e81');
+    bg.addColorStop(0.55, '#1e1b4b');
+    bg.addColorStop(1, '#020617');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, s, s);
+
+    for (let i = 0; i < 24; i++) {
+      ctx.fillStyle = i % 3 === 0 ? '#fde047' : '#ffffff';
+      ctx.beginPath();
+      ctx.arc(((i * 97) % 92 + 4) * s / 100, ((i * 53) % 90 + 5) * s / 100, (i % 3) + 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Distant Nebula Swirl
+    ctx.fillStyle = 'rgba(236, 72, 153, 0.22)';
+    ctx.beginPath();
+    ctx.ellipse(s * 0.25, s * 0.28, s * 0.22, s * 0.09, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Saturn Back Rings
+    ctx.save();
+    ctx.translate(s * 0.5, s * 0.52);
+    ctx.rotate(-0.28);
+    [
+      [s * 0.38, s * 0.11, 20, '#fde68a'],
+      [s * 0.32, s * 0.088, 16, '#fb923c'],
+      [s * 0.27, s * 0.072, 10, '#bae6fd']
+    ].forEach(([rx, ry, lw, col]) => {
+      ctx.strokeStyle = col;
+      ctx.lineWidth = lw;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, Math.PI, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Planet Body
+    const pGrad = ctx.createLinearGradient(0, -s * 0.19, 0, s * 0.19);
+    pGrad.addColorStop(0, '#fef08a');
+    pGrad.addColorStop(0.45, '#f59e0b');
+    pGrad.addColorStop(1, '#b45309');
+    ctx.fillStyle = pGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, s * 0.19, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Front Rings
+    [
+      [s * 0.38, s * 0.11, 20, '#fde68a'],
+      [s * 0.32, s * 0.088, 16, '#fb923c'],
+      [s * 0.27, s * 0.072, 10, '#bae6fd']
+    ].forEach(([rx, ry, lw, col]) => {
+      ctx.strokeStyle = col;
+      ctx.lineWidth = lw;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI);
+      ctx.stroke();
+    });
+    ctx.restore();
+
+    // Titan Moon
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.arc(s * 0.82, s * 0.2, s * 0.055, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawSolarSystem(ctx, s) {
+    const bg = ctx.createLinearGradient(0, 0, s, s);
+    bg.addColorStop(0, '#090d24');
+    bg.addColorStop(1, '#1e1b4b');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, s, s);
+
+    for (let i = 0; i < 28; i++) {
+      ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#bae6fd';
+      ctx.beginPath();
+      ctx.arc(((i * 71) % 94 + 3) * s / 100, ((i * 41) % 92 + 4) * s / 100, (i % 3) + 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Orbit Rings
+    [0.24, 0.34, 0.45, 0.57, 0.69].forEach((r) => {
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(s * 0.16, s * 0.5, s * r, -0.7, 0.7);
+      ctx.stroke();
+    });
+
+    // Sun
+    const sunGrad = ctx.createRadialGradient(s * 0.14, s * 0.48, 10, s * 0.14, s * 0.5, s * 0.18);
+    sunGrad.addColorStop(0, '#fef08a');
+    sunGrad.addColorStop(0.65, '#f59e0b');
+    sunGrad.addColorStop(1, '#ef4444');
+    ctx.fillStyle = sunGrad;
+    ctx.beginPath();
+    ctx.arc(s * 0.12, s * 0.5, s * 0.17, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Planets
+    const planets = [
+      { x: 0.37, y: 0.37, r: 0.04, c1: '#fb923c', c2: '#ea580c' },
+      { x: 0.48, y: 0.58, r: 0.06, c1: '#38bdf8', c2: '#16a34a' },
+      { x: 0.6, y: 0.34, r: 0.048, c1: '#f87171', c2: '#b91c1c' },
+      { x: 0.73, y: 0.55, r: 0.085, c1: '#fdba74', c2: '#c2410c' },
+      { x: 0.87, y: 0.35, r: 0.062, c1: '#60a5fa', c2: '#2563eb' }
+    ];
+    planets.forEach((p) => {
+      const g = ctx.createRadialGradient(p.x * s - 8, p.y * s - 8, 3, p.x * s, p.y * s, p.r * s);
+      g.addColorStop(0, p.c1);
+      g.addColorStop(1, p.c2);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(p.x * s, p.y * s, p.r * s, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function drawBerryBasket(ctx, s) {
+    const bg = ctx.createLinearGradient(0, 0, 0, s);
+    bg.addColorStop(0, '#fef3c7');
+    bg.addColorStop(1, '#fbcfe8');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, s, s);
+
+    // Tablecloth Stripes
+    ctx.fillStyle = '#fda4af';
+    ctx.fillRect(0, s * 0.72, s, s * 0.28);
+    ctx.fillStyle = '#fecdd3';
+    for (let x = 0; x < s; x += 60) {
+      ctx.fillRect(x, s * 0.72, 28, s * 0.28);
+    }
+
+    // Basket
+    ctx.fillStyle = '#d97706';
+    ctx.beginPath();
+    ctx.moveTo(s * 0.2, s * 0.48);
+    ctx.lineTo(s * 0.8, s * 0.48);
+    ctx.lineTo(s * 0.72, s * 0.82);
+    ctx.lineTo(s * 0.28, s * 0.82);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#92400e';
+    ctx.lineWidth = 7;
+    ctx.stroke();
+
+    // Big Smiling Strawberry
+    const drawStrawberry = (cx, cy, sc) => {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(sc, sc);
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(0, 88);
+      ctx.bezierCurveTo(-82, 35, -72, -62, 0, -55);
+      ctx.bezierCurveTo(72, -62, 82, 35, 0, 88);
+      ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      [[-28, -15], [26, -18], [-15, 22], [18, 20], [0, 48], [0, -8]].forEach(([sx, sy]) => {
+        ctx.beginPath();
+        ctx.ellipse(sx, sy, 4, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.fillStyle = '#16a34a';
+      ctx.beginPath();
+      ctx.ellipse(-22, -58, 24, 12, -0.4, 0, Math.PI * 2);
+      ctx.ellipse(22, -58, 24, 12, 0.4, 0, Math.PI * 2);
+      ctx.ellipse(0, -64, 18, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+    drawStrawberry(s * 0.5, s * 0.4, 1.35);
+    drawStrawberry(s * 0.31, s * 0.46, 0.9);
+    drawStrawberry(s * 0.69, s * 0.46, 0.9);
+
+    // Blueberries
+    [[0.36, 0.3], [0.64, 0.31], [0.22, 0.75], [0.78, 0.75]].forEach(([bx, by]) => {
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath();
+      ctx.arc(s * bx, s * by, 26, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#93c5fd';
+      ctx.beginPath();
+      ctx.arc(s * bx - 8, s * by - 8, 7, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function drawTropicalTrio(ctx, s) {
+    const bg = ctx.createLinearGradient(0, 0, 0, s);
+    bg.addColorStop(0, '#bae6fd');
+    bg.addColorStop(0.65, '#fef9c3');
+    bg.addColorStop(1, '#fde68a');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, s, s);
+
+    // Pineapple
+    ctx.save();
+    ctx.translate(s * 0.32, s * 0.52);
+    ctx.fillStyle = '#16a34a';
+    [-0.5, -0.2, 0, 0.2, 0.5].forEach((ang) => {
+      ctx.save();
+      ctx.rotate(ang);
+      ctx.beginPath();
+      ctx.ellipse(0, -138, 18, 56, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 82, 108, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#b45309';
+    ctx.lineWidth = 4;
+    for (let y = -70; y <= 70; y += 35) {
+      ctx.beginPath();
+      ctx.moveTo(-64, y);
+      ctx.lineTo(64, y + 25);
+      ctx.moveTo(64, y);
+      ctx.lineTo(-64, y + 25);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Watermelon Slice
+    ctx.save();
+    ctx.translate(s * 0.68, s * 0.64);
+    ctx.rotate(-0.15);
+    ctx.fillStyle = '#15803d';
+    ctx.beginPath();
+    ctx.arc(0, 0, 140, 0, Math.PI);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#dcfce7';
+    ctx.beginPath();
+    ctx.arc(0, 0, 124, 0, Math.PI);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(0, 0, 112, 0, Math.PI);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#1e293b';
+    [[-45, 34], [0, 52], [45, 34], [-22, 74], [24, 74]].forEach(([sx, sy]) => {
+      ctx.beginPath();
+      ctx.ellipse(sx, sy, 5, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+
+    // Kiwi Slice
+    ctx.fillStyle = '#92400e';
+    ctx.beginPath();
+    ctx.arc(s * 0.72, s * 0.28, 72, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#84cc16';
+    ctx.beginPath();
+    ctx.arc(s * 0.72, s * 0.28, 62, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ecfccb';
+    ctx.beginPath();
+    ctx.arc(s * 0.72, s * 0.28, 22, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawRainbowOrchard(ctx, s) {
+    const sky = ctx.createLinearGradient(0, 0, 0, s * 0.75);
+    sky.addColorStop(0, '#60a5fa');
+    sky.addColorStop(1, '#dbeafe');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, s, s);
+
+    ctx.fillStyle = '#fde047';
+    ctx.beginPath();
+    ctx.arc(s * 0.84, s * 0.16, s * 0.09, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(0, s * 0.72, s, s * 0.28);
+
+    // Big Apple Tree
+    ctx.fillStyle = '#92400e';
+    ctx.fillRect(s * 0.42, s * 0.48, s * 0.16, s * 0.34);
+    ctx.fillStyle = '#15803d';
+    [[0.5, 0.36, 0.24], [0.34, 0.42, 0.16], [0.66, 0.42, 0.16]].forEach(([cx, cy, r]) => {
+      ctx.beginPath();
+      ctx.arc(s * cx, s * cy, s * r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Apples on Tree + Oranges & Mango on Grass
+    [[0.4, 0.3], [0.56, 0.27], [0.64, 0.42], [0.36, 0.44], [0.5, 0.41]].forEach(([ax, ay]) => {
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(s * ax, s * ay, 22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#84cc16';
+      ctx.beginPath();
+      ctx.ellipse(s * ax + 8, s * ay - 22, 10, 5, -0.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Basket of Oranges & Grapes on Grass
+    [[0.22, 0.82, '#f97316'], [0.29, 0.84, '#fb923c'], [0.74, 0.83, '#8b5cf6'], [0.79, 0.83, '#a855f7'], [0.76, 0.88, '#7c3aed']].forEach(([fx, fy, col]) => {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(s * fx, s * fy, 24, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function drawForestFox(ctx, s) {
+    const sky = ctx.createLinearGradient(0, 0, 0, s);
+    sky.addColorStop(0, '#38bdf8');
+    sky.addColorStop(0.55, '#a7f3d0');
+    sky.addColorStop(1, '#15803d');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, s, s);
+
+    // Pine Trees
+    const drawPine = (x, y, h, col) => {
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(x - 14, y, 28, 70);
+      ctx.fillStyle = col;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(x, y - h + i * 48);
+        ctx.lineTo(x + 76 - i * 10, y - i * 38);
+        ctx.lineTo(x - 76 + i * 10, y - i * 38);
+        ctx.closePath();
+        ctx.fill();
+      }
+    };
+    drawPine(s * 0.18, s * 0.65, 220, '#166534');
+    drawPine(s * 0.82, s * 0.63, 240, '#15803d');
+    drawPine(s * 0.52, s * 0.56, 190, '#22c55e');
+
+    ctx.fillStyle = '#4ade80';
+    ctx.fillRect(0, s * 0.72, s, s * 0.28);
+
+    // Mushrooms
+    [[0.2, 0.84], [0.8, 0.85]].forEach(([mx, my]) => {
+      ctx.fillStyle = '#fef3c7';
+      ctx.fillRect(s * mx - 12, s * my - 10, 24, 38);
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(s * mx, s * my - 10, 34, Math.PI, 0);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(s * mx - 12, s * my - 24, 6, 0, Math.PI * 2);
+      ctx.arc(s * mx + 12, s * my - 22, 5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Cute Forest Fox
+    ctx.save();
+    ctx.translate(s * 0.5, s * 0.7);
+    // Tail
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath();
+    ctx.ellipse(88, 12, 65, 30, -0.35, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(135, -6, 20, 0, Math.PI * 2);
+    ctx.fill();
+    // Body & Head
+    ctx.fillStyle = '#ea580c';
+    ctx.beginPath();
+    ctx.ellipse(0, 22, 62, 52, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath();
+    ctx.moveTo(-66, -34);
+    ctx.lineTo(-42, -108);
+    ctx.lineTo(-14, -56);
+    ctx.closePath();
+    ctx.moveTo(66, -34);
+    ctx.lineTo(42, -108);
+    ctx.lineTo(14, -56);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(0, -34, 72, 56, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(-28, -14, 34, 24, 0, 0, Math.PI * 2);
+    ctx.ellipse(28, -14, 34, 24, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(-26, -38, 8, 0, Math.PI * 2);
+    ctx.arc(26, -38, 8, 0, Math.PI * 2);
+    ctx.arc(0, -14, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawNightOwl(ctx, s) {
+    const sky = ctx.createLinearGradient(0, 0, 0, s);
+    sky.addColorStop(0, '#0f172a');
+    sky.addColorStop(0.6, '#1e1b4b');
+    sky.addColorStop(1, '#064e3b');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, s, s);
+
+    // Moon & Stars
+    ctx.fillStyle = '#fef08a';
+    ctx.beginPath();
+    ctx.arc(s * 0.2, s * 0.2, 56, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(s * 0.24, s * 0.18, 46, 0, Math.PI * 2);
+    ctx.fill();
+
+    [[0.46, 0.14], [0.72, 0.16], [0.88, 0.28], [0.12, 0.42], [0.6, 0.22]].forEach(([sx, sy]) => {
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.arc(s * sx, s * sy, 5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Tree Branch
+    ctx.strokeStyle = '#78350f';
+    ctx.lineWidth = 34;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, s * 0.72);
+    ctx.quadraticCurveTo(s * 0.48, s * 0.65, s * 0.92, s * 0.72);
+    ctx.stroke();
+
+    // Cute Wise Owl
+    ctx.save();
+    ctx.translate(s * 0.52, s * 0.5);
+    ctx.fillStyle = '#92400e';
+    ctx.beginPath();
+    ctx.ellipse(0, 20, 92, 108, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fde68a';
+    ctx.beginPath();
+    ctx.ellipse(0, 44, 58, 66, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Eyes
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-34, -22, 34, 0, Math.PI * 2);
+    ctx.arc(34, -22, 34, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(-30, -22, 16, 0, Math.PI * 2);
+    ctx.arc(30, -22, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.moveTo(-14, -4);
+    ctx.lineTo(14, -4);
+    ctx.lineTo(0, 18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawWaterfallGlade(ctx, s) {
+    const sky = ctx.createLinearGradient(0, 0, 0, s * 0.6);
+    sky.addColorStop(0, '#38bdf8');
+    sky.addColorStop(1, '#dcfce7');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, s, s);
+
+    // Cliffs & Waterfall
+    ctx.fillStyle = '#64748b';
+    ctx.fillRect(s * 0.25, s * 0.2, s * 0.5, s * 0.52);
+    const wf = ctx.createLinearGradient(0, s * 0.2, 0, s * 0.75);
+    wf.addColorStop(0, '#bae6fd');
+    wf.addColorStop(1, '#0284c7');
+    ctx.fillStyle = wf;
+    ctx.fillRect(s * 0.4, s * 0.2, s * 0.2, s * 0.55);
+
+    ctx.fillStyle = '#22c55e';
+    ctx.fillRect(0, s * 0.68, s, s * 0.32);
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.ellipse(s * 0.5, s * 0.82, s * 0.32, s * 0.12, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Forest Pines & Butterflies
+    ctx.fillStyle = '#15803d';
+    [[0.14, 0.52], [0.86, 0.52]].forEach(([tx, ty]) => {
+      ctx.beginPath();
+      ctx.moveTo(s * tx, s * (ty - 0.3));
+      ctx.lineTo(s * (tx + 0.12), s * (ty + 0.16));
+      ctx.lineTo(s * (tx - 0.12), s * (ty + 0.16));
+      ctx.closePath();
+      ctx.fill();
+    });
+    [[0.28, 0.36, '#f472b6'], [0.74, 0.3, '#facc15']].forEach(([bx, by, col]) => {
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.ellipse(s * bx - 10, s * by, 14, 10, -0.4, 0, Math.PI * 2);
+      ctx.ellipse(s * bx + 10, s * by, 14, 10, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function drawPolarFriends(ctx, s) {
+    const sky = ctx.createLinearGradient(0, 0, 0, s * 0.65);
+    sky.addColorStop(0, '#0f172a');
+    sky.addColorStop(0.55, '#14b8a6');
+    sky.addColorStop(1, '#bae6fd');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, s, s);
+
+    // Aurora Wave
+    ctx.strokeStyle = 'rgba(167, 243, 208, 0.65)';
+    ctx.lineWidth = 28;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(s * 0.08, s * 0.24);
+    ctx.quadraticCurveTo(s * 0.42, s * 0.08, s * 0.92, s * 0.26);
+    ctx.stroke();
+
+    // Iceberg & Ocean
+    ctx.fillStyle = '#0284c7';
+    ctx.fillRect(0, s * 0.66, s, s * 0.34);
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath();
+    ctx.ellipse(s * 0.5, s * 0.72, s * 0.4, s * 0.14, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Happy Penguin
+    ctx.save();
+    ctx.translate(s * 0.5, s * 0.58);
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 74, 102, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(0, 14, 52, 74, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(-22, -40, 8, 0, Math.PI * 2);
+    ctx.arc(22, -40, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#f97316';
+    ctx.beginPath();
+    ctx.moveTo(-16, -24);
+    ctx.lineTo(16, -24);
+    ctx.lineTo(0, -4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(-28, 102, 24, 11, 0, 0, Math.PI * 2);
+    ctx.ellipse(28, 102, 24, 11, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  const PUZZLE_CATEGORIES = [
+    { id: 'space', label: 'Planets & Space', emoji: '🪐' },
+    { id: 'fruits', label: 'Yummy Fruits', emoji: '🍓' },
+    { id: 'forest', label: 'Forest', emoji: '🌲' },
+    { id: 'animals', label: 'Dinos & Ocean', emoji: '🦕' },
+    { id: 'stories', label: 'Castles & Stories', emoji: '🏰' }
+  ];
+
   const DEFAULT_PICTURES = [
-    { id: 'rocket', title: 'Space Rocket', emoji: '🚀', draw: drawSpaceAdventure },
-    { id: 'dino', title: 'Dino Meadow', emoji: '🦕', draw: drawDinoMeadow },
-    { id: 'ocean', title: 'Ocean Reef', emoji: '🐠', draw: drawOceanReef },
-    { id: 'castle', title: 'Rainbow Castle', emoji: '🏰', draw: drawRainbowCastle },
-    { id: 'ganesha', title: 'Little Ganesha', emoji: '🪷', src: './ganeshsa.jpeg' },
-    { id: 'mountain', title: 'Mount Kailash', emoji: '🏔️', src: './mountain.jpeg' }
+    { id: 'rocket', category: 'space', title: 'Space Rocket', emoji: '🚀', draw: drawSpaceAdventure, fact: 'Rockets fly at over 25,000 mph to escape Earth’s gravity!' },
+    { id: 'saturn', category: 'space', title: 'Ringed Saturn', emoji: '🪐', draw: drawSaturnRings, fact: 'Saturn’s glowing rings are made of billions of ice and rock pieces!' },
+    { id: 'solar', category: 'space', title: 'Solar System', emoji: '☀️', draw: drawSolarSystem, fact: 'Eight planets orbit around our giant star, the Sun!' },
+
+    { id: 'strawberry', category: 'fruits', title: 'Berry Basket', emoji: '🍓', draw: drawBerryBasket, fact: 'Strawberries are the only fruit with seeds on the outside!' },
+    { id: 'tropical', category: 'fruits', title: 'Tropical Trio', emoji: '🍍', draw: drawTropicalTrio, fact: 'Watermelon is over 90% water—super refreshing!' },
+    { id: 'orchard', category: 'fruits', title: 'Rainbow Orchard', emoji: '🍎', draw: drawRainbowOrchard, fact: 'Apples float in water because 25% of an apple is air!' },
+
+    { id: 'fox', category: 'forest', title: 'Forest Fox', emoji: '🦊', draw: drawForestFox, fact: 'Foxes use their fluffy tails like warm blankets in winter!' },
+    { id: 'owl', category: 'forest', title: 'Night Owl', emoji: '🦉', draw: drawNightOwl, fact: 'Owls can turn their heads almost all the way around!' },
+    { id: 'waterfall', category: 'forest', title: 'Waterfall Glade', emoji: '🦌', draw: drawWaterfallGlade, fact: 'Forest trees clean the air and give homes to thousands of animals!' },
+
+    { id: 'dino', category: 'animals', title: 'Dino Meadow', emoji: '🦕', draw: drawDinoMeadow, fact: 'Some long-necked dinosaurs were as tall as a 4-story building!' },
+    { id: 'ocean', category: 'animals', title: 'Ocean Reef', emoji: '🐠', draw: drawOceanReef, fact: 'Octopuses are super smart and have three hearts!' },
+    { id: 'arctic', category: 'animals', title: 'Polar Friends', emoji: '🐧', draw: drawPolarFriends, fact: 'Emperor penguins can dive deeper than 1,500 feet in icy oceans!' },
+
+    { id: 'castle', category: 'stories', title: 'Rainbow Castle', emoji: '🏰', draw: drawRainbowCastle, fact: 'Fairytale castles had tall lookout towers to spot visitors!' },
+    { id: 'ganesha', category: 'stories', title: 'Little Ganesha', emoji: '🪷', src: './ganeshsa.jpeg', fact: 'Ganesha is loved as the friendly helper of wisdom and new beginnings!' },
+    { id: 'mountain', category: 'stories', title: 'Mount Kailash', emoji: '🏔️', src: './mountain.jpeg', fact: 'High snowy mountains feed clean rivers far down into the valleys!' }
   ];
 
   function createSquareCanvasFromImage(img) {
@@ -728,11 +1315,13 @@
 
       this.pictures = DEFAULT_PICTURES.map((p) => ({ ...p }));
       this.customPicture = null;
+      this.activeCategory = PUZZLE_CATEGORIES[0].id;
       this.activePictureId = 'rocket';
       this.difficulty = 'easy';
       this.mode = 'jigsaw'; // 'jigsaw' | 'swap' | 'slide'
       this.showNumbers = false;
       this.peeking = false;
+      this.screen = 'setup'; // 'setup' | 'play'
 
       this.board = [];
       this.trayPieces = [];
@@ -753,6 +1342,7 @@
 
       this.bestRecords = this._loadBest();
       this._bindEvents();
+      this._renderCategoryTabs();
       this._renderPictureGallery();
     }
 
@@ -771,6 +1361,63 @@
       } catch (_) {}
     }
 
+    _getCompletedSet() {
+      const list = this.profileStore && this.profileStore.profile && Array.isArray(this.profileStore.profile.puzzleCompleted)
+        ? this.profileStore.profile.puzzleCompleted
+        : [];
+      return new Set(list);
+    }
+
+    _getCategoryPictures(categoryId = this.activeCategory) {
+      return this.pictures.filter((p) => p.category === categoryId);
+    }
+
+    _isPictureUnlocked(picId) {
+      if (picId === 'custom' && this.customPicture) return true;
+      const pic = this.pictures.find((p) => p.id === picId);
+      if (!pic) return false;
+      const catPics = this._getCategoryPictures(pic.category);
+      const idx = catPics.findIndex((p) => p.id === picId);
+      if (idx <= 0) return idx === 0;
+      const completed = this._getCompletedSet();
+      return completed.has(picId) || completed.has(catPics[idx - 1].id);
+    }
+
+    _getNextSuggestedPictureId(categoryId = this.activeCategory) {
+      const completed = this._getCompletedSet();
+      const catPics = this._getCategoryPictures(categoryId);
+      for (let i = 0; i < catPics.length; i++) {
+        const pic = catPics[i];
+        if (this._isPictureUnlocked(pic.id) && !completed.has(pic.id)) {
+          return pic.id;
+        }
+      }
+      return (catPics[0] || this.pictures[0]).id;
+    }
+
+    _markPictureCompleted(picId) {
+      if (picId === 'custom') return null;
+      const profile = this.profileStore.profile;
+      if (!Array.isArray(profile.puzzleCompleted)) {
+        profile.puzzleCompleted = [];
+      }
+      const pic = this.pictures.find((p) => p.id === picId);
+      const catPics = pic ? this._getCategoryPictures(pic.category) : [];
+      const idx = catPics.findIndex((p) => p.id === picId);
+      const nextPic = idx >= 0 && idx + 1 < catPics.length ? catPics[idx + 1] : null;
+      const wasNextUnlocked = nextPic ? this._isPictureUnlocked(nextPic.id) : true;
+
+      if (!profile.puzzleCompleted.includes(picId)) {
+        profile.puzzleCompleted.push(picId);
+      }
+      this.profileStore.save(profile);
+
+      if (nextPic && !wasNextUnlocked && this._isPictureUnlocked(nextPic.id)) {
+        return nextPic;
+      }
+      return null;
+    }
+
     _getActivePicture() {
       if (this.activePictureId === 'custom' && this.customPicture) {
         return this.customPicture;
@@ -778,63 +1425,47 @@
       return this.pictures.find((p) => p.id === this.activePictureId) || this.pictures[0];
     }
 
+    setCategory(categoryId) {
+      if (!PUZZLE_CATEGORIES.some((c) => c.id === categoryId)) return;
+      this.activeCategory = categoryId;
+      const currentPic = this._getActivePicture();
+      if (!currentPic || (currentPic.id !== 'custom' && currentPic.category !== categoryId)) {
+        this.activePictureId = this._getNextSuggestedPictureId(categoryId);
+      }
+      const toast = $('puzzle-lock-toast');
+      if (toast) toast.textContent = '';
+      this._renderCategoryTabs();
+      this._renderPictureGallery();
+    }
+
+    _renderCategoryTabs() {
+      const tabsEl = $('puzzle-cat-tabs');
+      if (!tabsEl) return;
+      tabsEl.innerHTML = '';
+      const completed = this._getCompletedSet();
+
+      PUZZLE_CATEGORIES.forEach((cat) => {
+        const catPics = this._getCategoryPictures(cat.id);
+        const doneCount = catPics.filter((p) => completed.has(p.id)).length;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `puzzle-cat-tab ${cat.id === this.activeCategory ? 'active' : ''}`;
+        btn.setAttribute('role', 'tab');
+        btn.setAttribute('aria-selected', String(cat.id === this.activeCategory));
+        btn.innerHTML = `
+          <span class="puzzle-cat-emoji">${cat.emoji}</span>
+          <span class="puzzle-cat-label">${cat.label}</span>
+          ${doneCount > 0 ? `<span class="puzzle-cat-count">${doneCount}/${catPics.length}</span>` : ''}
+        `;
+        btn.addEventListener('click', () => {
+          AudioEngine.pop();
+          this.setCategory(cat.id);
+        });
+        tabsEl.appendChild(btn);
+      });
+    }
+
     _bindEvents() {
-      const picSelect = $('puzzle-pic-select');
-      if (picSelect) {
-        picSelect.addEventListener('change', () => {
-          if (picSelect.value === '__upload__') {
-            picSelect.value = this.activePictureId;
-            AudioEngine.pop();
-            $('puzzle-upload-input').click();
-            return;
-          }
-          AudioEngine.pop();
-          this.selectPicture(picSelect.value);
-        });
-      }
-
-      const diffSelect = $('puzzle-diff-select');
-      if (diffSelect) {
-        diffSelect.addEventListener('change', () => {
-          AudioEngine.pop();
-          this.setDifficulty(diffSelect.value);
-        });
-      }
-
-      const diffSlider = $('puzzle-diff-slider');
-      if (diffSlider) {
-        diffSlider.addEventListener('input', () => {
-          const diffId = DIFFICULTY_ORDER[Number(diffSlider.value)] || 'easy';
-          const lbl = $('puzzle-diff-slider-label');
-          if (lbl) lbl.textContent = DIFFICULTIES[diffId].label;
-        });
-        diffSlider.addEventListener('change', () => {
-          const diffId = DIFFICULTY_ORDER[Number(diffSlider.value)] || 'easy';
-          AudioEngine.pop();
-          this.setDifficulty(diffId);
-        });
-      }
-
-      const optsBtn = $('btn-puzzle-options');
-      const optsDrawer = $('puzzle-options-drawer');
-      const optsClose = $('btn-puzzle-options-close');
-      if (optsBtn && optsDrawer) {
-        optsBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const willOpen = optsDrawer.classList.contains('hidden');
-          optsDrawer.classList.toggle('hidden', !willOpen);
-          optsBtn.setAttribute('aria-expanded', String(willOpen));
-          AudioEngine.pop();
-        });
-      }
-      if (optsClose && optsDrawer && optsBtn) {
-        optsClose.addEventListener('click', () => {
-          optsDrawer.classList.add('hidden');
-          optsBtn.setAttribute('aria-expanded', 'false');
-          AudioEngine.pop();
-        });
-      }
-
       document.querySelectorAll('[data-puzzle-diff]').forEach((btn) => {
         btn.addEventListener('click', () => {
           this.setDifficulty(btn.dataset.puzzleDiff);
@@ -849,32 +1480,46 @@
         });
       });
 
+      const startBtn = $('btn-puzzle-start');
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          AudioEngine.pop();
+          this.startPuzzlePlay();
+        });
+      }
+
+      const toSetupBtn = $('btn-puzzle-to-setup');
+      if (toSetupBtn) {
+        toSetupBtn.addEventListener('click', () => {
+          AudioEngine.pop();
+          this.showSetupScreen();
+        });
+      }
+
+      const allPicsBtn = $('btn-puzzle-all-pics');
+      if (allPicsBtn) {
+        allPicsBtn.addEventListener('click', () => {
+          AudioEngine.pop();
+          this.showSetupScreen();
+        });
+      }
+
       $('btn-puzzle-shuffle').addEventListener('click', () => {
         this.breakPuzzle();
       });
 
-      $('btn-puzzle-numbers').addEventListener('click', () => {
-        this.showNumbers = !this.showNumbers;
-        $('btn-puzzle-numbers').classList.toggle('active', this.showNumbers);
-        $('btn-puzzle-numbers').textContent = this.showNumbers ? '🔢 Numbers: On' : '🔢 Numbers: Off';
-        AudioEngine.pop();
-        this._renderAll();
-      });
-
       $('btn-puzzle-hint').addEventListener('click', () => this.showHint());
 
-      const peekBtn = $('btn-puzzle-peek');
-      peekBtn.addEventListener('click', () => {
+      const togglePeek = () => {
         this.peeking = !this.peeking;
-        peekBtn.classList.toggle('active', this.peeking);
+        $('btn-puzzle-peek').classList.toggle('active', this.peeking);
         $('puzzle-peek-overlay').classList.toggle('hidden', !this.peeking);
         AudioEngine.pop();
-      });
+      };
 
-      $('btn-puzzle-upload').addEventListener('click', () => {
-        AudioEngine.pop();
-        $('puzzle-upload-input').click();
-      });
+      $('btn-puzzle-peek').addEventListener('click', togglePeek);
+      const mobileGoalBtn = $('puzzle-mobile-goal-btn');
+      if (mobileGoalBtn) mobileGoalBtn.addEventListener('click', togglePeek);
 
       $('puzzle-upload-input').addEventListener('change', (e) => {
         const file = e.target.files && e.target.files[0];
@@ -904,14 +1549,7 @@
 
       $('btn-puzzle-next-pic').addEventListener('click', () => {
         AudioEngine.pop();
-        this.cycleNextPicture();
-      });
-
-      $('btn-puzzle-harder').addEventListener('click', () => {
-        AudioEngine.pop();
-        const order = ['easy', 'medium', 'hard', 'master'];
-        const next = order[Math.min(order.length - 1, order.indexOf(this.difficulty) + 1)];
-        this.setDifficulty(next);
+        this.playNextUnlockedPicture();
       });
     }
 
@@ -920,16 +1558,48 @@
     }
 
     start() {
+      if (!this._isPictureUnlocked(this.activePictureId)) {
+        this.activePictureId = this._getNextSuggestedPictureId(this.activeCategory);
+      }
+      this.showSetupScreen();
+    }
+
+    showSetupScreen() {
+      this.stop();
+      this.screen = 'setup';
+      const setupEl = $('puzzle-screen-setup');
+      const playEl = $('puzzle-screen-play');
+      if (setupEl) setupEl.classList.remove('hidden');
+      if (playEl) playEl.classList.add('hidden');
+      const toast = $('puzzle-lock-toast');
+      if (toast) toast.textContent = '';
+
+      const pic = this._getActivePicture();
+      if (pic && pic.category) this.activeCategory = pic.category;
+      if (!this._isPictureUnlocked(this.activePictureId)) {
+        this.activePictureId = this._getNextSuggestedPictureId(this.activeCategory);
+      }
       this._syncToolbarUI();
+      this._renderCategoryTabs();
       this._renderPictureGallery();
-      this.newRound();
+    }
+
+    startPuzzlePlay() {
+      if (!this._isPictureUnlocked(this.activePictureId)) {
+        this.activePictureId = this._getNextSuggestedPictureId(this.activeCategory);
+      }
+      this.screen = 'play';
+      const setupEl = $('puzzle-screen-setup');
+      const playEl = $('puzzle-screen-play');
+      if (setupEl) setupEl.classList.add('hidden');
+      if (playEl) playEl.classList.remove('hidden');
+      const pic = this._getActivePicture();
+      const titleChip = $('puzzle-play-title');
+      if (titleChip && pic) titleChip.textContent = `${pic.emoji} ${pic.title}`;
+      this.newRound(true);
     }
 
     stop() {
-      const optsDrawer = $('puzzle-options-drawer');
-      const optsBtn = $('btn-puzzle-options');
-      if (optsDrawer) optsDrawer.classList.add('hidden');
-      if (optsBtn) optsBtn.setAttribute('aria-expanded', 'false');
       if (this.timerId) {
         clearInterval(this.timerId);
         this.timerId = null;
@@ -948,27 +1618,49 @@
       if (!DIFFICULTIES[diffId]) return;
       this.difficulty = diffId;
       this._syncToolbarUI();
-      this.newRound();
+      if (this.screen === 'play') {
+        this.newRound();
+      }
     }
 
     setMode(mode) {
       if (mode !== 'jigsaw' && mode !== 'swap' && mode !== 'slide') return;
       this.mode = mode;
       this._syncToolbarUI();
-      this.newRound();
+      if (this.screen === 'play') {
+        this.newRound();
+      }
     }
 
     selectPicture(picId) {
+      if (!this._isPictureUnlocked(picId)) return false;
       this.activePictureId = picId;
+      const pic = this._getActivePicture();
+      if (pic && pic.category) this.activeCategory = pic.category;
+      const toast = $('puzzle-lock-toast');
+      if (toast) toast.textContent = '';
+      this._renderCategoryTabs();
       this._renderPictureGallery();
-      this.newRound();
+      if (this.screen === 'play') {
+        const titleChip = $('puzzle-play-title');
+        if (titleChip && pic) titleChip.textContent = `${pic.emoji} ${pic.title}`;
+        this.newRound();
+      }
+      return true;
     }
 
-    cycleNextPicture() {
-      const all = this.customPicture ? [...this.pictures, this.customPicture] : this.pictures;
-      const idx = all.findIndex((p) => p.id === this.activePictureId);
-      const next = all[(idx + 1) % all.length];
-      this.selectPicture(next.id);
+    playNextUnlockedPicture() {
+      const catPics = this._getCategoryPictures(this.activeCategory);
+      const idx = catPics.findIndex((p) => p.id === this.activePictureId);
+      if (idx >= 0 && idx + 1 < catPics.length && this._isPictureUnlocked(catPics[idx + 1].id)) {
+        this.activePictureId = catPics[idx + 1].id;
+      } else {
+        const catIdx = PUZZLE_CATEGORIES.findIndex((c) => c.id === this.activeCategory);
+        const nextCat = PUZZLE_CATEGORIES[(catIdx + 1) % PUZZLE_CATEGORIES.length];
+        this.activeCategory = nextCat.id;
+        this.activePictureId = this._getNextSuggestedPictureId(nextCat.id);
+      }
+      this.startPuzzlePlay();
     }
 
     breakPuzzle() {
@@ -991,7 +1683,8 @@
 
     handleUploadFile(file) {
       if (!file.type.startsWith('image/') && !/\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(file.name || '')) {
-        this._setStatus('Please pick an image file (PNG, JPG, WebP, or GIF)! 🖼️');
+        const toast = $('puzzle-lock-toast');
+        if (toast) toast.textContent = 'Please pick an image file (PNG, JPG, WebP, or GIF)! 🖼️';
         AudioEngine.wrong();
         return;
       }
@@ -1007,39 +1700,31 @@
             title: 'My Photo',
             emoji: '📸',
             canvas,
-            thumbUrl
+            thumbUrl,
+            fact: 'You made your very own custom photo puzzle!'
           };
           this.activePictureId = 'custom';
           AudioEngine.magic();
+          this._renderCategoryTabs();
           this._renderPictureGallery();
-          this.breakPuzzle();
+          this.startPuzzlePlay();
         };
         img.onerror = () => {
-          this._setStatus('Oops! Could not read that picture. Try another photo!');
+          const toast = $('puzzle-lock-toast');
+          if (toast) toast.textContent = 'Oops! Could not read that picture. Try another photo!';
           AudioEngine.wrong();
         };
         img.src = String(reader.result);
       };
       reader.onerror = () => {
-        this._setStatus('Oops! Could not open that file. Try another photo!');
+        const toast = $('puzzle-lock-toast');
+        if (toast) toast.textContent = 'Oops! Could not open that file. Try another photo!';
         AudioEngine.wrong();
       };
       reader.readAsDataURL(file);
     }
 
     _syncToolbarUI() {
-      const diffSelect = $('puzzle-diff-select');
-      if (diffSelect) diffSelect.value = this.difficulty;
-
-      const diffSlider = $('puzzle-diff-slider');
-      const diffIdx = Math.max(0, DIFFICULTY_ORDER.indexOf(this.difficulty));
-      if (diffSlider) diffSlider.value = String(diffIdx);
-
-      const sliderLbl = $('puzzle-diff-slider-label');
-      if (sliderLbl && DIFFICULTIES[this.difficulty]) {
-        sliderLbl.textContent = DIFFICULTIES[this.difficulty].label;
-      }
-
       document.querySelectorAll('[data-puzzle-diff]').forEach((btn) => {
         btn.classList.toggle('active', btn.dataset.puzzleDiff === this.difficulty);
       });
@@ -1049,36 +1734,39 @@
     }
 
     _renderPictureGallery() {
-      const all = this.customPicture ? [this.customPicture, ...this.pictures] : this.pictures;
+      const grid = $('puzzle-gallery-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
 
-      const picSelect = $('puzzle-pic-select');
-      if (picSelect) {
-        picSelect.innerHTML = '';
-        all.forEach((pic) => {
-          const opt = document.createElement('option');
-          opt.value = pic.id;
-          opt.textContent = `${pic.emoji} ${pic.title}`;
-          picSelect.appendChild(opt);
-        });
-        const uploadOpt = document.createElement('option');
-        uploadOpt.value = '__upload__';
-        uploadOpt.textContent = '📷 Upload My Photo...';
-        picSelect.appendChild(uploadOpt);
-        picSelect.value = this.activePictureId;
+      const completed = this._getCompletedSet();
+      const catPics = this._getCategoryPictures(this.activeCategory);
+      const unlockedCount = catPics.filter((p) => this._isPictureUnlocked(p.id)).length;
+      const counterEl = $('puzzle-unlock-counter');
+      if (counterEl) {
+        counterEl.textContent = `${unlockedCount} / ${catPics.length} Unlocked`;
       }
 
-      const strip = $('puzzle-pic-strip');
-      if (!strip) return;
-      strip.innerHTML = '';
+      const all = this.customPicture ? [this.customPicture, ...catPics] : catPics;
 
       all.forEach((pic) => {
+        const isCustom = pic.id === 'custom';
+        const unlocked = this._isPictureUnlocked(pic.id);
+        const isDone = !isCustom && completed.has(pic.id);
+        const isNextUp = unlocked && !isDone && !isCustom;
+        const idx = catPics.findIndex((p) => p.id === pic.id);
+        const prevPic = idx > 0 ? catPics[idx - 1] : null;
+
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `puzzle-pic-chip ${pic.id === this.activePictureId ? 'active' : ''}`;
+        btn.className = 'puzzle-pic-card';
+        if (pic.id === this.activePictureId) btn.classList.add('active');
+        if (isDone) btn.classList.add('completed');
+        if (!unlocked) btn.classList.add('locked');
         btn.dataset.picId = pic.id;
+        btn.setAttribute('aria-label', unlocked ? `${pic.title}` : `${pic.title} (Locked)`);
 
-        const thumb = document.createElement('span');
-        thumb.className = 'puzzle-pic-thumb';
+        const thumb = document.createElement('div');
+        thumb.className = 'puzzle-pic-card-thumb';
         if (pic.thumbUrl) {
           const img = document.createElement('img');
           img.src = pic.thumbUrl;
@@ -1091,6 +1779,12 @@
             img.alt = pic.title;
             thumb.innerHTML = '';
             thumb.appendChild(img);
+            if (!unlocked) {
+              const lockEl = document.createElement('div');
+              lockEl.className = 'puzzle-pic-lock-overlay';
+              lockEl.textContent = '🔒';
+              thumb.appendChild(lockEl);
+            }
           });
         } else if (pic.src) {
           const img = document.createElement('img');
@@ -1101,18 +1795,64 @@
           thumb.textContent = pic.emoji;
         }
 
+        if (!unlocked) {
+          const lockEl = document.createElement('div');
+          lockEl.className = 'puzzle-pic-lock-overlay';
+          lockEl.textContent = '🔒';
+          thumb.appendChild(lockEl);
+        } else if (isDone) {
+          const badge = document.createElement('span');
+          badge.className = 'puzzle-pic-status-badge done';
+          badge.textContent = '✅ Done';
+          btn.appendChild(badge);
+        } else if (isNextUp) {
+          const badge = document.createElement('span');
+          badge.className = 'puzzle-pic-status-badge next-up';
+          badge.textContent = '⭐ Next';
+          btn.appendChild(badge);
+        }
+
         const label = document.createElement('span');
-        label.className = 'puzzle-pic-label';
+        label.className = 'puzzle-pic-card-title';
         label.textContent = `${pic.emoji} ${pic.title}`;
 
         btn.appendChild(thumb);
         btn.appendChild(label);
+
         btn.addEventListener('click', () => {
+          if (!unlocked) {
+            AudioEngine.wrong();
+            btn.classList.remove('shake-lock');
+            void btn.offsetWidth;
+            btn.classList.add('shake-lock');
+            const msg = prevPic
+              ? `🔒 Finish ${prevPic.emoji} ${prevPic.title} first to unlock ${pic.title}!`
+              : `🔒 Complete the puzzle before this to unlock!`;
+            const toast = $('puzzle-lock-toast');
+            if (toast) toast.textContent = msg;
+            AudioEngine.speak(prevPic ? `Finish ${prevPic.title} first!` : 'Finish the previous puzzle first!', 'gentle');
+            return;
+          }
           AudioEngine.pop();
           this.selectPicture(pic.id);
         });
-        strip.appendChild(btn);
+
+        grid.appendChild(btn);
       });
+
+      // Always-available "Upload My Photo" card
+      const uploadCard = document.createElement('button');
+      uploadCard.type = 'button';
+      uploadCard.className = 'puzzle-pic-card puzzle-upload-card';
+      uploadCard.innerHTML = `
+        <div class="puzzle-pic-card-thumb" aria-hidden="true">📷</div>
+        <span class="puzzle-pic-card-title">My Photo</span>
+      `;
+      uploadCard.addEventListener('click', () => {
+        AudioEngine.pop();
+        $('puzzle-upload-input').click();
+      });
+      grid.appendChild(uploadCard);
     }
 
     async newRound(animateScatter = false) {
@@ -1136,6 +1876,8 @@
       $('btn-puzzle-peek').classList.remove('active');
       $('puzzle-peek-overlay').classList.add('hidden');
       $('puzzle-win-banner').classList.add('hidden');
+      const factEl = $('puzzle-fact-box');
+      if (factEl) factEl.classList.add('hidden');
       $('puzzle-board').classList.remove('solved-board');
 
       const token = ++this.loadToken;
@@ -1150,6 +1892,8 @@
         $('puzzle-preview-img').src = this.fullImageUrl;
         $('puzzle-peek-img').src = this.fullImageUrl;
         $('puzzle-board-ghost').src = this.fullImageUrl;
+        const mobileGoalImg = $('puzzle-mobile-goal-img');
+        if (mobileGoalImg) mobileGoalImg.src = this.fullImageUrl;
 
         const total = diff.size * diff.size;
         if (this.mode === 'jigsaw') {
@@ -1169,10 +1913,10 @@
         this._updateStats();
         this._setStatus(
           this.mode === 'jigsaw'
-            ? `Drag or tap a jigsaw piece into its matching spot! (${diff.label})`
+            ? `Drag or tap a piece into its matching spot!`
             : this.mode === 'swap'
-              ? `Drag or tap two pieces to swap! (${diff.label})`
-              : `Tap or slide tiles next to the empty space! (${diff.label})`
+              ? `Drag or tap two pieces to swap!`
+              : `Tap a tile next to the empty space to slide!`
         );
         this._renderAll(animateScatter);
         this._startTimer();
@@ -1189,7 +1933,6 @@
       this.timerId = setInterval(() => {
         if (this.solved) return;
         this.elapsedSec += 1;
-        this._updateTimerLabel();
       }, 1000);
     }
 
@@ -1199,22 +1942,12 @@
       return `${m}:${String(s).padStart(2, '0')}`;
     }
 
-    _updateTimerLabel() {
-      const el = $('puzzle-timer');
-      if (el) el.textContent = this._formatTime(this.elapsedSec);
-    }
-
     _updateStats() {
       const diff = DIFFICULTIES[this.difficulty];
       const total = diff.size * diff.size;
       const correctCount = this.board.reduce((acc, val, idx) => acc + (val === idx ? 1 : 0), 0);
-      const bestKey = `${this.difficulty}_${this.mode}`;
-      const best = this.bestRecords[bestKey];
-
-      $('puzzle-moves').textContent = this.moves;
-      $('puzzle-placed').textContent = `${correctCount}/${total}`;
-      $('puzzle-best').textContent = best ? `${best.moves} moves` : '—';
-      this._updateTimerLabel();
+      const placedEl = $('puzzle-placed');
+      if (placedEl) placedEl.textContent = `${correctCount}/${total}`;
     }
 
     _setStatus(msg) {
@@ -1690,7 +2423,7 @@
     }
 
     handleKey(key) {
-      if (this.solved || this.mode !== 'slide') return;
+      if (this.screen !== 'play' || this.solved || this.mode !== 'slide') return;
       const size = DIFFICULTIES[this.difficulty].size;
       const emptyVal = size * size - 1;
       const emptyPos = this.board.indexOf(emptyVal);
@@ -1812,13 +2545,63 @@
       spawnFloatingPop($('puzzle-board'), `+${diff.stars} ⭐ & ${treasure.emoji}`);
 
       const pic = this._getActivePicture();
-      const winMsg = `🎉 You solved ${pic.emoji} ${pic.title} in ${this.moves} moves (${this._formatTime(this.elapsedSec)})! +${diff.stars} ⭐ + ${treasure.emoji} ${treasure.name}!${isNewBest ? ' 🏆 New Best!' : ''}`;
+      const newlyUnlocked = this._markPictureCompleted(pic.id);
+      this._renderCategoryTabs();
+      this._renderPictureGallery();
+
+      const catPics = pic.category ? this._getCategoryPictures(pic.category) : [];
+      const idx = catPics.findIndex((p) => p.id === pic.id);
+      const nextInCat = idx >= 0 && idx + 1 < catPics.length ? catPics[idx + 1] : null;
+      let nextPic = nextInCat;
+      if (!nextPic) {
+        const catIdx = PUZZLE_CATEGORIES.findIndex((c) => c.id === this.activeCategory);
+        const nextCat = PUZZLE_CATEGORIES[(catIdx + 1) % PUZZLE_CATEGORIES.length];
+        const nextCatPics = this._getCategoryPictures(nextCat.id);
+        nextPic = nextCatPics[0] || null;
+      }
+
+      const winMsg = `🎉 Awesome! You solved ${pic.emoji} ${pic.title}! +${diff.stars} ⭐ + ${treasure.emoji} ${treasure.name}!`;
       this._setStatus(winMsg);
       $('puzzle-win-text').textContent = winMsg;
-      $('puzzle-win-banner').classList.remove('hidden');
-      $('btn-puzzle-harder').classList.toggle('hidden', this.difficulty === 'master');
 
-      AudioEngine.speak(`Awesome job! You solved the ${pic.title} puzzle!`, 'cheer');
+      const unlockPill = $('puzzle-unlock-pill');
+      if (unlockPill) {
+        if (newlyUnlocked) {
+          unlockPill.textContent = `🔓 Unlocked: ${newlyUnlocked.emoji} ${newlyUnlocked.title}!`;
+          unlockPill.classList.remove('hidden');
+        } else {
+          unlockPill.classList.add('hidden');
+        }
+      }
+
+      const factEl = $('puzzle-fact-box');
+      if (factEl) {
+        if (pic.fact) {
+          factEl.textContent = `💡 Did you know? ${pic.fact}`;
+          factEl.classList.remove('hidden');
+        } else {
+          factEl.classList.add('hidden');
+        }
+      }
+
+      const nextBtn = $('btn-puzzle-next-pic');
+      if (nextBtn) {
+        if (nextPic) {
+          nextBtn.textContent = `➡ Play ${nextPic.emoji} ${nextPic.title}`;
+          nextBtn.classList.remove('hidden');
+        } else {
+          nextBtn.classList.add('hidden');
+        }
+      }
+
+      $('puzzle-win-banner').classList.remove('hidden');
+
+      AudioEngine.speak(
+        newlyUnlocked
+          ? `Awesome job! You finished ${pic.title} and unlocked ${newlyUnlocked.title}!`
+          : `Awesome job! You solved the ${pic.title} puzzle! ${pic.fact || ''}`,
+        'cheer'
+      );
     }
   }
 
