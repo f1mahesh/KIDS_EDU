@@ -46,7 +46,8 @@ button {
   user-select: none;
 }
 
-.hidden {
+#legacy-views-host.hidden,
+#legacy-views-host .hidden {
   display: none !important;
 }
 

@@ -65,6 +65,19 @@ export interface KidProfile {
 export interface ProfilesStoreData {
   activeId: string;
   profiles: Record<string, KidProfile>;
+  updatedAt?: number;
+}
+
+export interface DeviceStorageStatus {
+  persisted: boolean;
+  idbReady: boolean;
+  opfsReady: boolean;
+  supportsFilePicker: boolean;
+  supportsShareFiles: boolean;
+  usageBytes: number;
+  quotaBytes: number;
+  linkedFileName: string | null;
+  filePermission: 'none' | 'granted' | 'prompt';
 }
 
 export interface BadgeDef {
@@ -120,6 +133,16 @@ export interface KidAppBridge {
   };
   launchConfetti: (count?: number) => void;
   spawnFloatingPop: (el: HTMLElement | null, text?: string) => void;
+  DeviceStorage?: {
+    requestPersistence: () => Promise<boolean>;
+    persistProfiles: (store: ProfilesStoreData) => Promise<void>;
+    loadDurableProfiles: () => Promise<ProfilesStoreData | null>;
+    getStatus: () => Promise<DeviceStorageStatus>;
+    linkSaveFile: (store: ProfilesStoreData) => Promise<{ ok: boolean; fileName?: string; reason?: string }>;
+    reconnectSaveFile: (store: ProfilesStoreData) => Promise<{ ok: boolean; fileName?: string }>;
+    unlinkSaveFile: () => Promise<void>;
+    shareOrDownloadBackup: (store: ProfilesStoreData) => Promise<{ ok: boolean; method: string }>;
+  };
   boot?: () => void;
   bridge?: {
     profileStore: {

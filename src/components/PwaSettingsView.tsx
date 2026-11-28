@@ -1,12 +1,14 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { PwaStatus } from '../pwa/usePwaSetup';
-import { KidProfile, ProfilesStoreData, getKidApp } from '../types/kidapp';
+import { DeviceStorageStatus, KidProfile, ProfilesStoreData, getKidApp } from '../types/kidapp';
 
 interface PwaSettingsViewProps {
   pwaStatus: PwaStatus;
   onTriggerInstall: () => Promise<boolean>;
   isDark: boolean;
   onToggleTheme: () => void;
+  transparencyPct: number;
+  onChangeTransparency: (pct: number) => void;
   profile: KidProfile;
   onStoreUpdated: () => void;
 }
@@ -19,11 +21,19 @@ const GROWNUP_CHALLENGES = [
   { q: '8 × 4 = ?', a: 32 }
 ];
 
+function formatBytes(bytes: number): string {
+  if (!bytes || bytes < 1024) return `${bytes || 0} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function PwaSettingsView({
   pwaStatus,
   onTriggerInstall,
   isDark,
   onToggleTheme,
+  transparencyPct,
+  onChangeTransparency,
   profile,
   onStoreUpdated
 }: PwaSettingsViewProps) {
@@ -38,10 +48,24 @@ export function PwaSettingsView({
   const [gateError, setGateError] = useState(false);
   const [backupMessage, setBackupMessage] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [storageStatus, setStorageStatus] = useState<DeviceStorageStatus | null>(null);
 
-  const challenge = GROWNUP_CHALLENGES[challengeIdx];
+  const refreshStorageStatus = useCallback(async () => {
+    const ds = getKidApp()?.DeviceStorage;
+    if (!ds) return;
+    const st = await ds.getStatus();
+    setStorageStatus(st);
+  }, []);
+
+  useEffect(() => {
+    void refreshStorageStatus();
+    const onStorageChange = () => void refreshStorageStatus();
+    window.addEventListener('kidapp:storage-change', onStorageChange);
+    return () => window.removeEventListener('kidapp:storage-change', onStorageChange);
+  }, [refreshStorageStatus]);
 
   const tryUnlock = () => {
+    const challenge = GROWNUP_CHALLENGES[challengeIdx];
     if (Number(gateInput.trim()) === challenge.a) {
       app?.AudioEngine.correct();
       setUnlocked(true);
@@ -54,23 +78,53 @@ export function PwaSettingsView({
     }
   };
 
-  const handleExportBackup = () => {
+  const handleSaveToFiles = async () => {
     const store = app?.bridge?.profileStore.store;
-    if (!store) return;
-    const payload = {
-      app: 'PlaySpark',
-      version: 2,
-      exportedAt: new Date().toISOString(),
-      data: store
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `playspark-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setBackupMessage('✅ Backup JSON downloaded!');
+    const ds = app?.DeviceStorage;
+    if (!store || !ds) return;
+    const res = await ds.shareOrDownloadBackup(store);
+    if (res.ok) {
+      setBackupMessage(
+        res.method === 'share'
+          ? '✅ Opened Share Sheet — choose "Save to Files" or iCloud Drive!'
+          : '✅ Backup JSON downloaded to your device!'
+      );
+    }
+  };
+
+  const handleLinkDeviceFile = async () => {
+    const store = app?.bridge?.profileStore.store;
+    const ds = app?.DeviceStorage;
+    if (!store || !ds) return;
+    const res = await ds.linkSaveFile(store);
+    if (res.ok) {
+      app?.AudioEngine.correct();
+      setBackupMessage(`✅ Auto-saving progress directly to "${res.fileName}" on your device!`);
+      void refreshStorageStatus();
+    } else if (res.reason !== 'cancelled') {
+      setBackupMessage('ℹ️ File linking is not supported on this browser; use Save to Files instead.');
+    }
+  };
+
+  const handleReconnectDeviceFile = async () => {
+    const store = app?.bridge?.profileStore.store;
+    const ds = app?.DeviceStorage;
+    if (!store || !ds) return;
+    const res = await ds.reconnectSaveFile(store);
+    if (res.ok) {
+      setBackupMessage(`✅ Reconnected auto-save file "${res.fileName}".`);
+      void refreshStorageStatus();
+    } else {
+      setBackupMessage('⚠️ Could not reconnect file permission.');
+    }
+  };
+
+  const handleUnlinkDeviceFile = async () => {
+    const ds = app?.DeviceStorage;
+    if (!ds) return;
+    await ds.unlinkSaveFile();
+    setBackupMessage('Unlinked auto-save file (progress still stays saved in app storage).');
+    void refreshStorageStatus();
   };
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +142,8 @@ export function PwaSettingsView({
       app.bridge.profileStore.replaceStore(storeCandidate);
       onStoreUpdated();
       app.AudioEngine.fanfare();
-      setBackupMessage('✅ Profiles and stars restored successfully!');
+      setBackupMessage('✅ Profiles and stars restored to device storage!');
+      void refreshStorageStatus();
     } catch (err) {
       app?.AudioEngine.wrong();
       setBackupMessage(
@@ -103,7 +158,10 @@ export function PwaSettingsView({
     onStoreUpdated();
     setConfirmReset(false);
     setBackupMessage('🔄 Current kid profile reset to fresh starter state.');
+    void refreshStorageStatus();
   };
+
+  const challenge = GROWNUP_CHALLENGES[challengeIdx];
 
   return (
     <div className="flex flex-col gap-4">
@@ -112,10 +170,10 @@ export function PwaSettingsView({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-lg font-extrabold tracking-tight sm:text-xl">
-              ⚙️ App Settings &amp; Offline PWA
+              ⚙️ App Settings &amp; Device Storage
             </h1>
             <p className="mt-0.5 text-xs opacity-75">
-              Install PlaySpark on your home screen, toggle Glass mode, or manage backups.
+              Install PlaySpark on your home screen, toggle Glass mode, or manage phone backups.
             </p>
           </div>
 
@@ -130,7 +188,7 @@ export function PwaSettingsView({
           )}
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
           <div className="liquid-glass rounded-2xl p-3">
             <div className="text-xs font-semibold opacity-70">Web Manifest</div>
             <div className="mt-1 text-sm font-extrabold">
@@ -153,6 +211,21 @@ export function PwaSettingsView({
                 : '⏳ Initializing'}
             </div>
           </div>
+          <div className="liquid-glass rounded-2xl p-3">
+            <div className="text-xs font-semibold opacity-70">Phone App Storage</div>
+            <div className="mt-1 text-sm font-extrabold">
+              {storageStatus?.persisted
+                ? '🔒 Persistent Device'
+                : storageStatus?.opfsReady || storageStatus?.idbReady
+                ? '💾 App Storage Active'
+                : '💾 Local Storage'}
+            </div>
+            {storageStatus && storageStatus.usageBytes > 0 && (
+              <div className="tabular-nums mt-0.5 text-[11px] opacity-65">
+                {formatBytes(storageStatus.usageBytes)} used
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -165,7 +238,8 @@ export function PwaSettingsView({
             <div className="mt-3 rounded-2xl border border-emerald-400/35 bg-emerald-500/10 p-4 text-sm">
               <strong>You are running PlaySpark as an installed app!</strong>
               <p className="mt-1 text-xs opacity-80">
-                All math blocks, phonics games, puzzles, and stories stay cached for offline play.
+                All math blocks, phonics games, puzzles, and progress are stored on your device for
+                offline play.
               </p>
             </div>
           )}
@@ -197,7 +271,8 @@ export function PwaSettingsView({
                   Scroll down and tap <strong>&quot;Add to Home Screen&quot;</strong>.
                 </li>
                 <li>
-                  Tap <strong>Add</strong> — PlaySpark opens full-screen without browser bars!
+                  Tap <strong>Add</strong> — PlaySpark gets its own isolated app storage on your
+                  device!
                 </li>
               </ol>
             </div>
@@ -230,24 +305,71 @@ export function PwaSettingsView({
         </section>
 
         <section className="liquid-glass rounded-[26px] p-4 sm:p-5 lg:col-span-5">
-          <h2 className="text-base font-extrabold tracking-tight">🌗 Visual Theme</h2>
+          <h2 className="text-base font-extrabold tracking-tight">🌗 Glass Theme &amp; Transparency</h2>
           <p className="mt-1 text-xs opacity-75">
-            Switch between crisp daytime Light Glass and bedtime Dark Glass.
+            Switch Light/Dark Glass or adjust transparency up to Complete Glass.
           </p>
           <button
             type="button"
             onClick={onToggleTheme}
-            className="liquid-glass mt-4 flex min-h-[48px] w-full items-center justify-between rounded-2xl px-4 text-sm font-bold transition hover:brightness-105 active:scale-[0.98]"
+            className="liquid-glass mt-3 flex min-h-[44px] w-full items-center justify-between rounded-2xl px-4 text-sm font-bold transition hover:brightness-105 active:scale-[0.98]"
           >
             <span>{isDark ? '🌙 Dark Glass Active' : '☀️ Light Glass Active'}</span>
-            <span className="rounded-full bg-indigo-600 px-3 py-1 text-xs text-white">
-              Switch
-            </span>
+            <span className="liquid-glass-active rounded-full px-3 py-1 text-xs">Switch</span>
           </button>
+
+          <div className="mt-4">
+            <div className="mb-1.5 flex items-center justify-between text-xs font-extrabold">
+              <span>🫧 Glass Transparency</span>
+              <span className="tabular-nums rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-indigo-700 dark:text-indigo-200">
+                {transparencyPct}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min={10}
+              max={95}
+              step={5}
+              value={transparencyPct}
+              onChange={(e) => onChangeTransparency(Number(e.target.value))}
+              aria-label="Glass Transparency Percentage"
+              className="w-full cursor-pointer accent-indigo-600"
+            />
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {[
+                { label: 'Frosted 25%', value: 25 },
+                { label: 'Balanced 55%', value: 55 },
+                { label: 'Complete Glass 90%', value: 90 }
+              ].map((preset) => (
+                <button
+                  key={preset.value}
+                  type="button"
+                  onClick={() => onChangeTransparency(preset.value)}
+                  className={`min-h-[32px] rounded-full px-2.5 text-[11px] font-bold transition ${
+                    transparencyPct === preset.value
+                      ? 'liquid-glass-active'
+                      : 'liquid-glass opacity-80 hover:opacity-100'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Live Glass Preview Strip */}
+            <div className="relative mt-3 overflow-hidden rounded-2xl bg-gradient-to-r from-pink-500 via-sky-400 to-emerald-400 p-2.5">
+              <div className="liquid-glass-capsule flex items-center justify-between rounded-full px-3 py-1.5">
+                <span className="text-[11px] font-bold">Preview Bar</span>
+                <span className="liquid-glass-active rounded-full px-2.5 py-0.5 text-[11px] font-extrabold">
+                  Selected
+                </span>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
 
-      {/* Grown-Ups Gate Protecting Export / Import / Reset */}
+      {/* Grown-Ups Gate Protecting Device File Sync / Export / Import / Reset */}
       <section className="liquid-glass rounded-[26px] p-4 sm:p-5">
         {!unlocked ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -257,10 +379,10 @@ export function PwaSettingsView({
               </span>
               <div>
                 <h2 className="text-base font-extrabold tracking-tight">
-                  👨‍👩‍👧 Grown-Ups Backup &amp; Reset
+                  👨‍👩‍👧 Grown-Ups Device Storage &amp; Backup
                 </h2>
                 <p className="text-xs opacity-70">
-                  Solve to export, restore, or reset kid progress for{' '}
+                  Solve to link a phone save file, save to Files/iCloud, restore, or reset{' '}
                   <strong>{profile.name || 'Kid'}</strong>
                 </p>
               </div>
@@ -289,20 +411,19 @@ export function PwaSettingsView({
               >
                 🔓 Unlock
               </button>
-              {gateError && (
-                <span className="text-xs font-bold text-rose-500">Try again!</span>
-              )}
+              {gateError && <span className="text-xs font-bold text-rose-500">Try again!</span>}
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h2 className="text-base font-extrabold tracking-tight">
-                  💾 Local-First Backups &amp; Reset
+                  💾 Phone Storage &amp; Backups
                 </h2>
                 <p className="text-xs opacity-70">
-                  Save all kid profiles, stars, treasures, and puzzle unlocks as a JSON file.
+                  Progress auto-saves in persistent device storage (IndexedDB + OPFS). You can also
+                  back up directly to your phone&apos;s Files folder.
                 </p>
               </div>
               <button
@@ -318,6 +439,58 @@ export function PwaSettingsView({
               </button>
             </div>
 
+            {/* Android / Desktop Real Device Auto-Save File */}
+            {storageStatus?.supportsFilePicker && (
+              <div className="rounded-2xl border border-indigo-400/30 bg-indigo-500/10 p-3.5 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="font-extrabold">
+                      📁 Auto-Save to Real Device File (Android / Desktop)
+                    </div>
+                    <div className="mt-0.5 opacity-80">
+                      {storageStatus.linkedFileName
+                        ? `Linked: ${storageStatus.linkedFileName} (${
+                            storageStatus.filePermission === 'granted'
+                              ? 'Auto-saving live'
+                              : 'Tap Reconnect to resume'
+                          })`
+                        : 'Pick a .json file in Downloads or Documents once — PlaySpark will auto-save every star to it.'}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {!storageStatus.linkedFileName ? (
+                      <button
+                        type="button"
+                        onClick={() => void handleLinkDeviceFile()}
+                        className="min-h-[40px] rounded-full bg-indigo-600 px-3.5 font-extrabold text-white"
+                      >
+                        📁 Link Save File
+                      </button>
+                    ) : (
+                      <>
+                        {storageStatus.filePermission !== 'granted' && (
+                          <button
+                            type="button"
+                            onClick={() => void handleReconnectDeviceFile()}
+                            className="min-h-[40px] rounded-full bg-indigo-600 px-3.5 font-extrabold text-white"
+                          >
+                            🔄 Reconnect
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => void handleUnlinkDeviceFile()}
+                          className="liquid-glass min-h-[40px] rounded-full px-3.5 font-bold"
+                        >
+                          Unlink
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <input
               ref={fileInputRef}
               type="file"
@@ -329,10 +502,10 @@ export function PwaSettingsView({
             <div className="flex flex-wrap gap-2.5">
               <button
                 type="button"
-                onClick={handleExportBackup}
+                onClick={() => void handleSaveToFiles()}
                 className="min-h-[48px] rounded-full bg-indigo-600 px-4 text-xs font-extrabold text-white shadow transition hover:brightness-105 active:scale-[0.98]"
               >
-                ⬇️ Export Backup (JSON)
+                📲 Save to Files / Download JSON
               </button>
               <button
                 type="button"

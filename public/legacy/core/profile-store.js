@@ -147,7 +147,13 @@ class ProfileStore {
   save(nextProfile = this.profile) {
     this.profile = ensureProfileShape(nextProfile);
     this.store.profiles[this.store.activeId] = this.profile;
-    localStorage.setItem(PROFILES_STORE_KEY, JSON.stringify(this.store));
+    this.store.updatedAt = Date.now();
+    try {
+      localStorage.setItem(PROFILES_STORE_KEY, JSON.stringify(this.store));
+    } catch (_) {}
+    if (app.DeviceStorage) {
+      app.DeviceStorage.persistProfiles(this.store);
+    }
     return this.profile;
   }
 
@@ -245,11 +251,39 @@ class ProfileStore {
         ? nextStore.activeId
         : Object.keys(sanitizedProfiles)[0];
 
-    this.store = { activeId, profiles: sanitizedProfiles };
+    this.store = { activeId, profiles: sanitizedProfiles, updatedAt: Date.now() };
     this.profile = ensureProfileShape(this.store.profiles[activeId]);
     this.currentStreak = 0;
-    localStorage.setItem(PROFILES_STORE_KEY, JSON.stringify(this.store));
+    try {
+      localStorage.setItem(PROFILES_STORE_KEY, JSON.stringify(this.store));
+    } catch (_) {}
+    if (app.DeviceStorage) {
+      app.DeviceStorage.persistProfiles(this.store);
+    }
     return this.profile;
+  }
+
+  async hydrateFromDevice() {
+    if (!app.DeviceStorage) return false;
+    await app.DeviceStorage.requestPersistence();
+    const durable = await app.DeviceStorage.loadDurableProfiles();
+    if (!durable || !durable.profiles) {
+      // Seed durable storage from existing localStorage on first run
+      if (this.profile.name || this.profile.stars > 0 || this.profile.solved > 0) {
+        await app.DeviceStorage.persistProfiles(this.store);
+      }
+      return false;
+    }
+
+    const localTs = this.store.updatedAt || 0;
+    const durableTs = durable.updatedAt || 0;
+    const localHasData = Boolean(this.profile.name || this.profile.stars > 0 || this.profile.solved > 0);
+
+    if (!localHasData || durableTs > localTs) {
+      this.replaceStore(durable);
+      return true;
+    }
+    return false;
   }
 
   recordAttempt(statKey, isCorrect) {

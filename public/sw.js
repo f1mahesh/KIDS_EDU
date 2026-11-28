@@ -1,4 +1,4 @@
-const CACHE_NAME = 'playspark-lg-v1';
+const CACHE_NAME = 'playspark-lg-v2';
 const APP_SHELL = [
   './',
   './index.html',

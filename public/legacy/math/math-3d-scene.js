@@ -159,6 +159,13 @@ class Math3DScene {
     this.rafId = requestAnimationFrame(loop);
   }
 
+  stop() {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+  }
+
   _buildCubes() {
     const cubes = [];
     const t = this.animProgress;

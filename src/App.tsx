@@ -13,9 +13,10 @@ import { AgeBandId, HelpTopicData, KidProfile, getKidApp } from './types/kidapp'
 type NavTab = 'home' | 'charts' | 'settings';
 
 const THEME_STORAGE_KEY = 'playspark_glass_theme';
+const TRANSPARENCY_STORAGE_KEY = 'playspark_glass_transparency';
 
 const CONTEXT_PILLS: Array<{ id: ContextFilter; label: string }> = [
-  { id: 'recommended', label: '🌟 For Me' },
+  { id: 'recommended', label: '🌟 Home' },
   { id: 'english', label: '📖 ABC' },
   { id: 'math', label: '🔢 123' },
   { id: 'fun', label: '🎨 Play' },
@@ -32,6 +33,14 @@ export default function App() {
       return localStorage.getItem(THEME_STORAGE_KEY) === 'dark';
     } catch {
       return false;
+    }
+  });
+  const [transparencyPct, setTransparencyPct] = useState<number>(() => {
+    try {
+      const saved = Number(localStorage.getItem(TRANSPARENCY_STORAGE_KEY));
+      return Number.isFinite(saved) && saved >= 10 && saved <= 95 ? saved : 55;
+    } catch {
+      return 55;
     }
   });
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('web');
@@ -69,13 +78,41 @@ export default function App() {
   });
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDark);
+    const root = document.documentElement;
+    root.classList.toggle('dark', isDark);
+
+    const t = Math.min(95, Math.max(10, transparencyPct)) / 100;
+    const surfaceAlpha = Math.max(0.08, 0.92 - t * 0.84).toFixed(2);
+    const elevatedAlpha = Math.max(0.14, 0.95 - t * 0.81).toFixed(2);
+    const capsuleAlpha = Math.max(0.06, 0.82 - t * 0.78).toFixed(2);
+    const activeAlpha = Math.max(0.28, 0.9 - t * 0.62).toFixed(2);
+    const blurPx = Math.round(28 - t * 16);
+
+    root.style.setProperty(
+      '--lg-surface',
+      isDark ? `rgba(28, 28, 34, ${surfaceAlpha})` : `rgba(255, 255, 255, ${surfaceAlpha})`
+    );
+    root.style.setProperty(
+      '--lg-surface-elevated',
+      isDark ? `rgba(38, 38, 46, ${elevatedAlpha})` : `rgba(255, 255, 255, ${elevatedAlpha})`
+    );
+    root.style.setProperty(
+      '--lg-capsule-bg',
+      isDark ? `rgba(22, 24, 34, ${capsuleAlpha})` : `rgba(255, 255, 255, ${capsuleAlpha})`
+    );
+    root.style.setProperty(
+      '--lg-active-bg',
+      isDark ? `rgba(99, 102, 241, ${activeAlpha})` : `rgba(79, 70, 229, ${activeAlpha})`
+    );
+    root.style.setProperty('--lg-blur', `${blurPx}px`);
+
     try {
       localStorage.setItem(THEME_STORAGE_KEY, isDark ? 'dark' : 'light');
+      localStorage.setItem(TRANSPARENCY_STORAGE_KEY, String(transparencyPct));
     } catch {
       // ignore storage errors
     }
-  }, [isDark]);
+  }, [isDark, transparencyPct]);
 
   useGlobalShortcuts(searchInputRef, !inGameplay);
 
@@ -89,6 +126,7 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false;
+    let autoOpenedProfile = false;
     const initBridge = () => {
       const app = getKidApp();
       if (!app || typeof app.boot !== 'function') {
@@ -99,6 +137,7 @@ export default function App() {
       syncFromBridge();
       const prof = app.bridge?.profileStore.profile;
       if (prof && !prof.name) {
+        autoOpenedProfile = true;
         setDraftName('');
         setDraftAvatar(prof.avatar || '🦁');
         setDraftAge(prof.ageBand || '4-6');
@@ -110,6 +149,14 @@ export default function App() {
 
     const onReady = () => initBridge();
     const onStateChange = () => syncFromBridge();
+    const onStorageChange = () => {
+      syncFromBridge();
+      const prof = getKidApp()?.bridge?.profileStore.profile;
+      if (autoOpenedProfile && prof?.name) {
+        autoOpenedProfile = false;
+        setProfileOpen(false);
+      }
+    };
     const onViewChange = (e: Event) => {
       const detail = (e as CustomEvent<{ view: string; inGameplay: boolean }>).detail;
       if (!detail) return;
@@ -129,6 +176,7 @@ export default function App() {
 
     window.addEventListener('kidapp:ready', onReady);
     window.addEventListener('kidapp:state-change', onStateChange);
+    window.addEventListener('kidapp:storage-change', onStorageChange);
     window.addEventListener('kidapp:view-change', onViewChange);
     window.addEventListener('kidapp:help', onHelp);
     window.addEventListener('kidapp:help-close', onHelpClose);
@@ -137,6 +185,7 @@ export default function App() {
       cancelled = true;
       window.removeEventListener('kidapp:ready', onReady);
       window.removeEventListener('kidapp:state-change', onStateChange);
+      window.removeEventListener('kidapp:storage-change', onStorageChange);
       window.removeEventListener('kidapp:view-change', onViewChange);
       window.removeEventListener('kidapp:help', onHelp);
       window.removeEventListener('kidapp:help-close', onHelpClose);
@@ -264,7 +313,7 @@ export default function App() {
           {/* ZONE 1: STICKY TOP GLASS BAR & HORIZONTAL CONTEXT STRIP */}
           {!inGameplay && (
             <header className="sticky top-[max(0.5rem,env(safe-area-inset-top))] z-30 mb-4 flex flex-col gap-2.5">
-              <div className="liquid-glass-elevated flex flex-wrap items-center justify-between gap-2 rounded-[26px] px-3 py-2 sm:px-4">
+              <div className="liquid-glass-capsule flex flex-wrap items-center justify-between gap-2 rounded-[26px] px-3 py-2 sm:px-4">
                 {/* Brand + Kid Stats */}
                 <div className="flex items-center gap-2">
                   <button
@@ -319,7 +368,7 @@ export default function App() {
                       onClick={() => switchToTab('home')}
                       className={`min-h-[36px] rounded-full px-3.5 text-xs font-extrabold transition ${
                         activeTab === 'home' && !isLegacyActive
-                          ? 'bg-indigo-600 text-white shadow-sm'
+                          ? 'liquid-glass-active'
                           : 'opacity-75 hover:opacity-100'
                       }`}
                     >
@@ -330,7 +379,7 @@ export default function App() {
                       onClick={() => switchToTab('charts')}
                       className={`min-h-[36px] rounded-full px-3.5 text-xs font-extrabold transition ${
                         activeTab === 'charts' && !isLegacyActive
-                          ? 'bg-indigo-600 text-white shadow-sm'
+                          ? 'liquid-glass-active'
                           : 'opacity-75 hover:opacity-100'
                       }`}
                     >
@@ -341,7 +390,7 @@ export default function App() {
                       onClick={() => switchToTab('settings')}
                       className={`min-h-[36px] rounded-full px-3.5 text-xs font-extrabold transition ${
                         activeTab === 'settings' && !isLegacyActive
-                          ? 'bg-indigo-600 text-white shadow-sm'
+                          ? 'liquid-glass-active'
                           : 'opacity-75 hover:opacity-100'
                       }`}
                     >
@@ -439,7 +488,7 @@ export default function App() {
                         }}
                         className={`min-h-[38px] shrink-0 rounded-full px-3.5 text-xs font-extrabold transition duration-200 active:scale-[0.98] ${
                           active
-                            ? 'bg-indigo-600 text-white shadow-sm'
+                            ? 'liquid-glass-active'
                             : 'liquid-glass opacity-85 hover:opacity-100'
                         }`}
                       >
@@ -463,6 +512,10 @@ export default function App() {
                 contextFilter={contextFilter}
                 isCompact={isCompact}
                 onSelectAgeBand={handleSelectAgeBand}
+                onResetFilter={() => {
+                  setContextFilter('recommended');
+                  setSearchQuery('');
+                }}
                 onLaunchActivity={(id) => bridge?.launchActivity(id)}
                 onToggleFavorite={handleToggleFavorite}
                 onOpenWorld={(w) => bridge?.openWorld(w)}
@@ -494,6 +547,8 @@ export default function App() {
                 onTriggerInstall={triggerInstallPrompt}
                 isDark={isDark}
                 onToggleTheme={() => setIsDark((d) => !d)}
+                transparencyPct={transparencyPct}
+                onChangeTransparency={setTransparencyPct}
                 profile={profile}
                 onStoreUpdated={syncFromBridge}
               />
@@ -504,23 +559,23 @@ export default function App() {
         </DevicePreviewShell>
       </div>
 
-      {/* MOBILE FLOATING BOTTOM GLASS CAPSULE (3 Tabs) + DETACHED + FAB */}
+      {/* MOBILE FLOATING BOTTOM GLASS CAPSULE (3 Tabs) */}
       {!inGameplay && (
         <div
-          className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-0 right-0 z-40 flex items-center justify-center gap-3 px-4 ${
+          className={`pointer-events-none fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-0 right-0 z-40 flex items-center justify-center px-4 ${
             isCompact ? '' : 'md:hidden'
           }`}
         >
           <nav
             aria-label="Mobile navigation"
-            className="liquid-glass-elevated flex items-center gap-1 rounded-full p-1.5"
+            className="liquid-glass-capsule pointer-events-auto flex items-center gap-1 rounded-full p-1.5"
           >
             <button
               type="button"
               onClick={() => switchToTab('home')}
               className={`min-h-[48px] rounded-full px-4 text-xs font-extrabold transition ${
                 activeTab === 'home' && !isLegacyActive
-                  ? 'bg-indigo-600 text-white shadow'
+                  ? 'liquid-glass-active'
                   : 'opacity-80 hover:opacity-100'
               }`}
             >
@@ -531,7 +586,7 @@ export default function App() {
               onClick={() => switchToTab('charts')}
               className={`min-h-[48px] rounded-full px-4 text-xs font-extrabold transition ${
                 activeTab === 'charts' && !isLegacyActive
-                  ? 'bg-indigo-600 text-white shadow'
+                  ? 'liquid-glass-active'
                   : 'opacity-80 hover:opacity-100'
               }`}
             >
@@ -542,23 +597,13 @@ export default function App() {
               onClick={() => switchToTab('settings')}
               className={`min-h-[48px] rounded-full px-4 text-xs font-extrabold transition ${
                 activeTab === 'settings' && !isLegacyActive
-                  ? 'bg-indigo-600 text-white shadow'
+                  ? 'liquid-glass-active'
                   : 'opacity-80 hover:opacity-100'
               }`}
             >
               ⚙️ Settings
             </button>
           </nav>
-
-          <button
-            type="button"
-            onClick={handleQuickCreateAction}
-            aria-label="Quick Math Challenge"
-            title="Quick Math Challenge"
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-2xl font-extrabold text-white shadow-xl transition hover:brightness-105 active:scale-95"
-          >
-            +
-          </button>
         </div>
       )}
 

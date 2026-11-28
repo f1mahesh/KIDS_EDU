@@ -646,8 +646,17 @@
         }
       },
       mountHeroCanvas: (canvas) => {
-        if (!canvas) return;
+        if (!canvas) {
+          if (heroScene && typeof heroScene.stop === 'function') {
+            heroScene.stop();
+            heroScene = null;
+          }
+          return;
+        }
         if (!heroScene || heroScene.canvas !== canvas) {
+          if (heroScene && typeof heroScene.stop === 'function') {
+            heroScene.stop();
+          }
           heroScene = new Math3DScene(canvas, { mode: 'hero', autoSpin: true });
         }
       },
@@ -657,6 +666,12 @@
 
     hydrateStaticActivityCards();
     refreshHeader();
+    profileStore.hydrateFromDevice().then((restored) => {
+      if (restored) {
+        refreshHeader();
+      }
+      window.dispatchEvent(new CustomEvent('kidapp:storage-change'));
+    });
   };
 
   window.dispatchEvent(new CustomEvent('kidapp:ready'));
