@@ -206,16 +206,25 @@ const HELP_TOPICS = {
 function openHelpModal(topic) {
   AudioEngine.pop();
   const data = HELP_TOPICS[topic] || HELP_TOPICS.setup;
-  $('help-modal-title').textContent = data.title;
-  $('help-modal-body').innerHTML = data.body;
-  $('help-modal').classList.remove('hidden');
+  window.dispatchEvent(new CustomEvent('kidapp:help', { detail: { topic, data } }));
+  const titleEl = $('help-modal-title');
+  const bodyEl = $('help-modal-body');
+  const modalEl = $('help-modal');
+  if (titleEl && bodyEl && modalEl) {
+    titleEl.textContent = data.title;
+    bodyEl.innerHTML = data.body;
+    modalEl.classList.remove('hidden');
+  }
 }
 
 function closeHelpModal() {
-  $('help-modal').classList.add('hidden');
+  window.dispatchEvent(new CustomEvent('kidapp:help-close'));
+  const modalEl = $('help-modal');
+  if (modalEl) modalEl.classList.add('hidden');
 }
 
   app.$ = $;
+  app.HELP_TOPICS = HELP_TOPICS;
   app.launchConfetti = launchConfetti;
   app.spawnFloatingPop = spawnFloatingPop;
   app.openHelpModal = openHelpModal;

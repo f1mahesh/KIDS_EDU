@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+:root {
+  --lg-font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Roboto", sans-serif;
+
+  /* Light Glass */
+  --lg-bg-canvas: #eef2f8;
+  --lg-surface: rgba(255, 255, 255, 0.72);
+  --lg-surface-elevated: rgba(255, 255, 255, 0.86);
+  --lg-border: rgba(255, 255, 255, 0.55);
+  --lg-inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  --lg-shadow: 0 12px 36px -12px rgba(15, 23, 42, 0.14);
+  --lg-text-primary: #0f172a;
+  --lg-text-secondary: #475569;
+  --lg-theme-color: #eef2f8;
+}
+
+.dark {
+  /* Dark Glass */
+  --lg-bg-canvas: #070913;
+  --lg-surface: rgba(28, 28, 32, 0.72);
+  --lg-surface-elevated: rgba(38, 38, 44, 0.84);
+  --lg-border: rgba(255, 255, 255, 0.14);
+  --lg-inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --lg-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+  --lg-text-primary: #f8fafc;
+  --lg-text-secondary: #94a3b8;
+  --lg-theme-color: #070913;
+}
+
+html {
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  font-family: var(--lg-font-sans);
+  background: var(--lg-bg-canvas) !important;
+  color: var(--lg-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body,
+#root {
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  font-family: var(--lg-font-sans);
+  background: transparent !important;
+  color: var(--lg-text-primary);
+}
+
+.liquid-glass {
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-border);
+  box-shadow: var(--lg-inner-highlight), var(--lg-shadow);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+}
+
+.liquid-glass-elevated {
+  background: var(--lg-surface-elevated);
+  border: 1px solid var(--lg-border);
+  box-shadow: var(--lg-inner-highlight), var(--lg-shadow);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes orb-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4vw, 3vh, 0) scale(1.08);
+  }
+}
+
+@keyframes orb-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-4vw, -3vh, 0) scale(0.94);
+  }
+}
+
+.orb-drift-a {
+  animation: orb-drift-a 18s ease-in-out infinite;
+}
+
+.orb-drift-b {
+  animation: orb-drift-b 22s ease-in-out infinite;
+}
+
+/* Harmonize legacy game panels with Light & Dark Liquid Glass */
+#legacy-views-host .panel-card {
+  background: var(--lg-surface-elevated);
+  border: 1px solid var(--lg-border);
+  box-shadow: var(--lg-inner-highlight), var(--lg-shadow);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  color: var(--lg-text-primary);
+}
+
+.dark #legacy-views-host .panel-card h1,
+.dark #legacy-views-host .panel-card h2,
+.dark #legacy-views-host .panel-card h3,
+.dark #legacy-views-host .question-card,
+.dark #legacy-views-host .stage-3d-card {
+  color: var(--lg-text-primary);
+}
+
+.dark #legacy-views-host .question-card,
+.dark #legacy-views-host .stage-3d-card,
+.dark #legacy-views-host .magic-portal,
+.dark #legacy-views-host .wb-stage,
+.dark #legacy-views-host .wb-board-wrap,
+.dark #legacy-views-host .puzzle-how-box,
+.dark #legacy-views-host .puzzle-preview-card {
+  background: rgba(24, 24, 30, 0.78);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+}
+
+.dark #legacy-views-host .muted,
+.dark #legacy-views-host .hub-subtitle,
+.dark #legacy-views-host .puzzle-how-label,
+.dark #legacy-views-host .wb-clue-text {
+  color: #cbd5e1;
+}
+
+.dark #legacy-views-host .back-btn,
+.dark #legacy-views-host .magic-pill:not(.active),
+.dark #legacy-views-host .age-tab:not(.active),
+.dark #legacy-views-host .puzzle-choice-pill:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+}
+
+.dark #legacy-views-host .puzzle-step-heading {
+  color: #e2e8f0;
+}
+
+.dark #legacy-views-host .lesson-card,
+.dark #legacy-views-host .story-panel {
+  background: rgba(24, 24, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+}

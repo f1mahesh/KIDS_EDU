@@ -219,9 +219,36 @@ class ProfileStore {
   resetCurrent() {
     const keepName = this.profile.name;
     const keepAvatar = this.profile.avatar;
-    this.profile = createEmptyProfile(keepName, keepAvatar);
+    const keepAgeBand = this.profile.ageBand || '4-6';
+    this.profile = createEmptyProfile(keepName, keepAvatar, keepAgeBand);
     this.currentStreak = 0;
     this.save(this.profile);
+    return this.profile;
+  }
+
+  replaceStore(nextStore) {
+    if (!nextStore || typeof nextStore !== 'object' || !nextStore.profiles) {
+      throw new Error('Invalid PlaySpark backup format');
+    }
+    const sanitizedProfiles = {};
+    for (const [id, raw] of Object.entries(nextStore.profiles)) {
+      if (raw && typeof raw === 'object') {
+        sanitizedProfiles[id] = ensureProfileShape(raw);
+      }
+    }
+    const keys = Object.keys(sanitizedProfiles);
+    if (keys.length === 0) {
+      sanitizedProfiles.default = createEmptyProfile();
+    }
+    const activeId =
+      nextStore.activeId && sanitizedProfiles[nextStore.activeId]
+        ? nextStore.activeId
+        : Object.keys(sanitizedProfiles)[0];
+
+    this.store = { activeId, profiles: sanitizedProfiles };
+    this.profile = ensureProfileShape(this.store.profiles[activeId]);
+    this.currentStreak = 0;
+    localStorage.setItem(PROFILES_STORE_KEY, JSON.stringify(this.store));
     return this.profile;
   }
 
